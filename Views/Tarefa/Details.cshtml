@@ -1,0 +1,144 @@
+@model WebApp.Models.Tarefa
+
+@{
+    ViewData["Title"] = "Detalhes da Tarefa";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="bi bi-card-text"></i> Detalhes da Tarefa</h4>
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-action="Kanban" class="btn btn-secondary btn-sm">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5 class="card-title">@Model.Titulo</h5>
+                        @if (!string.IsNullOrEmpty(Model.Descricao))
+                        {
+                            <p class="card-text">@Model.Descricao</p>
+                        }
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-end">
+                            <span class="badge bg-@(Model.Status switch {
+                                WebApp.Models.StatusTarefa.ToDo => "primary",
+                                WebApp.Models.StatusTarefa.InProgress => "warning",
+                                WebApp.Models.StatusTarefa.InReview => "info",
+                                WebApp.Models.StatusTarefa.Done => "success",
+                                _ => "secondary"
+                            }) fs-6">@Model.Status</span>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-info-circle"></i> Informações Básicas</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Prioridade:</strong></td>
+                                <td>
+                                    <span class="badge bg-@(Model.Prioridade switch {
+                                        WebApp.Models.PrioridadeTarefa.Baixa => "success",
+                                        WebApp.Models.PrioridadeTarefa.Media => "warning",
+                                        WebApp.Models.PrioridadeTarefa.Alta => "danger",
+                                        WebApp.Models.PrioridadeTarefa.Critica => "dark",
+                                        _ => "secondary"
+                                    })">@Model.Prioridade</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Responsável:</strong></td>
+                                <td>@(Model.Responsavel ?? "Não definido")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data de Vencimento:</strong></td>
+                                <td>
+                                    @if (Model.DataVencimento.HasValue)
+                                    {
+                                        var isAtrasada = Model.DataVencimento.Value < DateTime.Now && Model.Status != WebApp.Models.StatusTarefa.Done;
+                                        <span class="@(isAtrasada ? "text-danger" : "")">
+                                            @Model.DataVencimento.Value.ToString("dd/MM/yyyy")
+                                            @if (isAtrasada)
+                                            {
+                                                <i class="bi bi-exclamation-triangle text-danger"></i>
+                                            }
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Não definida</span>
+                                    }
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-clock"></i> Tempo e Progresso</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Estimativa:</strong></td>
+                                <td>@(Model.EstimativaHoras?.ToString("0.0") ?? "Não definida") horas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tempo Gasto:</strong></td>
+                                <td>@(Model.TempoGasto?.ToString("0.0") ?? "0") horas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Progresso:</strong></td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar" role="progressbar" style="width: @Model.Progresso%" aria-valuenow="@Model.Progresso" aria-valuemin="0" aria-valuemax="100">
+                                            @Model.Progresso%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Tags))
+                {
+                    <hr>
+                    <h6><i class="bi bi-tags"></i> Tags</h6>
+                    <div>
+                        @foreach (var tag in Model.Tags.Split(','))
+                        {
+                            <span class="badge bg-light text-dark me-1">@tag.Trim()</span>
+                        }
+                    </div>
+                }
+
+                <hr>
+                <h6><i class="bi bi-calendar"></i> Datas</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-muted">
+                            <strong>Criada em:</strong> @Model.DataCriacao.ToString("dd/MM/yyyy HH:mm")
+                        </small>
+                    </div>
+                    @if (Model.DataAtualizacao.HasValue)
+                    {
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <strong>Atualizada em:</strong> @Model.DataAtualizacao.Value.ToString("dd/MM/yyyy HH:mm")
+                            </small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

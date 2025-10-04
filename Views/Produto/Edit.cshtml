@@ -1,0 +1,216 @@
+@model WebApp.Models.Produto
+
+@{
+    ViewData["Title"] = "Editar Produto";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-pencil"></i> Editar Produto</h2>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-form"></i> Dados do Produto</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <input asp-for="Id" type="hidden" />
+                        <input asp-for="DataCriacao" type="hidden" />
+                        
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label asp-for="Nome" class="form-label"></label>
+                                    <input asp-for="Nome" class="form-control" placeholder="Digite o nome do produto" />
+                                    <span asp-validation-for="Nome" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Codigo" class="form-label"></label>
+                                    <input asp-for="Codigo" class="form-control" placeholder="Código do produto" />
+                                    <span asp-validation-for="Codigo" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Descricao" class="form-label"></label>
+                            <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Descrição do produto"></textarea>
+                            <span asp-validation-for="Descricao" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Preco" class="form-label"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input asp-for="Preco" class="form-control" type="number" step="0.01" min="0.01" placeholder="0,00" />
+                                    </div>
+                                    <span asp-validation-for="Preco" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="PrecoCusto" class="form-label"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input asp-for="PrecoCusto" class="form-control" type="number" step="0.01" min="0" placeholder="0,00" />
+                                    </div>
+                                    <span asp-validation-for="PrecoCusto" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="CategoriaId" class="form-label"></label>
+                                    <select asp-for="CategoriaId" class="form-select" asp-items="ViewBag.CategoriaId">
+                                        <option value="">Selecione uma categoria</option>
+                                    </select>
+                                    <span asp-validation-for="CategoriaId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="QuantidadeEstoque" class="form-label"></label>
+                                    <input asp-for="QuantidadeEstoque" class="form-control" type="number" min="0" placeholder="0" />
+                                    <span asp-validation-for="QuantidadeEstoque" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="QuantidadeMinima" class="form-label"></label>
+                                    <input asp-for="QuantidadeMinima" class="form-control" type="number" min="0" placeholder="0" />
+                                    <span asp-validation-for="QuantidadeMinima" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Marca" class="form-label"></label>
+                                    <input asp-for="Marca" class="form-control" placeholder="Marca do produto" />
+                                    <span asp-validation-for="Marca" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label asp-for="Modelo" class="form-label"></label>
+                                    <input asp-for="Modelo" class="form-control" placeholder="Modelo" />
+                                    <span asp-validation-for="Modelo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label asp-for="Cor" class="form-label"></label>
+                                    <input asp-for="Cor" class="form-control" placeholder="Cor" />
+                                    <span asp-validation-for="Cor" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label asp-for="Tamanho" class="form-label"></label>
+                                    <input asp-for="Tamanho" class="form-control" placeholder="Tamanho" />
+                                    <span asp-validation-for="Tamanho" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label asp-for="Peso" class="form-label"></label>
+                                    <input asp-for="Peso" class="form-control" placeholder="Peso" />
+                                    <span asp-validation-for="Peso" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Dimensoes" class="form-label"></label>
+                            <input asp-for="Dimensoes" class="form-control" placeholder="Ex: 20x30x10 cm" />
+                            <span asp-validation-for="Dimensoes" class="text-danger"></span>
+                        </div>
+
+                        <!-- Imagens Existentes -->
+                        @if (Model.Imagens.Any())
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Imagens Atuais</label>
+                                <div class="row">
+                                    @foreach (var imagem in Model.Imagens.OrderBy(i => i.Ordem))
+                                    {
+                                        <div class="col-md-3 mb-3">
+                                            <div class="card">
+                                                <img src="@imagem.Caminho" class="card-img-top" alt="@imagem.Titulo" style="height: 150px; object-fit: cover;">
+                                                <div class="card-body p-2">
+                                                    <small class="text-muted">@imagem.Titulo</small>
+                                                    @if (imagem.Principal)
+                                                    {
+                                                        <span class="badge bg-primary">Principal</span>
+                                                    }
+                                                </div>
+                                                <div class="card-footer p-2">
+                                                    <form asp-action="DeleteImage" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@imagem.Id" />
+                                                        <input type="hidden" name="produtoId" value="@Model.Id" />
+                                                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir esta imagem?')">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label class="form-label">Adicionar Novas Imagens</label>
+                            <input type="file" name="imagens" class="form-control" multiple accept="image/*" />
+                            <small class="form-text text-muted">Selecione uma ou mais imagens para adicionar (JPG, PNG, GIF)</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input asp-for="Ativo" class="form-check-input" type="checkbox" />
+                                    <label asp-for="Ativo" class="form-check-label"></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input asp-for="Destaque" class="form-check-input" type="checkbox" />
+                                    <label asp-for="Destaque" class="form-check-label"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

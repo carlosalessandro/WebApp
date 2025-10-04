@@ -1,0 +1,108 @@
+@model List<int>
+
+@{
+    ViewData["Title"] = "Gerenciar Permissões";
+    var usuario = ViewBag.Usuario as WebApp.Models.User;
+    var permissoesPorCategoria = ViewBag.PermissoesPorCategoria as IEnumerable<IGrouping<WebApp.Models.Categoria, WebApp.Models.Permissao>>;
+    var permissoesConcedidas = ViewBag.PermissoesConcedidas as List<int>;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-person-gear"></i> Gerenciar Permissões - @(usuario?.Name ?? "Usuário")</h4>
+                <p class="mb-0 text-muted">Email: @(usuario?.Email ?? "")</p>
+            </div>
+            <div class="card-body">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <form asp-action="Manage" method="post">
+                    <input type="hidden" name="id" value="@(usuario?.Id ?? 0)" />
+                    
+                    @foreach (var categoria in permissoesPorCategoria ?? Enumerable.Empty<IGrouping<WebApp.Models.Categoria, WebApp.Models.Permissao>>())
+                    {
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-folder"></i> @categoria.Key.Nome
+                                </h5>
+                                <small>@categoria.Key.Descricao</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    @foreach (var permissao in categoria.OrderBy(p => p.Ordem))
+                                    {
+                                        <div class="col-md-6 col-lg-4 mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" 
+                                                       type="checkbox" 
+                                                       name="permissaoIds" 
+                                                       value="@permissao.Id" 
+                                                       id="permissao_@permissao.Id"
+                                                       @(permissoesConcedidas?.Contains(permissao.Id) == true ? "checked" : "") />
+                                                <label class="form-check-label" for="permissao_@permissao.Id">
+                                                    <strong>@permissao.Nome</strong>
+                                                    @if (!string.IsNullOrEmpty(permissao.Descricao))
+                                                    {
+                                                        <br><small class="text-muted">@permissao.Descricao</small>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(permissao.Codigo))
+                                                    {
+                                                        <br><span class="badge bg-secondary">@permissao.Codigo</span>
+                                                    }
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-controller="User" asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Salvar Permissões
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Selecionar/deselecionar todas as permissões de uma categoria
+    document.addEventListener('DOMContentLoaded', function() {
+        const categoriaHeaders = document.querySelectorAll('.card-header');
+        categoriaHeaders.forEach(header => {
+            header.style.cursor = 'pointer';
+            header.addEventListener('click', function() {
+                const cardBody = this.nextElementSibling;
+                const checkboxes = cardBody.querySelectorAll('input[type="checkbox"]');
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                
+                checkboxes.forEach(cb => {
+                    cb.checked = !allChecked;
+                });
+            });
+        });
+    });
+</script>

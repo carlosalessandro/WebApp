@@ -1,0 +1,144 @@
+@model WebApp.Models.MenuItem
+
+@{
+    ViewData["Title"] = "Excluir Item do Menu";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-trash"></i> Excluir Item do Menu</h2>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+
+            <div class="alert alert-warning" role="alert">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Atenção!</strong> Esta ação não pode ser desfeita. O item do menu será permanentemente excluído.
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Confirmação de Exclusão</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Título:</label>
+                                <div class="p-2 bg-light rounded">
+                                    @if (!string.IsNullOrEmpty(Model.Icone))
+                                    {
+                                        <i class="@Model.Icone"></i>
+                                    }
+                                    @Html.DisplayFor(model => model.Titulo)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Status:</label>
+                                <div class="p-2 bg-light rounded">
+                                    @if (Model.Ativo)
+                                    {
+                                        <span class="badge bg-success">Ativo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inativo</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Controller:</label>
+                                <div class="p-2 bg-light rounded">
+                                    @Html.DisplayFor(model => model.Controller)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Action:</label>
+                                <div class="p-2 bg-light rounded">
+                                    @Html.DisplayFor(model => model.Action)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ordem:</label>
+                                <div class="p-2 bg-light rounded">
+                                    @Html.DisplayFor(model => model.Ordem)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Data de Criação:</label>
+                                <div class="p-2 bg-light rounded">
+                                    @Html.DisplayFor(model => model.DataCriacao)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.SubMenus.Any())
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Este item possui submenus!</strong> Os seguintes submenus também serão excluídos:
+                            <ul class="mb-0 mt-2">
+                                @foreach (var submenu in Model.SubMenus.OrderBy(s => s.Ordem))
+                                {
+                                    <li>
+                                        @if (!string.IsNullOrEmpty(submenu.Icone))
+                                        {
+                                            <i class="@submenu.Icone"></i>
+                                        }
+                                        @submenu.Titulo
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Descricao))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Descrição:</label>
+                            <div class="p-2 bg-light rounded">
+                                @Html.DisplayFor(model => model.Descricao)
+                            </div>
+                        </div>
+                    }
+
+                    <form asp-action="Delete" method="post" class="mt-4">
+                        <input asp-for="Id" type="hidden" />
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Confirmar Exclusão
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

@@ -1,0 +1,153 @@
+@model IEnumerable<WebApp.Models.Tarefa>
+
+@{
+    ViewData["Title"] = "Lista de Tarefas";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-list-task"></i> Lista de Tarefas</h2>
+            <div>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nova Tarefa
+                </a>
+                <a asp-action="Kanban" class="btn btn-outline-primary">
+                    <i class="bi bi-kanban"></i> Kanban
+                </a>
+            </div>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="card">
+            <div class="card-body">
+                @if (Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Status</th>
+                                    <th>Prioridade</th>
+                                    <th>Responsável</th>
+                                    <th>Vencimento</th>
+                                    <th>Progresso</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var tarefa in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2" style="width: 4px; height: 20px; background-color: @tarefa.Cor; border-radius: 2px;"></div>
+                                                <div>
+                                                    <strong>@tarefa.Titulo</strong>
+                                                    @if (!string.IsNullOrEmpty(tarefa.Descricao))
+                                                    {
+                                                        <br><small class="text-muted">@(tarefa.Descricao.Length > 50 ? tarefa.Descricao.Substring(0, 50) + "..." : tarefa.Descricao)</small>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-@(tarefa.Status switch {
+                                                WebApp.Models.StatusTarefa.ToDo => "primary",
+                                                WebApp.Models.StatusTarefa.InProgress => "warning",
+                                                WebApp.Models.StatusTarefa.InReview => "info",
+                                                WebApp.Models.StatusTarefa.Done => "success",
+                                                _ => "secondary"
+                                            })">@tarefa.Status</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-@(tarefa.Prioridade switch {
+                                                WebApp.Models.PrioridadeTarefa.Baixa => "success",
+                                                WebApp.Models.PrioridadeTarefa.Media => "warning",
+                                                WebApp.Models.PrioridadeTarefa.Alta => "danger",
+                                                WebApp.Models.PrioridadeTarefa.Critica => "dark",
+                                                _ => "secondary"
+                                            })">@tarefa.Prioridade</span>
+                                        </td>
+                                        <td>@(tarefa.Responsavel ?? "Não definido")</td>
+                                        <td>
+                                            @if (tarefa.DataVencimento.HasValue)
+                                            {
+                                                var isAtrasada = tarefa.DataVencimento.Value < DateTime.Now && tarefa.Status != WebApp.Models.StatusTarefa.Done;
+                                                <span class="@(isAtrasada ? "text-danger" : "")">
+                                                    @tarefa.DataVencimento.Value.ToString("dd/MM/yyyy")
+                                                    @if (isAtrasada)
+                                                    {
+                                                        <i class="bi bi-exclamation-triangle text-danger"></i>
+                                                    }
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Não definida</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="progress" style="width: 80px; height: 20px;">
+                                                <div class="progress-bar" role="progressbar" style="width: @tarefa.Progresso%" aria-valuenow="@tarefa.Progresso" aria-valuemin="0" aria-valuemax="100">
+                                                    @tarefa.Progresso%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="Details" asp-route-id="@tarefa.Id" class="btn btn-sm btn-outline-info" title="Ver detalhes">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a asp-action="Edit" asp-route-id="@tarefa.Id" class="btn btn-sm btn-outline-primary" title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@tarefa.Id" class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-3">
+                        <p class="text-muted">
+                            <i class="bi bi-info-circle"></i> 
+                            Total de tarefas: <strong>@Model.Count()</strong>
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="text-muted mt-3">Nenhuma tarefa encontrada</h4>
+                        <p class="text-muted">Comece criando sua primeira tarefa!</p>
+                        <a asp-action="Create" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Criar Primeira Tarefa
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

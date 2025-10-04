@@ -1,0 +1,85 @@
+@model WebApp.Models.Cliente
+
+@{
+    ViewData["Title"] = "Detalhes do Cliente";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-person-lines-fill"></i> Detalhes do Cliente</h2>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Informações do Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">@Html.DisplayNameFor(model => model.Nome)</label>
+                            <p class="form-control-plaintext">@Html.DisplayFor(model => model.Nome)</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">@Html.DisplayNameFor(model => model.CPF)</label>
+                            <p class="form-control-plaintext">@Html.DisplayFor(model => model.CPF)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">@Html.DisplayNameFor(model => model.Email)</label>
+                            <p class="form-control-plaintext">@Html.DisplayFor(model => model.Email)</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">@Html.DisplayNameFor(model => model.Telefone)</label>
+                            <p class="form-control-plaintext">@Html.DisplayFor(model => model.Telefone)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label fw-bold">@Html.DisplayNameFor(model => model.Endereco)</label>
+                            <p class="form-control-plaintext">@Html.DisplayFor(model => model.Endereco)</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">@Html.DisplayNameFor(model => model.Bairro)</label>
+                            <p class="form-control-plaintext">@Html.DisplayFor(model => model.Bairro)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">@Html.DisplayNameFor(model => model.Cidade)</label>
+                            <p class="form-control-plaintext">@Html.DisplayFor(model => model.Cidade)</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">@Html.DisplayNameFor(model => model.EstadoCivil)</label>
+                            <p class="form-control-plaintext">@Html.DisplayFor(model => model.EstadoCivil)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">@Html.DisplayNameFor(model => model.DataCadastro)</label>
+                            <p class="form-control-plaintext">@Html.DisplayFor(model => model.DataCadastro)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a asp-action="Delete" asp-route-id="@Model?.Id" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Excluir
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

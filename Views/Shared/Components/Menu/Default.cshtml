@@ -1,0 +1,93 @@
+@model IEnumerable<WebApp.Models.MenuItem>
+
+<ul class="nav flex-column">
+    @foreach (var item in Model)
+    {
+        <li class="nav-item">
+            @if (item.EMenuPai && item.SubMenus.Any())
+            {
+                <!-- Menu pai com submenu -->
+                <div class="nav-link dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#submenu-@item.Id" aria-expanded="false">
+                    @if (!string.IsNullOrEmpty(item.Icone))
+                    {
+                        <i class="@item.Icone"></i>
+                    }
+                    @item.Titulo
+                </div>
+                <div class="collapse" id="submenu-@item.Id">
+                    <ul class="nav flex-column ms-3">
+                        @foreach (var submenu in item.SubMenus)
+                        {
+                            <li class="nav-item">
+                                @if (!string.IsNullOrEmpty(submenu.Url))
+                                {
+                                    <a class="nav-link" href="@submenu.Url" target="@(submenu.AbrirNovaAba ? "_blank" : null)">
+                                        @if (!string.IsNullOrEmpty(submenu.Icone))
+                                        {
+                                            <i class="@submenu.Icone"></i>
+                                        }
+                                        @submenu.Titulo
+                                    </a>
+                                }
+                                else if (!string.IsNullOrEmpty(submenu.Controller) && !string.IsNullOrEmpty(submenu.Action))
+                                {
+                                    <a class="nav-link" asp-controller="@submenu.Controller" asp-action="@submenu.Action" asp-area="@submenu.Area" target="@(submenu.AbrirNovaAba ? "_blank" : null)">
+                                        @if (!string.IsNullOrEmpty(submenu.Icone))
+                                        {
+                                            <i class="@submenu.Icone"></i>
+                                        }
+                                        @submenu.Titulo
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="nav-link text-muted">
+                                        @if (!string.IsNullOrEmpty(submenu.Icone))
+                                        {
+                                            <i class="@submenu.Icone"></i>
+                                        }
+                                        @submenu.Titulo
+                                    </span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <!-- Menu item normal -->
+                @if (!string.IsNullOrEmpty(item.Url))
+                {
+                    <a class="nav-link" href="@item.Url" target="@(item.AbrirNovaAba ? "_blank" : null)">
+                        @if (!string.IsNullOrEmpty(item.Icone))
+                        {
+                            <i class="@item.Icone"></i>
+                        }
+                        @item.Titulo
+                    </a>
+                }
+                else if (!string.IsNullOrEmpty(item.Controller) && !string.IsNullOrEmpty(item.Action))
+                {
+                    <a class="nav-link" asp-controller="@item.Controller" asp-action="@item.Action" asp-area="@item.Area" target="@(item.AbrirNovaAba ? "_blank" : null)">
+                        @if (!string.IsNullOrEmpty(item.Icone))
+                        {
+                            <i class="@item.Icone"></i>
+                        }
+                        @item.Titulo
+                    </a>
+                }
+                else
+                {
+                    <span class="nav-link text-muted">
+                        @if (!string.IsNullOrEmpty(item.Icone))
+                        {
+                            <i class="@item.Icone"></i>
+                        }
+                        @item.Titulo
+                    </span>
+                }
+            }
+        </li>
+    }
+</ul>

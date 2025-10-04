@@ -1,0 +1,370 @@
+@{
+    ViewData["Title"] = "Dashboard - Clientes";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-people"></i> Dashboard de Clientes</h2>
+            <div>
+                <button onclick="refreshClientes()" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-clockwise"></i> Atualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Cards de Estatísticas -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Total de Clientes
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalClientes">-</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-people-fill fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Cadastros Este Mês
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="clientesEsteMes">-</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-person-plus-fill fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Média Mensal
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="mediaMensal">-</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-graph-up fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Crescimento
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="crescimento">-%</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-trending-up fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="row">
+            <!-- Gráfico de Clientes por Mês -->
+            <div class="col-xl-8 col-lg-7">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Evolução de Clientes por Mês</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <canvas id="clientesPorMesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Distribuição por Estado Civil -->
+            <div class="col-xl-4 col-lg-5">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Distribuição por Estado Civil</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie pt-4 pb-2">
+                            <canvas id="estadoCivilChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Clientes Recentes -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Clientes Cadastrados Recentemente</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="clientesRecentesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Telefone</th>
+                                        <th>Cidade</th>
+                                        <th>Data Cadastro</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dados carregados via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts do Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let charts = {};
+
+    // Carregar dados do dashboard de clientes
+    async function loadClientesData() {
+        try {
+            // Carregar estatísticas gerais
+            const statsResponse = await fetch('/Dashboard/GetEstatisticasGerais');
+            const stats = await statsResponse.json();
+            
+            document.getElementById('totalClientes').textContent = stats.totalClientes || 0;
+            
+            // Calcular clientes deste mês
+            const clientesPorMesResponse = await fetch('/Dashboard/GetClientesPorMes');
+            const clientesPorMes = await clientesPorMesResponse.json();
+            
+            const mesAtual = new Date().toISOString().substring(0, 7);
+            const clientesEsteMes = clientesPorMes.find(item => item.mes === mesAtual)?.total || 0;
+            document.getElementById('clientesEsteMes').textContent = clientesEsteMes;
+            
+            // Calcular média mensal
+            const totalMeses = clientesPorMes.length;
+            const totalClientes = clientesPorMes.reduce((sum, item) => sum + item.total, 0);
+            const mediaMensal = totalMeses > 0 ? Math.round(totalClientes / totalMeses) : 0;
+            document.getElementById('mediaMensal').textContent = mediaMensal;
+            
+            // Calcular crescimento (comparar com mês anterior)
+            const mesAnterior = new Date();
+            mesAnterior.setMonth(mesAnterior.getMonth() - 1);
+            const mesAnteriorStr = mesAnterior.toISOString().substring(0, 7);
+            const clientesMesAnterior = clientesPorMes.find(item => item.mes === mesAnteriorStr)?.total || 0;
+            const crescimento = clientesMesAnterior > 0 ? Math.round(((clientesEsteMes - clientesMesAnterior) / clientesMesAnterior) * 100) : 0;
+            document.getElementById('crescimento').textContent = crescimento + '%';
+
+            // Carregar gráficos
+            await loadClientesPorMesChart();
+            await loadEstadoCivilChart();
+            await loadClientesRecentes();
+
+        } catch (error) {
+            console.error('Erro ao carregar dados de clientes:', error);
+        }
+    }
+
+    // Gráfico de Clientes por Mês
+    async function loadClientesPorMesChart() {
+        try {
+            const response = await fetch('/Dashboard/GetClientesPorMes');
+            const data = await response.json();
+            
+            const ctx = document.getElementById('clientesPorMesChart').getContext('2d');
+            
+            if (charts.clientesPorMes) {
+                charts.clientesPorMes.destroy();
+            }
+            
+            charts.clientesPorMes = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => item.mes),
+                    datasets: [{
+                        label: 'Clientes Cadastrados',
+                        data: data.map(item => item.total),
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#4e73df',
+                        pointBorderColor: '#4e73df',
+                        pointRadius: 5,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao carregar gráfico de clientes por mês:', error);
+        }
+    }
+
+    // Gráfico de Estado Civil (simulado - você pode implementar endpoint específico)
+    async function loadEstadoCivilChart() {
+        try {
+            // Simulando dados - implemente endpoint específico se necessário
+            const data = [
+                { estadoCivil: 'Solteiro', total: 45 },
+                { estadoCivil: 'Casado', total: 35 },
+                { estadoCivil: 'Divorciado', total: 15 },
+                { estadoCivil: 'Viúvo', total: 5 }
+            ];
+            
+            const ctx = document.getElementById('estadoCivilChart').getContext('2d');
+            
+            if (charts.estadoCivil) {
+                charts.estadoCivil.destroy();
+            }
+            
+            charts.estadoCivil = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(item => item.estadoCivil),
+                    datasets: [{
+                        data: data.map(item => item.total),
+                        backgroundColor: ['#4e73df', '#1cc88a', '#f6c23e', '#e74a3b'],
+                        hoverBackgroundColor: ['#2e59d9', '#17a673', '#dda20a', '#c0392b'],
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao carregar gráfico de estado civil:', error);
+        }
+    }
+
+    // Carregar Clientes Recentes
+    async function loadClientesRecentes() {
+        try {
+            // Simulando dados - implemente endpoint específico
+            const clientesRecentes = [
+                { nome: 'João Silva', email: 'joao@email.com', telefone: '(11) 99999-9999', cidade: 'São Paulo', dataCadastro: '2025-09-28' },
+                { nome: 'Maria Santos', email: 'maria@email.com', telefone: '(11) 88888-8888', cidade: 'Rio de Janeiro', dataCadastro: '2025-09-27' },
+                { nome: 'Pedro Costa', email: 'pedro@email.com', telefone: '(11) 77777-7777', cidade: 'Belo Horizonte', dataCadastro: '2025-09-26' }
+            ];
+            
+            const tbody = document.querySelector('#clientesRecentesTable tbody');
+            tbody.innerHTML = '';
+            
+            clientesRecentes.forEach(cliente => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${cliente.nome}</td>
+                    <td>${cliente.email}</td>
+                    <td>${cliente.telefone}</td>
+                    <td>${cliente.cidade}</td>
+                    <td>${new Date(cliente.dataCadastro).toLocaleDateString('pt-BR')}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Erro ao carregar clientes recentes:', error);
+        }
+    }
+
+    // Função para atualizar dashboard
+    function refreshClientes() {
+        loadClientesData();
+    }
+
+    // Carregar dados quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        loadClientesData();
+    });
+</script>
+
+<style>
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .text-xs {
+        font-size: 0.7rem;
+    }
+    .font-weight-bold {
+        font-weight: 700 !important;
+    }
+    .text-gray-800 {
+        color: #5a5c69 !important;
+    }
+    .text-gray-300 {
+        color: #dddfeb !important;
+    }
+    .chart-area {
+        position: relative;
+        height: 10rem;
+        width: 100%;
+    }
+    .chart-pie {
+        position: relative;
+        height: 15rem;
+        width: 100%;
+    }
+</style>

@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Bem-vindo ao Sistema!</h1>
+    
+    <div class="alert alert-success" role="alert">
+        <h4>Olá, @ViewBag.UserName!</h4>
+        <p>Você está logado com o email: <strong>@ViewBag.UserEmail</strong></p>
+    </div>
+    
+    <div class="mt-5">
+        <h3>Funcionalidades do Sistema:</h3>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">✅ Autenticação com cookies</li>
+            <li class="list-group-item">✅ Validação de formulários</li>
+            <li class="list-group-item">✅ Registro de novos usuários</li>
+            <li class="list-group-item">✅ Login/Logout</li>
+            <li class="list-group-item">✅ Lembrar-me</li>
+            <li class="list-group-item">✅ Interface responsiva</li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,489 @@
+@model IEnumerable<WebApp.Models.Tarefa>
+
+@{
+    ViewData["Title"] = "Kanban Board";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-kanban"></i> Kanban Board</h2>
+            <div>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nova Tarefa
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-list"></i> Lista
+                </a>
+                <button onclick="testEndpoint()" class="btn btn-outline-info btn-sm">
+                    <i class="bi bi-bug"></i> Testar Endpoint
+                </button>
+            </div>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="kanban-board">
+            @Html.AntiForgeryToken()
+            <div class="row">
+                <!-- A Fazer -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-list-ul"></i> A Fazer
+                                <span class="badge bg-light text-dark ms-2">@Model.Count(t => t.Status == WebApp.Models.StatusTarefa.ToDo)</span>
+                            </h5>
+                        </div>
+                        <div class="card-body p-2" data-status="@WebApp.Models.StatusTarefa.ToDo" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            @foreach (var tarefa in Model.Where(t => t.Status == WebApp.Models.StatusTarefa.ToDo).OrderBy(t => t.Ordem))
+                            {
+                                <div class="card mb-2 tarefa-card" draggable="true" ondragstart="drag(event)" data-tarefa-id="@tarefa.Id" style="border-left: 4px solid @tarefa.Cor">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title mb-0">@tarefa.Titulo</h6>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" asp-action="Details" asp-route-id="@tarefa.Id"><i class="bi bi-eye"></i> Ver</a></li>
+                                                    <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@tarefa.Id"><i class="bi bi-pencil"></i> Editar</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@tarefa.Id"><i class="bi bi-trash"></i> Excluir</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        
+                                        @if (!string.IsNullOrEmpty(tarefa.Descricao))
+                                        {
+                                            <p class="card-text small text-muted">@(tarefa.Descricao.Length > 100 ? tarefa.Descricao.Substring(0, 100) + "..." : tarefa.Descricao)</p>
+                                        }
+                                        
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                @if (!string.IsNullOrEmpty(tarefa.Responsavel))
+                                                {
+                                                    <small class="text-muted"><i class="bi bi-person"></i> @tarefa.Responsavel</small>
+                                                }
+                                            </div>
+                                            <div>
+                                                @if (tarefa.DataVencimento.HasValue)
+                                                {
+                                                    var isAtrasada = tarefa.DataVencimento.Value < DateTime.Now && tarefa.Status != WebApp.Models.StatusTarefa.Done;
+                                                    <small class="@(isAtrasada ? "text-danger" : "text-muted")">
+                                                        <i class="bi bi-calendar"></i> @tarefa.DataVencimento.Value.ToString("dd/MM")
+                                                    </small>
+                                                }
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-2">
+                                            <span class="badge bg-@(tarefa.Prioridade switch {
+                                                WebApp.Models.PrioridadeTarefa.Baixa => "success",
+                                                WebApp.Models.PrioridadeTarefa.Media => "warning", 
+                                                WebApp.Models.PrioridadeTarefa.Alta => "danger",
+                                                WebApp.Models.PrioridadeTarefa.Critica => "dark",
+                                                _ => "secondary"
+                                            })">@tarefa.Prioridade</span>
+                                            
+                                            @if (!string.IsNullOrEmpty(tarefa.Tags))
+                                            {
+                                                @foreach (var tag in tarefa.Tags.Split(',').Take(2))
+                                                {
+                                                    <span class="badge bg-light text-dark">@tag.Trim()</span>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Em Progresso -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card border-warning">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="bi bi-play-circle"></i> Em Progresso
+                                <span class="badge bg-light text-dark ms-2">@Model.Count(t => t.Status == WebApp.Models.StatusTarefa.InProgress)</span>
+                            </h5>
+                        </div>
+                        <div class="card-body p-2" data-status="@WebApp.Models.StatusTarefa.InProgress" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            @foreach (var tarefa in Model.Where(t => t.Status == WebApp.Models.StatusTarefa.InProgress).OrderBy(t => t.Ordem))
+                            {
+                                <div class="card mb-2 tarefa-card" draggable="true" ondragstart="drag(event)" data-tarefa-id="@tarefa.Id" style="border-left: 4px solid @tarefa.Cor">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title mb-0">@tarefa.Titulo</h6>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" asp-action="Details" asp-route-id="@tarefa.Id"><i class="bi bi-eye"></i> Ver</a></li>
+                                                    <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@tarefa.Id"><i class="bi bi-pencil"></i> Editar</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@tarefa.Id"><i class="bi bi-trash"></i> Excluir</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        
+                                        @if (!string.IsNullOrEmpty(tarefa.Descricao))
+                                        {
+                                            <p class="card-text small text-muted">@(tarefa.Descricao.Length > 100 ? tarefa.Descricao.Substring(0, 100) + "..." : tarefa.Descricao)</p>
+                                        }
+                                        
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                @if (!string.IsNullOrEmpty(tarefa.Responsavel))
+                                                {
+                                                    <small class="text-muted"><i class="bi bi-person"></i> @tarefa.Responsavel</small>
+                                                }
+                                            </div>
+                                            <div>
+                                                @if (tarefa.DataVencimento.HasValue)
+                                                {
+                                                    var isAtrasada = tarefa.DataVencimento.Value < DateTime.Now && tarefa.Status != WebApp.Models.StatusTarefa.Done;
+                                                    <small class="@(isAtrasada ? "text-danger" : "text-muted")">
+                                                        <i class="bi bi-calendar"></i> @tarefa.DataVencimento.Value.ToString("dd/MM")
+                                                    </small>
+                                                }
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-2">
+                                            <span class="badge bg-@(tarefa.Prioridade switch {
+                                                WebApp.Models.PrioridadeTarefa.Baixa => "success",
+                                                WebApp.Models.PrioridadeTarefa.Media => "warning", 
+                                                WebApp.Models.PrioridadeTarefa.Alta => "danger",
+                                                WebApp.Models.PrioridadeTarefa.Critica => "dark",
+                                                _ => "secondary"
+                                            })">@tarefa.Prioridade</span>
+                                            
+                                            @if (!string.IsNullOrEmpty(tarefa.Tags))
+                                            {
+                                                @foreach (var tag in tarefa.Tags.Split(',').Take(2))
+                                                {
+                                                    <span class="badge bg-light text-dark">@tag.Trim()</span>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Em Revisão -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card border-info">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-eye"></i> Em Revisão
+                                <span class="badge bg-light text-dark ms-2">@Model.Count(t => t.Status == WebApp.Models.StatusTarefa.InReview)</span>
+                            </h5>
+                        </div>
+                        <div class="card-body p-2" data-status="@WebApp.Models.StatusTarefa.InReview" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            @foreach (var tarefa in Model.Where(t => t.Status == WebApp.Models.StatusTarefa.InReview).OrderBy(t => t.Ordem))
+                            {
+                                <div class="card mb-2 tarefa-card" draggable="true" ondragstart="drag(event)" data-tarefa-id="@tarefa.Id" style="border-left: 4px solid @tarefa.Cor">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title mb-0">@tarefa.Titulo</h6>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" asp-action="Details" asp-route-id="@tarefa.Id"><i class="bi bi-eye"></i> Ver</a></li>
+                                                    <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@tarefa.Id"><i class="bi bi-pencil"></i> Editar</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@tarefa.Id"><i class="bi bi-trash"></i> Excluir</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        
+                                        @if (!string.IsNullOrEmpty(tarefa.Descricao))
+                                        {
+                                            <p class="card-text small text-muted">@(tarefa.Descricao.Length > 100 ? tarefa.Descricao.Substring(0, 100) + "..." : tarefa.Descricao)</p>
+                                        }
+                                        
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                @if (!string.IsNullOrEmpty(tarefa.Responsavel))
+                                                {
+                                                    <small class="text-muted"><i class="bi bi-person"></i> @tarefa.Responsavel</small>
+                                                }
+                                            </div>
+                                            <div>
+                                                @if (tarefa.DataVencimento.HasValue)
+                                                {
+                                                    var isAtrasada = tarefa.DataVencimento.Value < DateTime.Now && tarefa.Status != WebApp.Models.StatusTarefa.Done;
+                                                    <small class="@(isAtrasada ? "text-danger" : "text-muted")">
+                                                        <i class="bi bi-calendar"></i> @tarefa.DataVencimento.Value.ToString("dd/MM")
+                                                    </small>
+                                                }
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-2">
+                                            <span class="badge bg-@(tarefa.Prioridade switch {
+                                                WebApp.Models.PrioridadeTarefa.Baixa => "success",
+                                                WebApp.Models.PrioridadeTarefa.Media => "warning", 
+                                                WebApp.Models.PrioridadeTarefa.Alta => "danger",
+                                                WebApp.Models.PrioridadeTarefa.Critica => "dark",
+                                                _ => "secondary"
+                                            })">@tarefa.Prioridade</span>
+                                            
+                                            @if (!string.IsNullOrEmpty(tarefa.Tags))
+                                            {
+                                                @foreach (var tag in tarefa.Tags.Split(',').Take(2))
+                                                {
+                                                    <span class="badge bg-light text-dark">@tag.Trim()</span>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Concluída -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card border-success">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-check-circle"></i> Concluída
+                                <span class="badge bg-light text-dark ms-2">@Model.Count(t => t.Status == WebApp.Models.StatusTarefa.Done)</span>
+                            </h5>
+                        </div>
+                        <div class="card-body p-2" data-status="@WebApp.Models.StatusTarefa.Done" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            @foreach (var tarefa in Model.Where(t => t.Status == WebApp.Models.StatusTarefa.Done).OrderBy(t => t.Ordem))
+                            {
+                                <div class="card mb-2 tarefa-card" draggable="true" ondragstart="drag(event)" data-tarefa-id="@tarefa.Id" style="border-left: 4px solid @tarefa.Cor">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title mb-0">@tarefa.Titulo</h6>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" asp-action="Details" asp-route-id="@tarefa.Id"><i class="bi bi-eye"></i> Ver</a></li>
+                                                    <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@tarefa.Id"><i class="bi bi-pencil"></i> Editar</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@tarefa.Id"><i class="bi bi-trash"></i> Excluir</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        
+                                        @if (!string.IsNullOrEmpty(tarefa.Descricao))
+                                        {
+                                            <p class="card-text small text-muted">@(tarefa.Descricao.Length > 100 ? tarefa.Descricao.Substring(0, 100) + "..." : tarefa.Descricao)</p>
+                                        }
+                                        
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                @if (!string.IsNullOrEmpty(tarefa.Responsavel))
+                                                {
+                                                    <small class="text-muted"><i class="bi bi-person"></i> @tarefa.Responsavel</small>
+                                                }
+                                            </div>
+                                            <div>
+                                                @if (tarefa.DataVencimento.HasValue)
+                                                {
+                                                    var isAtrasada = tarefa.DataVencimento.Value < DateTime.Now && tarefa.Status != WebApp.Models.StatusTarefa.Done;
+                                                    <small class="@(isAtrasada ? "text-danger" : "text-muted")">
+                                                        <i class="bi bi-calendar"></i> @tarefa.DataVencimento.Value.ToString("dd/MM")
+                                                    </small>
+                                                }
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-2">
+                                            <span class="badge bg-@(tarefa.Prioridade switch {
+                                                WebApp.Models.PrioridadeTarefa.Baixa => "success",
+                                                WebApp.Models.PrioridadeTarefa.Media => "warning", 
+                                                WebApp.Models.PrioridadeTarefa.Alta => "danger",
+                                                WebApp.Models.PrioridadeTarefa.Critica => "dark",
+                                                _ => "secondary"
+                                            })">@tarefa.Prioridade</span>
+                                            
+                                            @if (!string.IsNullOrEmpty(tarefa.Tags))
+                                            {
+                                                @foreach (var tag in tarefa.Tags.Split(',').Take(2))
+                                                {
+                                                    <span class="badge bg-light text-dark">@tag.Trim()</span>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .kanban-board .card-body {
+        min-height: 400px;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    
+    .tarefa-card {
+        cursor: move;
+        transition: all 0.3s ease;
+    }
+    
+    .tarefa-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .tarefa-card.dragging {
+        opacity: 0.5;
+        transform: rotate(5deg);
+    }
+    
+    .card-body.drag-over {
+        background-color: rgba(0,123,255,0.1);
+        border: 2px dashed #007bff;
+    }
+</style>
+
+<script>
+    let draggedElement = null;
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+        ev.currentTarget.classList.add('drag-over');
+    }
+
+    function drag(ev) {
+        draggedElement = ev.target;
+        ev.target.classList.add('dragging');
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        ev.currentTarget.classList.remove('drag-over');
+        
+        if (draggedElement) {
+            const tarefaId = draggedElement.getAttribute('data-tarefa-id');
+            const novoStatus = parseInt(ev.currentTarget.getAttribute('data-status'));
+            const statusAtual = parseInt(draggedElement.closest('[data-status]').getAttribute('data-status'));
+            
+            console.log('Drop event:', {
+                tarefaId: tarefaId,
+                novoStatus: novoStatus,
+                statusAtual: statusAtual
+            });
+            
+            if (!tarefaId) {
+                console.error('ID da tarefa não encontrado');
+                alert('Erro: ID da tarefa não encontrado');
+                return;
+            }
+            
+            if (isNaN(novoStatus)) {
+                console.error('Status inválido:', ev.currentTarget.getAttribute('data-status'));
+                alert('Erro: Status de destino inválido');
+                return;
+            }
+            
+            if (novoStatus !== statusAtual) {
+                console.log('Atualizando tarefa de status', statusAtual, 'para', novoStatus);
+                updateTarefaStatus(tarefaId, novoStatus);
+            } else {
+                console.log('Tarefa já está no status correto, não fazendo nada');
+            }
+            
+            draggedElement.classList.remove('dragging');
+            draggedElement = null;
+        }
+    }
+
+    function updateTarefaStatus(tarefaId, novoStatus) {
+        console.log('Atualizando tarefa:', tarefaId, 'para status:', novoStatus);
+        
+        fetch('/Tarefa/UpdateStatus', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                tarefaId: parseInt(tarefaId),
+                novoStatus: novoStatus,
+                novaOrdem: 0
+            })
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.success) {
+                // Recarregar a página para mostrar as mudanças
+                location.reload();
+            } else {
+                console.error('Erro do servidor:', data.message);
+                alert('Erro ao atualizar tarefa: ' + (data.message || 'Erro desconhecido'));
+            }
+        })
+        .catch(error => {
+            console.error('Erro na requisição:', error);
+            alert('Erro ao atualizar tarefa: ' + error.message);
+        });
+    }
+
+    // Função para testar o endpoint
+    function testEndpoint() {
+        console.log('Testando endpoint...');
+        fetch('/Tarefa/TestStatus')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Teste do endpoint:', data);
+                alert('Endpoint funcionando: ' + data.message);
+            })
+            .catch(error => {
+                console.error('Erro no teste:', error);
+                alert('Erro no teste: ' + error.message);
+            });
+    }
+
+    // Remover classe drag-over quando sair da área
+    document.addEventListener('dragleave', function(e) {
+        if (e.target.classList.contains('card-body')) {
+            e.target.classList.remove('drag-over');
+        }
+    });
+</script>

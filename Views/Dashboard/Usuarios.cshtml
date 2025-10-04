@@ -1,0 +1,368 @@
+@{
+    ViewData["Title"] = "Dashboard - Usuários";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-people-fill"></i> Dashboard de Usuários</h2>
+            <div>
+                <button onclick="refreshUsuarios()" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-clockwise"></i> Atualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Cards de Estatísticas -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Total de Usuários
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalUsuarios">-</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-people-fill fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Usuários Ativos
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="usuariosAtivos">-</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-person-check-fill fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Novos Este Mês
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="novosUsuarios">-</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-person-plus-fill fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Taxa de Crescimento
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="taxaCrescimento">-%</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-graph-up fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="row">
+            <!-- Gráfico de Usuários por Mês -->
+            <div class="col-xl-8 col-lg-7">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Crescimento de Usuários por Mês</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <canvas id="usuariosPorMesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Distribuição de Permissões -->
+            <div class="col-xl-4 col-lg-5">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Distribuição de Permissões</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie pt-4 pb-2">
+                            <canvas id="permissoesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Usuários Recentes -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Usuários Recentes</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="usuariosRecentesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Data de Criação</th>
+                                        <th>Status</th>
+                                        <th>Permissões</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dados carregados via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts do Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let charts = {};
+
+    // Carregar dados do dashboard de usuários
+    async function loadUsuariosData() {
+        try {
+            // Carregar estatísticas gerais
+            const statsResponse = await fetch('/Dashboard/GetEstatisticasGerais');
+            const stats = await statsResponse.json();
+            
+            document.getElementById('totalUsuarios').textContent = stats.totalUsuarios || 0;
+            
+            // Simular dados de usuários ativos (implemente endpoint específico)
+            document.getElementById('usuariosAtivos').textContent = Math.floor((stats.totalUsuarios || 0) * 0.85);
+            document.getElementById('novosUsuarios').textContent = Math.floor((stats.totalUsuarios || 0) * 0.1);
+            document.getElementById('taxaCrescimento').textContent = '12%';
+
+            // Carregar gráficos
+            await loadUsuariosPorMes();
+            await loadPermissoes();
+            await loadUsuariosRecentes();
+
+        } catch (error) {
+            console.error('Erro ao carregar dados de usuários:', error);
+        }
+    }
+
+    // Gráfico de Usuários por Mês
+    async function loadUsuariosPorMes() {
+        try {
+            // Simular dados de crescimento de usuários
+            const meses = [];
+            const usuarios = [];
+            const dataAtual = new Date();
+            
+            for (let i = 11; i >= 0; i--) {
+                const data = new Date(dataAtual.getFullYear(), dataAtual.getMonth() - i, 1);
+                const mes = `${data.getFullYear()}-${(data.getMonth() + 1).toString().padStart(2, '0')}`;
+                meses.push(mes);
+                
+                // Simular crescimento exponencial
+                const baseUsuarios = 10;
+                const crescimento = Math.floor(baseUsuarios * Math.pow(1.2, 11 - i));
+                usuarios.push(crescimento);
+            }
+            
+            const ctx = document.getElementById('usuariosPorMesChart').getContext('2d');
+            
+            if (charts.usuariosPorMes) {
+                charts.usuariosPorMes.destroy();
+            }
+            
+            charts.usuariosPorMes = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: meses,
+                    datasets: [{
+                        label: 'Total de Usuários',
+                        data: usuarios,
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#4e73df',
+                        pointBorderColor: '#4e73df',
+                        pointRadius: 5,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 5
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao carregar gráfico de usuários por mês:', error);
+        }
+    }
+
+    // Gráfico de Permissões
+    async function loadPermissoes() {
+        try {
+            // Simular dados de distribuição de permissões
+            const data = [
+                { permissao: 'Administrador', total: 2 },
+                { permissao: 'Gerente', total: 5 },
+                { permissao: 'Usuário', total: 15 },
+                { permissao: 'Visualizador', total: 8 }
+            ];
+            
+            const ctx = document.getElementById('permissoesChart').getContext('2d');
+            
+            if (charts.permissoes) {
+                charts.permissoes.destroy();
+            }
+            
+            charts.permissoes = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(item => item.permissao),
+                    datasets: [{
+                        data: data.map(item => item.total),
+                        backgroundColor: ['#4e73df', '#1cc88a', '#f6c23e', '#e74a3b'],
+                        hoverBackgroundColor: ['#2e59d9', '#17a673', '#dda20a', '#c0392b'],
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao carregar gráfico de permissões:', error);
+        }
+    }
+
+    // Carregar Usuários Recentes
+    async function loadUsuariosRecentes() {
+        try {
+            // Simular dados de usuários recentes
+            const usuariosRecentes = [
+                { nome: 'Administrador', email: 'admin@teste.com', dataCriacao: '2025-09-01', status: 'Ativo', permissoes: 'Administrador' },
+                { nome: 'Usuário Teste', email: 'usuario@teste.com', dataCriacao: '2025-09-15', status: 'Ativo', permissoes: 'Usuário' },
+                { nome: 'Gerente Sistema', email: 'gerente@teste.com', dataCriacao: '2025-09-20', status: 'Ativo', permissoes: 'Gerente' }
+            ];
+            
+            const tbody = document.querySelector('#usuariosRecentesTable tbody');
+            tbody.innerHTML = '';
+            
+            usuariosRecentes.forEach(usuario => {
+                const row = document.createElement('tr');
+                const statusClass = usuario.status === 'Ativo' ? 'bg-success' : 'bg-danger';
+                
+                row.innerHTML = `
+                    <td>${usuario.nome}</td>
+                    <td>${usuario.email}</td>
+                    <td>${new Date(usuario.dataCriacao).toLocaleDateString('pt-BR')}</td>
+                    <td><span class="badge ${statusClass}">${usuario.status}</span></td>
+                    <td><span class="badge bg-primary">${usuario.permissoes}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Erro ao carregar usuários recentes:', error);
+        }
+    }
+
+    // Função para atualizar dashboard
+    function refreshUsuarios() {
+        loadUsuariosData();
+    }
+
+    // Carregar dados quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUsuariosData();
+    });
+</script>
+
+<style>
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .text-xs {
+        font-size: 0.7rem;
+    }
+    .font-weight-bold {
+        font-weight: 700 !important;
+    }
+    .text-gray-800 {
+        color: #5a5c69 !important;
+    }
+    .text-gray-300 {
+        color: #dddfeb !important;
+    }
+    .chart-area {
+        position: relative;
+        height: 10rem;
+        width: 100%;
+    }
+    .chart-pie {
+        position: relative;
+        height: 15rem;
+        width: 100%;
+    }
+</style>

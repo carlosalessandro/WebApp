@@ -1,0 +1,80 @@
+@model IEnumerable<WebApp.Models.User>
+
+@{
+    ViewData["Title"] = "Usuários";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-people"></i> Usuários</h2>
+</div>
+
+<div class="row">
+    @foreach (var user in Model)
+    {
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-person"></i> @user.Name
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        <strong>Email:</strong> @user.Email<br>
+                        <strong>Cadastrado em:</strong> @user.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                    </p>
+                    
+                    @if (user.UsuarioPermissoes.Any())
+                    {
+                        <div class="mb-3">
+                            <h6><i class="bi bi-shield-check"></i> Permissões Concedidas:</h6>
+                            <div class="list-group list-group-flush">
+                                @foreach (var permissao in user.UsuarioPermissoes.Where(up => up.Concedida).Take(3))
+                                {
+                                    <div class="list-group-item py-2">
+                                        <small class="text-muted">@permissao.Permissao.Categoria.Nome</small><br>
+                                        <strong>@permissao.Permissao.Nome</strong>
+                                    </div>
+                                }
+                                @if (user.UsuarioPermissoes.Count(up => up.Concedida) > 3)
+                                {
+                                    <div class="list-group-item py-2 text-center">
+                                        <small class="text-muted">+@(user.UsuarioPermissoes.Count(up => up.Concedida) - 3) outras permissões</small>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mb-0">
+                            <small><i class="bi bi-exclamation-triangle"></i> Nenhuma permissão concedida</small>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group w-100" role="group">
+                        <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-eye"></i> Detalhes
+                        </a>
+                        <a asp-action="Permissions" asp-route-id="@user.Id" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-shield-check"></i> Ver Permissões
+                        </a>
+                        <a asp-action="ManagePermissions" asp-route-id="@user.Id" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-gear"></i> Gerenciar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="bi bi-people display-1 text-muted"></i>
+        <h3 class="text-muted">Nenhum usuário encontrado</h3>
+        <p class="text-muted">Os usuários aparecerão aqui quando se registrarem no sistema.</p>
+    </div>
+}

@@ -1,0 +1,473 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+            <div>
+                <button onclick="refreshDashboard()" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-clockwise"></i> Atualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Cards de Estatísticas Gerais -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Total de Clientes
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalClientes">-</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-people-fill fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Tarefas Concluídas
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="tarefasConcluidas">-</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-check-circle-fill fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Tarefas em Progresso
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="tarefasEmProgresso">-</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-play-circle-fill fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Taxa de Conclusão
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="taxaConclusao">-%</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-graph-up fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="row">
+            <!-- Gráfico de Tarefas por Status -->
+            <div class="col-xl-6 col-lg-7">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Tarefas por Status</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie pt-4 pb-2">
+                            <canvas id="tarefasPorStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Tarefas por Prioridade -->
+            <div class="col-xl-6 col-lg-5">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Tarefas por Prioridade</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie pt-4 pb-2">
+                            <canvas id="tarefasPorPrioridadeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Gráfico de Clientes por Mês -->
+            <div class="col-xl-8 col-lg-7">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Clientes Cadastrados por Mês</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <canvas id="clientesPorMesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Produtividade -->
+            <div class="col-xl-4 col-lg-5">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Produtividade por Responsável</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-bar">
+                            <canvas id="produtividadeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Tarefas Atrasadas -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Tarefas Atrasadas</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="tarefasAtrasadasTable">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Responsável</th>
+                                        <th>Data Vencimento</th>
+                                        <th>Dias de Atraso</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dados carregados via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts do Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let charts = {};
+
+    // Carregar dados do dashboard
+    async function loadDashboardData() {
+        try {
+            // Carregar estatísticas gerais
+            const statsResponse = await fetch('/Dashboard/GetEstatisticasGerais');
+            const stats = await statsResponse.json();
+            
+            document.getElementById('totalClientes').textContent = stats.totalClientes || 0;
+            document.getElementById('tarefasConcluidas').textContent = stats.tarefasConcluidas || 0;
+            document.getElementById('tarefasEmProgresso').textContent = stats.tarefasEmProgresso || 0;
+            document.getElementById('taxaConclusao').textContent = (stats.taxaConclusao || 0) + '%';
+
+            // Carregar gráficos
+            await loadTarefasPorStatus();
+            await loadTarefasPorPrioridade();
+            await loadClientesPorMes();
+            await loadProdutividade();
+            await loadTarefasAtrasadas();
+
+        } catch (error) {
+            console.error('Erro ao carregar dados do dashboard:', error);
+        }
+    }
+
+    // Gráfico de Tarefas por Status
+    async function loadTarefasPorStatus() {
+        try {
+            const response = await fetch('/Dashboard/GetTarefasPorStatus');
+            const data = await response.json();
+            
+            const ctx = document.getElementById('tarefasPorStatusChart').getContext('2d');
+            
+            if (charts.tarefasPorStatus) {
+                charts.tarefasPorStatus.destroy();
+            }
+            
+            charts.tarefasPorStatus = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(item => item.status),
+                    datasets: [{
+                        data: data.map(item => item.total),
+                        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e'],
+                        hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a'],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyFontColor: "#858796",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        xPadding: 15,
+                        yPadding: 15,
+                        displayColors: false,
+                        caretPadding: 10,
+                    },
+                    legend: {
+                        display: false
+                    },
+                    cutoutPercentage: 80,
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao carregar gráfico de tarefas por status:', error);
+        }
+    }
+
+    // Gráfico de Tarefas por Prioridade
+    async function loadTarefasPorPrioridade() {
+        try {
+            const response = await fetch('/Dashboard/GetTarefasPorPrioridade');
+            const data = await response.json();
+            
+            const ctx = document.getElementById('tarefasPorPrioridadeChart').getContext('2d');
+            
+            if (charts.tarefasPorPrioridade) {
+                charts.tarefasPorPrioridade.destroy();
+            }
+            
+            charts.tarefasPorPrioridade = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.map(item => item.prioridade),
+                    datasets: [{
+                        data: data.map(item => item.total),
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d'],
+                        hoverBackgroundColor: ['#218838', '#e0a800', '#c82333', '#5a6268'],
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyFontColor: "#858796",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        xPadding: 15,
+                        yPadding: 15,
+                        displayColors: false,
+                        caretPadding: 10,
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao carregar gráfico de tarefas por prioridade:', error);
+        }
+    }
+
+    // Gráfico de Clientes por Mês
+    async function loadClientesPorMes() {
+        try {
+            const response = await fetch('/Dashboard/GetClientesPorMes');
+            const data = await response.json();
+            
+            const ctx = document.getElementById('clientesPorMesChart').getContext('2d');
+            
+            if (charts.clientesPorMes) {
+                charts.clientesPorMes.destroy();
+            }
+            
+            charts.clientesPorMes = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => item.mes),
+                    datasets: [{
+                        label: 'Clientes',
+                        data: data.map(item => item.total),
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao carregar gráfico de clientes por mês:', error);
+        }
+    }
+
+    // Gráfico de Produtividade
+    async function loadProdutividade() {
+        try {
+            const response = await fetch('/Dashboard/GetProdutividadePorResponsavel');
+            const data = await response.json();
+            
+            const ctx = document.getElementById('produtividadeChart').getContext('2d');
+            
+            if (charts.produtividade) {
+                charts.produtividade.destroy();
+            }
+            
+            charts.produtividade = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.responsavel),
+                    datasets: [{
+                        label: 'Taxa de Conclusão (%)',
+                        data: data.map(item => item.taxaConclusao),
+                        backgroundColor: '#1cc88a',
+                        borderColor: '#1cc88a',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao carregar gráfico de produtividade:', error);
+        }
+    }
+
+    // Carregar Tarefas Atrasadas
+    async function loadTarefasAtrasadas() {
+        try {
+            const response = await fetch('/Dashboard/GetTarefasAtrasadas');
+            const data = await response.json();
+            
+            const tbody = document.querySelector('#tarefasAtrasadasTable tbody');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Nenhuma tarefa atrasada</td></tr>';
+                return;
+            }
+            
+            data.forEach(tarefa => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${tarefa.titulo}</td>
+                    <td>${tarefa.responsavel || 'Não definido'}</td>
+                    <td>${new Date(tarefa.dataVencimento).toLocaleDateString('pt-BR')}</td>
+                    <td><span class="badge bg-danger">${tarefa.diasAtraso} dias</span></td>
+                    <td><span class="badge bg-warning">${tarefa.status}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Erro ao carregar tarefas atrasadas:', error);
+        }
+    }
+
+    // Função para atualizar dashboard
+    function refreshDashboard() {
+        loadDashboardData();
+    }
+
+    // Carregar dados quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDashboardData();
+    });
+</script>
+
+<style>
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .text-xs {
+        font-size: 0.7rem;
+    }
+    .font-weight-bold {
+        font-weight: 700 !important;
+    }
+    .text-gray-800 {
+        color: #5a5c69 !important;
+    }
+    .text-gray-300 {
+        color: #dddfeb !important;
+    }
+    .chart-area {
+        position: relative;
+        height: 10rem;
+        width: 100%;
+    }
+    .chart-pie {
+        position: relative;
+        height: 15rem;
+        width: 100%;
+    }
+    .chart-bar {
+        position: relative;
+        height: 10rem;
+        width: 100%;
+    }
+</style>

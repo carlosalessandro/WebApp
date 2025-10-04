@@ -1,0 +1,285 @@
+@model WebApp.Models.Produto
+
+@{
+    ViewData["Title"] = "Detalhes do Produto";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-eye"></i> Detalhes do Produto</h2>
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informações do Produto</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Nome:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @Html.DisplayFor(model => model.Nome)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Código:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @Html.DisplayFor(model => model.Codigo)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Preço:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            <span class="h5 text-primary">@Model.Preco.ToString("C")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Preço de Custo:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @if (Model.PrecoCusto.HasValue)
+                                            {
+                                                <span>@Model.PrecoCusto.Value.ToString("C")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Não informado</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Estoque:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            <span class="h6">@Html.DisplayFor(model => model.QuantidadeEstoque)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Estoque Mínimo:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @if (Model.QuantidadeMinima.HasValue)
+                                            {
+                                                <span>@Html.DisplayFor(model => model.QuantidadeMinima)</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Não definido</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Categoria:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @if (Model.Categoria != null)
+                                            {
+                                                <span class="badge bg-info">@Model.Categoria.Nome</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Não categorizado</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(Model.Descricao))
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Descrição:</label>
+                                    <div class="p-2 bg-light rounded">
+                                        @Html.DisplayFor(model => model.Descricao)
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Marca:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @Html.DisplayFor(model => model.Marca)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Modelo:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @Html.DisplayFor(model => model.Modelo)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Cor:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @Html.DisplayFor(model => model.Cor)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Tamanho:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @Html.DisplayFor(model => model.Tamanho)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Peso:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @Html.DisplayFor(model => model.Peso)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Dimensões:</label>
+                                <div class="p-2 bg-light rounded">
+                                    @Html.DisplayFor(model => model.Dimensoes)
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Status:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @if (Model.Ativo)
+                                            {
+                                                <span class="badge bg-success">Ativo</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Inativo</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Destaque:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @if (Model.Destaque)
+                                            {
+                                                <span class="badge bg-warning text-dark">Destaque</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Normal</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Data de Criação:</label>
+                                        <div class="p-2 bg-light rounded">
+                                            @Html.DisplayFor(model => model.DataCriacao)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (Model.DataAtualizacao.HasValue)
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Última Atualização:</label>
+                                    <div class="p-2 bg-light rounded">
+                                        @Html.DisplayFor(model => model.DataAtualizacao)
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-images"></i> Imagens do Produto</h5>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.Imagens.Any())
+                            {
+                                <div id="carouselProduto" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        @foreach (var imagem in Model.Imagens.OrderBy(i => i.Ordem))
+                                        {
+                                            <div class="carousel-item @(imagem.Principal ? "active" : "")">
+                                                <img src="@imagem.Caminho" class="d-block w-100" alt="@imagem.Titulo" style="height: 300px; object-fit: cover;">
+                                                <div class="carousel-caption d-none d-md-block">
+                                                    <h6>@imagem.Titulo</h6>
+                                                    @if (imagem.Principal)
+                                                    {
+                                                        <span class="badge bg-primary">Principal</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                    @if (Model.Imagens.Count() > 1)
+                                    {
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselProduto" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Anterior</span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#carouselProduto" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Próximo</span>
+                                        </button>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-5">
+                                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                    <p class="text-muted mt-2">Nenhuma imagem disponível</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

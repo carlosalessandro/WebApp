@@ -1,0 +1,102 @@
+@model IEnumerable<WebApp.Models.MenuItem>
+
+@{
+    ViewData["Title"] = "Itens Duplicados do Menu";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">
+                        <i class="bi bi-exclamation-triangle text-warning"></i>
+                        Itens Duplicados do Menu
+                    </h3>
+                    <div>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                        @if (Model.Any())
+                        {
+                            <form asp-action="RemoveDuplicates" method="post" class="d-inline" onsubmit="return confirm('Tem certeza que deseja remover todos os itens duplicados? Esta ação não pode ser desfeita.');">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Remover Duplicatas
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="alert alert-warning">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Atenção:</strong> Foram encontrados <strong>@Model.Count()</strong> itens duplicados. 
+                            Os itens mais antigos serão mantidos e os mais recentes serão removidos.
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Título</th>
+                                        <th>Controller</th>
+                                        <th>Action</th>
+                                        <th>Menu Pai</th>
+                                        <th>Data Criação</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@item.Id</td>
+                                            <td>
+                                                <i class="@item.Icone"></i>
+                                                @item.Titulo
+                                            </td>
+                                            <td>@item.Controller</td>
+                                            <td>@item.Action</td>
+                                            <td>
+                                                @if (item.MenuPaiId.HasValue)
+                                                {
+                                                    <span class="badge bg-info">ID: @item.MenuPaiId</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>@item.DataCriacao.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>
+                                                @if (item.Ativo)
+                                                {
+                                                    <span class="badge bg-success">Ativo</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Inativo</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success text-center">
+                            <i class="bi bi-check-circle"></i>
+                            <h4>Nenhum item duplicado encontrado!</h4>
+                            <p class="mb-0">Todos os itens do menu são únicos.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

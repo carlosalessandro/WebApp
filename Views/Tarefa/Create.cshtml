@@ -1,0 +1,103 @@
+@model WebApp.Models.Tarefa
+
+@{
+    ViewData["Title"] = "Nova Tarefa";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-plus-circle"></i> Nova Tarefa</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label asp-for="Titulo" class="form-label"></label>
+                                <input asp-for="Titulo" class="form-control" placeholder="Digite o título da tarefa" />
+                                <span asp-validation-for="Titulo" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="Prioridade" class="form-label"></label>
+                                <select asp-for="Prioridade" class="form-select">
+                                    <option value="@WebApp.Models.PrioridadeTarefa.Baixa">Baixa</option>
+                                    <option value="@WebApp.Models.PrioridadeTarefa.Media" selected>Média</option>
+                                    <option value="@WebApp.Models.PrioridadeTarefa.Alta">Alta</option>
+                                    <option value="@WebApp.Models.PrioridadeTarefa.Critica">Crítica</option>
+                                </select>
+                                <span asp-validation-for="Prioridade" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descricao" class="form-label"></label>
+                        <textarea asp-for="Descricao" class="form-control" rows="4" placeholder="Descreva a tarefa em detalhes"></textarea>
+                        <span asp-validation-for="Descricao" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Responsavel" class="form-label"></label>
+                                <input asp-for="Responsavel" class="form-control" placeholder="Nome do responsável" />
+                                <span asp-validation-for="Responsavel" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="DataVencimento" class="form-label"></label>
+                                <input asp-for="DataVencimento" type="date" class="form-control" />
+                                <span asp-validation-for="DataVencimento" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="EstimativaHoras" class="form-label"></label>
+                                <input asp-for="EstimativaHoras" type="number" step="0.5" min="0.5" max="100" class="form-control" placeholder="Ex: 2.5" />
+                                <span asp-validation-for="EstimativaHoras" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="Tags" class="form-label"></label>
+                                <input asp-for="Tags" class="form-control" placeholder="Ex: urgente, frontend, bug" />
+                                <small class="form-text text-muted">Separe as tags por vírgula</small>
+                                <span asp-validation-for="Tags" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="Cor" class="form-label"></label>
+                                <input asp-for="Cor" type="color" class="form-control form-control-color" value="#007bff" />
+                                <span asp-validation-for="Cor" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Kanban" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar ao Kanban
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Criar Tarefa
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

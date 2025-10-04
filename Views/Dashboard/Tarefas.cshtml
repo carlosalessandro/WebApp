@@ -1,0 +1,469 @@
+@{
+    ViewData["Title"] = "Dashboard - Tarefas";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-kanban"></i> Dashboard de Tarefas</h2>
+            <div>
+                <button onclick="refreshTarefas()" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-clockwise"></i> Atualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Cards de Estatísticas -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Total de Tarefas
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalTarefas">-</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-list-task fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Tarefas Concluídas
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="tarefasConcluidas">-</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-check-circle-fill fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Tarefas Atrasadas
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="tarefasAtrasadas">-</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-exclamation-triangle-fill fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Taxa de Conclusão
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="taxaConclusao">-%</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-graph-up fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="row">
+            <!-- Gráfico de Tarefas por Status -->
+            <div class="col-xl-6 col-lg-7">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Distribuição por Status</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie pt-4 pb-2">
+                            <canvas id="tarefasPorStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Tarefas por Prioridade -->
+            <div class="col-xl-6 col-lg-5">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Distribuição por Prioridade</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie pt-4 pb-2">
+                            <canvas id="tarefasPorPrioridadeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Gráfico de Produtividade -->
+            <div class="col-xl-8 col-lg-7">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Produtividade por Responsável</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-bar">
+                            <canvas id="produtividadeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Tempo Gasto -->
+            <div class="col-xl-4 col-lg-5">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Tempo Gasto vs Estimativa</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-bar">
+                            <canvas id="tempoGastoChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Tarefas Atrasadas -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Tarefas Atrasadas</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="tarefasAtrasadasTable">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Responsável</th>
+                                        <th>Data Vencimento</th>
+                                        <th>Dias de Atraso</th>
+                                        <th>Prioridade</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dados carregados via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts do Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let charts = {};
+
+    // Carregar dados do dashboard de tarefas
+    async function loadTarefasData() {
+        try {
+            // Carregar estatísticas gerais
+            const statsResponse = await fetch('/Dashboard/GetEstatisticasGerais');
+            const stats = await statsResponse.json();
+            
+            document.getElementById('totalTarefas').textContent = stats.totalTarefas || 0;
+            document.getElementById('tarefasConcluidas').textContent = stats.tarefasConcluidas || 0;
+            document.getElementById('taxaConclusao').textContent = (stats.taxaConclusao || 0) + '%';
+
+            // Carregar tarefas atrasadas
+            const atrasadasResponse = await fetch('/Dashboard/GetTarefasAtrasadas');
+            const tarefasAtrasadas = await atrasadasResponse.json();
+            document.getElementById('tarefasAtrasadas').textContent = tarefasAtrasadas.length;
+
+            // Carregar gráficos
+            await loadTarefasPorStatus();
+            await loadTarefasPorPrioridade();
+            await loadProdutividade();
+            await loadTempoGasto();
+            await loadTarefasAtrasadas();
+
+        } catch (error) {
+            console.error('Erro ao carregar dados de tarefas:', error);
+        }
+    }
+
+    // Gráfico de Tarefas por Status
+    async function loadTarefasPorStatus() {
+        try {
+            const response = await fetch('/Dashboard/GetTarefasPorStatus');
+            const data = await response.json();
+            
+            const ctx = document.getElementById('tarefasPorStatusChart').getContext('2d');
+            
+            if (charts.tarefasPorStatus) {
+                charts.tarefasPorStatus.destroy();
+            }
+            
+            charts.tarefasPorStatus = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(item => item.status),
+                    datasets: [{
+                        data: data.map(item => item.total),
+                        backgroundColor: ['#4e73df', '#f6c23e', '#36b9cc', '#1cc88a'],
+                        hoverBackgroundColor: ['#2e59d9', '#dda20a', '#2c9faf', '#17a673'],
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao carregar gráfico de tarefas por status:', error);
+        }
+    }
+
+    // Gráfico de Tarefas por Prioridade
+    async function loadTarefasPorPrioridade() {
+        try {
+            const response = await fetch('/Dashboard/GetTarefasPorPrioridade');
+            const data = await response.json();
+            
+            const ctx = document.getElementById('tarefasPorPrioridadeChart').getContext('2d');
+            
+            if (charts.tarefasPorPrioridade) {
+                charts.tarefasPorPrioridade.destroy();
+            }
+            
+            charts.tarefasPorPrioridade = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.map(item => item.prioridade),
+                    datasets: [{
+                        data: data.map(item => item.total),
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d'],
+                        hoverBackgroundColor: ['#218838', '#e0a800', '#c82333', '#5a6268'],
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao carregar gráfico de tarefas por prioridade:', error);
+        }
+    }
+
+    // Gráfico de Produtividade
+    async function loadProdutividade() {
+        try {
+            const response = await fetch('/Dashboard/GetProdutividadePorResponsavel');
+            const data = await response.json();
+            
+            const ctx = document.getElementById('produtividadeChart').getContext('2d');
+            
+            if (charts.produtividade) {
+                charts.produtividade.destroy();
+            }
+            
+            charts.produtividade = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.responsavel),
+                    datasets: [{
+                        label: 'Taxa de Conclusão (%)',
+                        data: data.map(item => item.taxaConclusao),
+                        backgroundColor: '#1cc88a',
+                        borderColor: '#1cc88a',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao carregar gráfico de produtividade:', error);
+        }
+    }
+
+    // Gráfico de Tempo Gasto
+    async function loadTempoGasto() {
+        try {
+            const response = await fetch('/Dashboard/GetTempoGastoPorTarefa');
+            const data = await response.json();
+            
+            const ctx = document.getElementById('tempoGastoChart').getContext('2d');
+            
+            if (charts.tempoGasto) {
+                charts.tempoGasto.destroy();
+            }
+            
+            // Pegar apenas os primeiros 5 itens para o gráfico
+            const dadosLimitados = data.slice(0, 5);
+            
+            charts.tempoGasto = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dadosLimitados.map(item => item.titulo.length > 20 ? item.titulo.substring(0, 20) + '...' : item.titulo),
+                    datasets: [{
+                        label: 'Tempo Gasto (h)',
+                        data: dadosLimitados.map(item => item.tempoGasto),
+                        backgroundColor: '#4e73df',
+                        borderColor: '#4e73df',
+                        borderWidth: 1
+                    }, {
+                        label: 'Estimativa (h)',
+                        data: dadosLimitados.map(item => item.estimativa),
+                        backgroundColor: '#f6c23e',
+                        borderColor: '#f6c23e',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao carregar gráfico de tempo gasto:', error);
+        }
+    }
+
+    // Carregar Tarefas Atrasadas
+    async function loadTarefasAtrasadas() {
+        try {
+            const response = await fetch('/Dashboard/GetTarefasAtrasadas');
+            const data = await response.json();
+            
+            const tbody = document.querySelector('#tarefasAtrasadasTable tbody');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Nenhuma tarefa atrasada</td></tr>';
+                return;
+            }
+            
+            data.forEach(tarefa => {
+                const row = document.createElement('tr');
+                const prioridadeClass = tarefa.prioridade === 'Alta' ? 'bg-danger' : 
+                                      tarefa.prioridade === 'Média' ? 'bg-warning' : 'bg-success';
+                
+                row.innerHTML = `
+                    <td>${tarefa.titulo}</td>
+                    <td>${tarefa.responsavel || 'Não definido'}</td>
+                    <td>${new Date(tarefa.dataVencimento).toLocaleDateString('pt-BR')}</td>
+                    <td><span class="badge bg-danger">${tarefa.diasAtraso} dias</span></td>
+                    <td><span class="badge ${prioridadeClass}">${tarefa.prioridade}</span></td>
+                    <td><span class="badge bg-warning">${tarefa.status}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Erro ao carregar tarefas atrasadas:', error);
+        }
+    }
+
+    // Função para atualizar dashboard
+    function refreshTarefas() {
+        loadTarefasData();
+    }
+
+    // Carregar dados quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        loadTarefasData();
+    });
+</script>
+
+<style>
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .text-xs {
+        font-size: 0.7rem;
+    }
+    .font-weight-bold {
+        font-weight: 700 !important;
+    }
+    .text-gray-800 {
+        color: #5a5c69 !important;
+    }
+    .text-gray-300 {
+        color: #dddfeb !important;
+    }
+    .chart-pie {
+        position: relative;
+        height: 15rem;
+        width: 100%;
+    }
+    .chart-bar {
+        position: relative;
+        height: 10rem;
+        width: 100%;
+    }
+</style>

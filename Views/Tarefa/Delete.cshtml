@@ -1,0 +1,75 @@
+@model WebApp.Models.Tarefa
+
+@{
+    ViewData["Title"] = "Excluir Tarefa";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4><i class="bi bi-exclamation-triangle"></i> Confirmar Exclusão</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Atenção!</strong> Esta ação não pode ser desfeita. A tarefa será permanentemente excluída.
+                </div>
+
+                <h5>@Model.Titulo</h5>
+                
+                @if (!string.IsNullOrEmpty(Model.Descricao))
+                {
+                    <p class="text-muted">@(Model.Descricao.Length > 200 ? Model.Descricao.Substring(0, 200) + "..." : Model.Descricao)</p>
+                }
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Status:</strong> 
+                            <span class="badge bg-@(Model.Status switch {
+                                WebApp.Models.StatusTarefa.ToDo => "primary",
+                                WebApp.Models.StatusTarefa.InProgress => "warning",
+                                WebApp.Models.StatusTarefa.InReview => "info",
+                                WebApp.Models.StatusTarefa.Done => "success",
+                                _ => "secondary"
+                            })">@Model.Status</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Prioridade:</strong> 
+                            <span class="badge bg-@(Model.Prioridade switch {
+                                WebApp.Models.PrioridadeTarefa.Baixa => "success",
+                                WebApp.Models.PrioridadeTarefa.Media => "warning",
+                                WebApp.Models.PrioridadeTarefa.Alta => "danger",
+                                WebApp.Models.PrioridadeTarefa.Critica => "dark",
+                                _ => "secondary"
+                            })">@Model.Prioridade</span>
+                        </p>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Responsavel))
+                {
+                    <p><strong>Responsável:</strong> @Model.Responsavel</p>
+                }
+
+                @if (Model.DataVencimento.HasValue)
+                {
+                    <p><strong>Data de Vencimento:</strong> @Model.DataVencimento.Value.ToString("dd/MM/yyyy")</p>
+                }
+
+                <form asp-action="Delete" class="mt-4">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Kanban" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Confirmar Exclusão
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

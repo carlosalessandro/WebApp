@@ -1,0 +1,68 @@
+@{
+    ViewData["Title"] = "Relatórios";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-graph-up"></i> Relatórios</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
+                                <h5 class="card-title mt-3">Relatório de Clientes</h5>
+                                <p class="card-text">Visualize e exporte dados dos clientes cadastrados</p>
+                                <a asp-action="Clientes" class="btn btn-primary">
+                                    <i class="bi bi-eye"></i> Visualizar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-file-earmark-excel text-success" style="font-size: 3rem;"></i>
+                                <h5 class="card-title mt-3">Exportar Excel</h5>
+                                <p class="card-text">Exporte dados dos clientes para Excel</p>
+                                <a asp-action="ExportarExcel" class="btn btn-success">
+                                    <i class="bi bi-download"></i> Baixar Excel
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-file-earmark-pdf text-danger" style="font-size: 3rem;"></i>
+                                <h5 class="card-title mt-3">Exportar PDF</h5>
+                                <p class="card-text">Exporte dados dos clientes para PDF</p>
+                                <a asp-action="ExportarPdf" class="btn btn-danger">
+                                    <i class="bi bi-download"></i> Baixar PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-file-earmark-text text-info" style="font-size: 3rem;"></i>
+                                <h5 class="card-title mt-3">Exportar CSV</h5>
+                                <p class="card-text">Exporte dados dos clientes para CSV</p>
+                                <a asp-action="ExportarCsv" class="btn btn-info">
+                                    <i class="bi bi-download"></i> Baixar CSV
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

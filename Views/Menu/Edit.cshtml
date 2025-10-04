@@ -1,0 +1,147 @@
+@model WebApp.Models.MenuItem
+
+@{
+    ViewData["Title"] = "Editar Item do Menu";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-pencil"></i> Editar Item do Menu</h2>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-form"></i> Dados do Item</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input asp-for="Id" type="hidden" />
+                        <input asp-for="DataCriacao" type="hidden" />
+                        
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Titulo" class="form-label"></label>
+                                    <input asp-for="Titulo" class="form-control" placeholder="Digite o título do item" />
+                                    <span asp-validation-for="Titulo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Icone" class="form-label"></label>
+                                    <input asp-for="Icone" class="form-control" placeholder="Ex: bi-house, bi-gear" />
+                                    <span asp-validation-for="Icone" class="text-danger"></span>
+                                    <small class="form-text text-muted">Use classes do Bootstrap Icons (ex: bi-house)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Controller" class="form-label"></label>
+                                    <input asp-for="Controller" class="form-control" placeholder="Ex: Home, Cliente" />
+                                    <span asp-validation-for="Controller" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Action" class="form-label"></label>
+                                    <input asp-for="Action" class="form-control" placeholder="Ex: Index, Create" />
+                                    <span asp-validation-for="Action" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Url" class="form-label"></label>
+                                    <input asp-for="Url" class="form-control" placeholder="Ex: /home, https://exemplo.com" />
+                                    <span asp-validation-for="Url" class="text-danger"></span>
+                                    <small class="form-text text-muted">URL externa ou relativa (opcional se Controller/Action estiver preenchido)</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Area" class="form-label"></label>
+                                    <input asp-for="Area" class="form-control" placeholder="Ex: Admin, Reports" />
+                                    <span asp-validation-for="Area" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Ordem" class="form-label"></label>
+                                    <input asp-for="Ordem" class="form-control" type="number" min="0" />
+                                    <span asp-validation-for="Ordem" class="text-danger"></span>
+                                    <small class="form-text text-muted">Ordem de exibição no menu (menor número = primeiro)</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="MenuPaiId" class="form-label"></label>
+                                    <select asp-for="MenuPaiId" class="form-select" asp-items="ViewBag.MenuPaiId">
+                                        <option value="">Selecione um menu pai (opcional)</option>
+                                    </select>
+                                    <span asp-validation-for="MenuPaiId" class="text-danger"></span>
+                                    <small class="form-text text-muted">Deixe vazio para item de menu principal</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Descricao" class="form-label"></label>
+                            <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Descrição do item do menu (opcional)"></textarea>
+                            <span asp-validation-for="Descricao" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check form-switch mb-3">
+                                    <input asp-for="Ativo" class="form-check-input" type="checkbox" />
+                                    <label asp-for="Ativo" class="form-check-label"></label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-switch mb-3">
+                                    <input asp-for="AbrirNovaAba" class="form-check-input" type="checkbox" />
+                                    <label asp-for="AbrirNovaAba" class="form-check-label"></label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-switch mb-3">
+                                    <input asp-for="EMenuPai" class="form-check-input" type="checkbox" />
+                                    <label asp-for="EMenuPai" class="form-check-label"></label>
+                                    <small class="form-text text-muted">Marque se este item será um menu pai com submenus</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

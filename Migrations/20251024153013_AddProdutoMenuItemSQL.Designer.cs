@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApp.Models;
 
@@ -10,9 +11,11 @@ using WebApp.Models;
 namespace WebApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251024153013_AddProdutoMenuItemSQL")]
+    partial class AddProdutoMenuItemSQL
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -57,7 +60,7 @@ namespace WebApp.Migrations
                         {
                             Id = 1,
                             Ativa = true,
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(811),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3923),
                             Descricao = "Permissões relacionadas à administração do sistema",
                             Nome = "Administração",
                             Ordem = 1
@@ -66,7 +69,7 @@ namespace WebApp.Migrations
                         {
                             Id = 2,
                             Ativa = true,
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(816),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3925),
                             Descricao = "Permissões relacionadas ao gerenciamento de usuários",
                             Nome = "Usuários",
                             Ordem = 2
@@ -75,7 +78,7 @@ namespace WebApp.Migrations
                         {
                             Id = 3,
                             Ativa = true,
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(818),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3927),
                             Descricao = "Permissões relacionadas ao gerenciamento de clientes",
                             Nome = "Clientes",
                             Ordem = 3
@@ -84,7 +87,7 @@ namespace WebApp.Migrations
                         {
                             Id = 4,
                             Ativa = true,
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(821),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3928),
                             Descricao = "Permissões relacionadas à visualização de relatórios",
                             Nome = "Relatórios",
                             Ordem = 4
@@ -258,7 +261,7 @@ namespace WebApp.Migrations
                             Action = "Index",
                             Ativo = true,
                             Controller = "Home",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(745),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3884),
                             EMenuPai = false,
                             Icone = "bi-house",
                             Ordem = 1,
@@ -269,7 +272,7 @@ namespace WebApp.Migrations
                             Id = 2,
                             AbrirNovaAba = false,
                             Ativo = true,
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(751),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3886),
                             EMenuPai = true,
                             Icone = "bi-folder",
                             Ordem = 2,
@@ -282,7 +285,7 @@ namespace WebApp.Migrations
                             Action = "Index",
                             Ativo = true,
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(756),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3888),
                             EMenuPai = false,
                             Icone = "bi-people",
                             MenuPaiId = 2,
@@ -296,7 +299,7 @@ namespace WebApp.Migrations
                             Action = "Privacy",
                             Ativo = true,
                             Controller = "Home",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(759),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3890),
                             EMenuPai = false,
                             Icone = "bi-shield",
                             Ordem = 3,
@@ -366,7 +369,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 1,
                             Codigo = "SISTEMA_GERENCIAR",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(875),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3957),
                             Descricao = "Permissão para gerenciar configurações do sistema",
                             Nome = "Gerenciar Sistema",
                             Ordem = 1
@@ -379,7 +382,7 @@ namespace WebApp.Migrations
                             CategoriaId = 1,
                             Codigo = "MENU_GERENCIAR",
                             Controller = "Menu",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(881),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3965),
                             Descricao = "Permissão para gerenciar itens do menu",
                             Nome = "Gerenciar Menu",
                             Ordem = 2
@@ -390,7 +393,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 2,
                             Codigo = "USUARIO_VISUALIZAR",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(884),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3967),
                             Descricao = "Permissão para visualizar lista de usuários",
                             Nome = "Visualizar Usuários",
                             Ordem = 1
@@ -401,7 +404,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 2,
                             Codigo = "USUARIO_CRIAR",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(886),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3969),
                             Descricao = "Permissão para criar novos usuários",
                             Nome = "Criar Usuários",
                             Ordem = 2
@@ -412,7 +415,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 2,
                             Codigo = "USUARIO_EDITAR",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(889),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3970),
                             Descricao = "Permissão para editar usuários existentes",
                             Nome = "Editar Usuários",
                             Ordem = 3
@@ -423,7 +426,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 2,
                             Codigo = "USUARIO_EXCLUIR",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(892),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3972),
                             Descricao = "Permissão para excluir usuários",
                             Nome = "Excluir Usuários",
                             Ordem = 4
@@ -436,7 +439,7 @@ namespace WebApp.Migrations
                             CategoriaId = 3,
                             Codigo = "CLIENTE_VISUALIZAR",
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(895),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3974),
                             Descricao = "Permissão para visualizar lista de clientes",
                             Nome = "Visualizar Clientes",
                             Ordem = 1
@@ -449,7 +452,7 @@ namespace WebApp.Migrations
                             CategoriaId = 3,
                             Codigo = "CLIENTE_CRIAR",
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(897),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3976),
                             Descricao = "Permissão para criar novos clientes",
                             Nome = "Criar Clientes",
                             Ordem = 2
@@ -462,7 +465,7 @@ namespace WebApp.Migrations
                             CategoriaId = 3,
                             Codigo = "CLIENTE_EDITAR",
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(900),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3978),
                             Descricao = "Permissão para editar clientes existentes",
                             Nome = "Editar Clientes",
                             Ordem = 3
@@ -475,7 +478,7 @@ namespace WebApp.Migrations
                             CategoriaId = 3,
                             Codigo = "CLIENTE_EXCLUIR",
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(903),
+                            DataCriacao = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3980),
                             Descricao = "Permissão para excluir clientes",
                             Nome = "Excluir Clientes",
                             Ordem = 4
@@ -715,7 +718,7 @@ namespace WebApp.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(337),
+                            CreatedAt = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3658),
                             Email = "admin@teste.com",
                             Name = "Administrador",
                             Password = "123456"
@@ -723,7 +726,7 @@ namespace WebApp.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 10, 24, 12, 46, 14, 298, DateTimeKind.Local).AddTicks(342),
+                            CreatedAt = new DateTime(2025, 10, 24, 12, 30, 13, 549, DateTimeKind.Local).AddTicks(3661),
                             Email = "usuario@teste.com",
                             Name = "Usuário Teste",
                             Password = "123456"

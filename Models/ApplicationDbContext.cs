@@ -17,6 +17,8 @@ namespace WebApp.Models
         public DbSet<Tarefa> Tarefas { get; set; }
         public DbSet<Produto> Produtos { get; set; }
         public DbSet<ProdutoImagem> ProdutoImagens { get; set; }
+        public DbSet<Venda> Vendas { get; set; }
+        public DbSet<ItemVenda> ItensVenda { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

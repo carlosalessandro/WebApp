@@ -1,0 +1,408 @@
+@model WebApp.Models.Venda
+
+@{
+    ViewData["Title"] = "PDV - Ponto de Venda";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid pdv-container">
+    <div class="row">
+        <!-- Coluna da Esquerda - Produtos -->
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-shopping-cart"></i> PDV - Ponto de Venda</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" id="busca-produto" class="form-control" placeholder="Buscar produto (nome ou código)">
+                                <div class="input-group-append">
+                                    <button class="btn btn-light" id="btn-buscar-produto">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filtro de Categorias -->
+                    <div class="categorias-container mb-3">
+                        <button class="btn btn-outline-primary categoria-btn active" data-categoria="0">Todos</button>
+                        @foreach (var categoria in ViewBag.Categorias)
+                        {
+                            <button class="btn btn-outline-primary categoria-btn" data-categoria="@categoria.Id">@categoria.Nome</button>
+                        }
+                    </div>
+
+                    <!-- Lista de Produtos -->
+                    <div class="produtos-container" id="produtos-container">
+                        <div class="row">
+                            @foreach (var produto in ViewBag.Produtos)
+                            {
+                                <div class="col-md-3 mb-3 produto-item" data-categoria="@produto.CategoriaId">
+                                    <div class="card h-100 produto-card" data-id="@produto.Id" data-nome="@produto.Nome" data-preco="@produto.Preco.ToString("F2")">
+                                        <div class="card-img-top text-center pt-2">
+                                            @if (produto.Imagens != null && produto.Imagens.Any())
+                                            {
+                                                <img src="~/uploads/produtos/@produto.Imagens.First().NomeArquivo" alt="@produto.Nome" class="produto-img">
+                                            }
+                                            else
+                                            {
+                                                <img src="~/img/produto-sem-imagem.png" alt="Sem imagem" class="produto-img">
+                                            }
+                                        </div>
+                                        <div class="card-body">
+                                            <h6 class="card-title">@produto.Nome</h6>
+                                            <p class="card-text text-success">R$ @produto.Preco.ToString("F2")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna da Direita - Carrinho -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-shopping-basket"></i> Carrinho de Compras</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Qtd</th>
+                                    <th>Preço</th>
+                                    <th>Subtotal</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="carrinho-itens">
+                                @foreach (var item in Model.Itens)
+                                {
+                                    <tr>
+                                        <td>@item.Produto.Nome</td>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <button class="btn btn-sm btn-outline-secondary diminuir-qtd" data-item="@item.Id">-</button>
+                                                <input type="text" class="form-control text-center item-qtd" value="@item.Quantidade" readonly>
+                                                <button class="btn btn-sm btn-outline-secondary aumentar-qtd" data-item="@item.Id">+</button>
+                                            </div>
+                                        </td>
+                                        <td>R$ @item.PrecoUnitario.ToString("F2")</td>
+                                        <td>R$ @item.Subtotal.ToString("F2")</td>
+                                        <td>
+                                            <form asp-action="RemoverItem" method="post">
+                                                <input type="hidden" name="itemId" value="@item.Id">
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Resumo da Compra -->
+                    <div class="p-3 bg-light">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span>R$ @Model.ValorTotal.ToString("F2")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Desconto:</span>
+                            <span>R$ @Model.Desconto.ToString("F2")</span>
+                        </div>
+                        <div class="d-flex justify-content-between font-weight-bold">
+                            <span>Total:</span>
+                            <span>R$ @Model.ValorFinal.ToString("F2")</span>
+                        </div>
+
+                        <!-- Aplicar Desconto -->
+                        <div class="mt-3">
+                            <form asp-action="AplicarDesconto" method="post" class="form-inline">
+                                <input type="hidden" name="vendaId" value="@Model.Id">
+                                <div class="input-group mb-2 mr-sm-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">R$</div>
+                                    </div>
+                                    <input type="number" step="0.01" min="0" name="desconto" class="form-control" placeholder="Desconto" value="@Model.Desconto">
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-info">Aplicar</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Finalizar Venda -->
+                    <div class="p-3">
+                        <button type="button" class="btn btn-lg btn-success btn-block" data-toggle="modal" data-target="#finalizarVendaModal" @(Model.Itens.Count == 0 ? "disabled" : "")>
+                            <i class="fas fa-check-circle"></i> Finalizar Venda
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Adicionar Produto -->
+<div class="modal fade" id="adicionarProdutoModal" tabindex="-1" role="dialog" aria-labelledby="adicionarProdutoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="adicionarProdutoModalLabel">Adicionar Produto</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="AdicionarItem" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="vendaId" value="@Model.Id">
+                    <input type="hidden" id="produtoId" name="produtoId">
+                    
+                    <div class="form-group">
+                        <label>Produto:</label>
+                        <h5 id="nomeProdutoModal"></h5>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Preço:</label>
+                        <h5 id="precoProdutoModal" class="text-success"></h5>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quantidade">Quantidade:</label>
+                        <input type="number" class="form-control" id="quantidade" name="quantidade" value="1" min="1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Adicionar ao Carrinho</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Finalizar Venda -->
+<div class="modal fade" id="finalizarVendaModal" tabindex="-1" role="dialog" aria-labelledby="finalizarVendaModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="finalizarVendaModalLabel">Finalizar Venda</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="FinalizarVenda" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="vendaId" value="@Model.Id">
+                    
+                    <div class="form-group">
+                        <label for="formaPagamento">Forma de Pagamento:</label>
+                        <select class="form-control" id="formaPagamento" name="formaPagamento" required>
+                            <option value="">Selecione...</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            <option value="Cartão de Débito">Cartão de Débito</option>
+                            <option value="PIX">PIX</option>
+                            <option value="Boleto">Boleto</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clienteSearch">Cliente (opcional):</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="clienteSearch" placeholder="Buscar cliente...">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="buscarClienteBtn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="clientesResultado" class="mt-2"></div>
+                        <input type="hidden" id="clienteId" name="clienteId">
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <strong>Total a pagar:</strong> R$ @Model.ValorFinal.ToString("F2")
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Confirmar Pagamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Variáveis globais
+            const vendaId = @Model.Id;
+            
+            // Filtrar produtos por categoria
+            $('.categoria-btn').click(function() {
+                const categoriaId = $(this).data('categoria');
+                
+                // Atualizar botão ativo
+                $('.categoria-btn').removeClass('active');
+                $(this).addClass('active');
+                
+                // Filtrar produtos
+                if (categoriaId == 0) {
+                    $('.produto-item').show();
+                } else {
+                    $('.produto-item').hide();
+                    $(`.produto-item[data-categoria="${categoriaId}"]`).show();
+                }
+            });
+            
+            // Buscar produtos
+            $('#btn-buscar-produto').click(function() {
+                const termo = $('#busca-produto').val();
+                const categoriaId = $('.categoria-btn.active').data('categoria');
+                
+                $.ajax({
+                    url: '@Url.Action("BuscarProdutos", "PDV")',
+                    data: { termo: termo, categoriaId: categoriaId == 0 ? null : categoriaId },
+                    success: function(result) {
+                        $('#produtos-container').html(result);
+                    }
+                });
+            });
+            
+            // Evento de pressionar Enter no campo de busca
+            $('#busca-produto').keypress(function(e) {
+                if (e.which == 13) {
+                    $('#btn-buscar-produto').click();
+                    return false;
+                }
+            });
+            
+            // Abrir modal ao clicar em um produto
+            $(document).on('click', '.produto-card', function() {
+                const id = $(this).data('id');
+                const nome = $(this).data('nome');
+                const preco = $(this).data('preco');
+                
+                $('#produtoId').val(id);
+                $('#nomeProdutoModal').text(nome);
+                $('#precoProdutoModal').text('R$ ' + preco);
+                $('#quantidade').val(1);
+                
+                $('#adicionarProdutoModal').modal('show');
+            });
+            
+            // Aumentar quantidade do item
+            $(document).on('click', '.aumentar-qtd', function() {
+                const itemId = $(this).data('item');
+                const input = $(this).prev('.item-qtd');
+                let qtd = parseInt(input.val()) + 1;
+                input.val(qtd);
+                
+                // Atualizar via AJAX (implementar depois)
+            });
+            
+            // Diminuir quantidade do item
+            $(document).on('click', '.diminuir-qtd', function() {
+                const itemId = $(this).data('item');
+                const input = $(this).next('.item-qtd');
+                let qtd = parseInt(input.val());
+                if (qtd > 1) {
+                    qtd -= 1;
+                    input.val(qtd);
+                    
+                    // Atualizar via AJAX (implementar depois)
+                }
+            });
+            
+            // Buscar clientes
+            $('#buscarClienteBtn').click(function() {
+                const termo = $('#clienteSearch').val();
+                if (termo.length < 3) {
+                    alert('Digite pelo menos 3 caracteres para buscar');
+                    return;
+                }
+                
+                $.ajax({
+                    url: '@Url.Action("BuscarClientes", "PDV")',
+                    data: { termo: termo },
+                    success: function(result) {
+                        let html = '<div class="list-group">';
+                        if (result.length === 0) {
+                            html += '<div class="list-group-item">Nenhum cliente encontrado</div>';
+                        } else {
+                            result.forEach(function(cliente) {
+                                html += `<a href="#" class="list-group-item list-group-item-action selecionar-cliente" data-id="${cliente.id}" data-nome="${cliente.nome}">${cliente.nome} - ${cliente.cpf}</a>`;
+                            });
+                        }
+                        html += '</div>';
+                        $('#clientesResultado').html(html);
+                    }
+                });
+            });
+            
+            // Selecionar cliente
+            $(document).on('click', '.selecionar-cliente', function(e) {
+                e.preventDefault();
+                const id = $(this).data('id');
+                const nome = $(this).data('nome');
+                
+                $('#clienteId').val(id);
+                $('#clienteSearch').val(nome);
+                $('#clientesResultado').html('');
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .pdv-container {
+            margin-top: -15px;
+        }
+        
+        .produto-img {
+            max-height: 100px;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        
+        .produto-card {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .produto-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .categorias-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 10px;
+        }
+        
+        .categoria-btn {
+            margin-right: 5px;
+        }
+        
+        .item-qtd {
+            max-width: 40px;
+        }
+    </style>
+}

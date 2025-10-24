@@ -1,0 +1,61 @@
+@{
+    ViewData["Title"] = "Enviar Mensagem WhatsApp";
+}
+
+<div class="container-fluid">
+    <h1 class="mt-4">Enviar Mensagem WhatsApp</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/Home">Home</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Integração WhatsApp</a></li>
+        <li class="breadcrumb-item active">Enviar Mensagem</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-paper-plane me-1"></i>
+            Enviar Nova Mensagem
+        </div>
+        <div class="card-body">
+            @if (ViewBag.Sucesso != null && ViewBag.Sucesso)
+            {
+                <div class="alert alert-success">
+                    @ViewBag.Mensagem
+                </div>
+            }
+
+            <form asp-action="EnviarMensagem" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="numeroDestino" class="control-label">Número de Destino</label>
+                            <input name="numeroDestino" id="numeroDestino" class="form-control" placeholder="+5511999999999" required />
+                            <small class="form-text text-muted">Formato internacional com código do país (Ex: +5511999999999)</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="mensagem" class="control-label">Mensagem</label>
+                            <textarea name="mensagem" id="mensagem" class="form-control" rows="5" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group mt-3">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-paper-plane me-1"></i> Enviar Mensagem
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

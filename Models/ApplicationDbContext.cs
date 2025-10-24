@@ -19,6 +19,7 @@ namespace WebApp.Models
         public DbSet<ProdutoImagem> ProdutoImagens { get; set; }
         public DbSet<Venda> Vendas { get; set; }
         public DbSet<ItemVenda> ItensVenda { get; set; }
+        public DbSet<WhatsAppIntegracao> WhatsAppIntegracoes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

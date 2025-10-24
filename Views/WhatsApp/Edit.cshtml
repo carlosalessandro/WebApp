@@ -1,0 +1,87 @@
+@model WebApp.Models.WhatsAppIntegracao
+
+@{
+    ViewData["Title"] = "Editar Configuração WhatsApp";
+}
+
+<div class="container-fluid">
+    <h1 class="mt-4">Editar Configuração WhatsApp</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/Home">Home</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Integração WhatsApp</a></li>
+        <li class="breadcrumb-item active">Editar</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-edit me-1"></i>
+            Editar Configuração
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="TokenAcesso" class="control-label"></label>
+                            <input asp-for="TokenAcesso" class="form-control" />
+                            <span asp-validation-for="TokenAcesso" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="NumeroTelefone" class="control-label"></label>
+                            <input asp-for="NumeroTelefone" class="form-control" />
+                            <span asp-validation-for="NumeroTelefone" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="BusinessAccountId" class="control-label"></label>
+                            <input asp-for="BusinessAccountId" class="form-control" />
+                            <span asp-validation-for="BusinessAccountId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group form-check mt-4">
+                            <label class="form-check-label">
+                                <input class="form-check-input" asp-for="Ativo" /> @Html.DisplayNameFor(model => model.Ativo)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="WebhookUrl" class="control-label"></label>
+                            <input asp-for="WebhookUrl" class="form-control" />
+                            <span asp-validation-for="WebhookUrl" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="WebhookSecret" class="control-label"></label>
+                            <input asp-for="WebhookSecret" class="form-control" />
+                            <span asp-validation-for="WebhookSecret" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group mt-3">
+                    <input type="submit" value="Salvar" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

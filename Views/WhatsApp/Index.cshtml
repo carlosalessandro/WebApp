@@ -1,0 +1,72 @@
+@model IEnumerable<WebApp.Models.WhatsAppIntegracao>
+
+@{
+    ViewData["Title"] = "Integração WhatsApp";
+}
+
+<div class="container-fluid">
+    <h1 class="mt-4">Integração WhatsApp</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/Home">Home</a></li>
+        <li class="breadcrumb-item active">Integração WhatsApp</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Configurações de Integração
+        </div>
+        <div class="card-body">
+            <p>
+                <a asp-action="Create" class="btn btn-primary">Nova Configuração</a>
+                <a asp-action="EnviarMensagem" class="btn btn-success">Enviar Mensagem</a>
+            </p>
+            <table class="table table-bordered table-striped" id="dataTable">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.NumeroTelefone)</th>
+                        <th>@Html.DisplayNameFor(model => model.BusinessAccountId)</th>
+                        <th>@Html.DisplayNameFor(model => model.Ativo)</th>
+                        <th>@Html.DisplayNameFor(model => model.DataCriacao)</th>
+                        <th>@Html.DisplayNameFor(model => model.UltimaAtualizacao)</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.NumeroTelefone)</td>
+                            <td>@Html.DisplayFor(modelItem => item.BusinessAccountId)</td>
+                            <td>
+                                @if (item.Ativo)
+                                {
+                                    <span class="badge bg-success">Ativo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inativo</span>
+                                }
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.DataCriacao)</td>
+                            <td>@Html.DisplayFor(modelItem => item.UltimaAtualizacao)</td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Editar</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detalhes</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Excluir</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable();
+        });
+    </script>
+}

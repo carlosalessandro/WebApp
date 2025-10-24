@@ -28,6 +28,8 @@ builder.Services.AddAuthorization();
 
 // Add custom services
 builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IWhatsAppService, WhatsAppService>();
 
 var app = builder.Build();
 

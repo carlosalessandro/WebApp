@@ -5,21 +5,50 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApp.Models;
+using WebApp.Services;
 
 namespace WebApp.Controllers
 {
     public class PDVController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        // Método para garantir que o item de menu NFC-e exista
+        private void EnsureNFCeMenuItemExists()
+        {
+            if (_context.MenuItems.Any(m => m.Titulo == "NFC-e"))
+                return;
 
-        public PDVController(ApplicationDbContext context)
+            var menuItem = new MenuItem
+            {
+                Titulo = "NFC-e",
+                Icone = "bi-receipt",
+                Ordem = 6,
+                Ativo = true,
+                AbrirNovaAba = false,
+                Descricao = "Nota Fiscal de Consumidor Eletrônica",
+                Controller = "PDV",
+                Action = "Index",
+                DataCriacao = DateTime.Now,
+                EMenuPai = false
+            };
+
+            _context.MenuItems.Add(menuItem);
+            _context.SaveChanges();
+        }
+        private readonly ApplicationDbContext _context;
+        private readonly INFCeService _nfceService;
+
+        public PDVController(ApplicationDbContext context, INFCeService nfceService)
         {
             _context = context;
+            _nfceService = nfceService;
         }
 
         // GET: PDV
         public IActionResult Index()
         {
+            // Garante que o item de menu NFC-e exista
+            EnsureNFCeMenuItemExists();
+            
             // Verificar se há uma venda em aberto
             var vendaAberta = _context.Vendas
                 .Include(v => v.Itens)
@@ -224,6 +253,84 @@ namespace WebApp.Controllers
                 .ToList();
 
             return Json(clientes);
+        }
+
+        // POST: PDV/GerarNFCe
+        [HttpPost]
+        public async Task<IActionResult> GerarNFCe(int vendaId)
+        {
+            var nfce = await _nfceService.GerarNFCeAsync(vendaId);
+            if (nfce == null)
+            {
+                TempData["Erro"] = "Não foi possível gerar a NFC-e. Verifique os dados da venda.";
+                return RedirectToAction(nameof(Comprovante), new { id = vendaId });
+            }
+
+            TempData["Sucesso"] = $"NFC-e gerada com sucesso. Chave de acesso: {nfce.ChaveAcesso}";
+            return RedirectToAction(nameof(DetalhesNFCe), new { id = nfce.Id });
+        }
+
+        // GET: PDV/DetalhesNFCe/5
+        public async Task<IActionResult> DetalhesNFCe(int id)
+        {
+            var nfce = await _context.NFCes
+                .Include(n => n.Venda)
+                .FirstOrDefaultAsync(n => n.Id == id);
+
+            if (nfce == null)
+            {
+                return NotFound();
+            }
+
+            return View(nfce);
+        }
+
+        // GET: PDV/ImportarNFCe
+        public IActionResult ImportarNFCe()
+        {
+            return View();
+        }
+
+        // POST: PDV/ImportarNFCe
+        [HttpPost]
+        public async Task<IActionResult> ImportarNFCe(string chaveAcesso)
+        {
+            if (string.IsNullOrEmpty(chaveAcesso))
+            {
+                TempData["Erro"] = "A chave de acesso é obrigatória.";
+                return View();
+            }
+
+            var nfce = await _nfceService.ImportarNFCeAsync(chaveAcesso);
+            if (nfce == null)
+            {
+                TempData["Erro"] = "Não foi possível importar a NFC-e. Verifique a chave de acesso.";
+                return View();
+            }
+
+            TempData["Sucesso"] = "NFC-e importada com sucesso.";
+            return RedirectToAction(nameof(DetalhesNFCe), new { id = nfce.Id });
+        }
+
+        // POST: PDV/CancelarNFCe
+        [HttpPost]
+        public async Task<IActionResult> CancelarNFCe(int nfceId, string justificativa)
+        {
+            if (string.IsNullOrEmpty(justificativa))
+            {
+                TempData["Erro"] = "A justificativa é obrigatória para cancelar a NFC-e.";
+                return RedirectToAction(nameof(DetalhesNFCe), new { id = nfceId });
+            }
+
+            var resultado = await _nfceService.CancelarNFCeAsync(nfceId, justificativa);
+            if (!resultado)
+            {
+                TempData["Erro"] = "Não foi possível cancelar a NFC-e.";
+                return RedirectToAction(nameof(DetalhesNFCe), new { id = nfceId });
+            }
+
+            TempData["Sucesso"] = "NFC-e cancelada com sucesso.";
+            return RedirectToAction(nameof(DetalhesNFCe), new { id = nfceId });
         }
     }
 }

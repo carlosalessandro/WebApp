@@ -44,6 +44,31 @@ namespace WebApp.Models
         [Display(Name = "Status")]
         public string Status { get; set; } = "Aberta";
 
+        // Campos para NFC-e
+        [Display(Name = "Possui NFC-e")]
+        public bool PossuiNFCe { get; set; } = false;
+
+        [Display(Name = "Status NFC-e")]
+        public string StatusNFCe { get; set; }
+
+        [Display(Name = "Número NFC-e")]
+        public string NumeroNFCe { get; set; }
+
+        [Display(Name = "Série NFC-e")]
+        public string SerieNFCe { get; set; }
+
+        [Display(Name = "Chave de Acesso NFC-e")]
+        public string ChaveAcessoNFCe { get; set; }
+
+        [Display(Name = "Data Emissão NFC-e")]
+        public DateTime? DataEmissaoNFCe { get; set; }
+
+        // Relacionamento com NFCe detalhada
+        public int? NFCeId { get; set; }
+
+        [ForeignKey("NFCeId")]
+        public NFCe NFCe { get; set; }
+
         public virtual ICollection<ItemVenda> Itens { get; set; } = new List<ItemVenda>();
     }
 }

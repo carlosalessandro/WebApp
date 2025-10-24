@@ -30,6 +30,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IWhatsAppService, WhatsAppService>();
+builder.Services.AddScoped<INFCeService, NFCeService>();
 
 var app = builder.Build();
 

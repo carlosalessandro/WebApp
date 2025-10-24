@@ -84,15 +84,83 @@
                 </table>
             </div>
 
+            <!-- Seção de NFC-e -->
+            <div class="mt-4 border p-3 rounded">
+                <h5>NFC-e</h5>
+                @if (Model.PossuiNFCe)
+                {
+                    <div class="alert alert-success">
+                        <p><strong>Status:</strong> @Model.StatusNFCe</p>
+                        <p><strong>Número:</strong> @Model.NumeroNFCe</p>
+                        <p><strong>Série:</strong> @Model.SerieNFCe</p>
+                        <p><strong>Chave de Acesso:</strong> @Model.ChaveAcessoNFCe</p>
+                        <p><strong>Data de Emissão:</strong> @(Model.DataEmissaoNFCe?.ToString("dd/MM/yyyy HH:mm") ?? "-")</p>
+                        
+                        @if (Model.StatusNFCe != "Cancelada")
+                        {
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelarNFCeModal">
+                                Cancelar NFC-e
+                            </button>
+                        }
+                        
+                        <a asp-action="DetalhesNFCe" asp-route-id="@Model.NFCeId" class="btn btn-info">Detalhes da NFC-e</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <p>Esta venda não possui NFC-e emitida.</p>
+                        <form asp-action="GerarNFCe" method="post">
+                            <input type="hidden" name="vendaId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-success">Gerar NFC-e</button>
+                        </form>
+                    </div>
+                }
+            </div>
+
             <div class="row mt-4">
                 <div class="col-md-12 text-center">
                     <p class="mb-0">Obrigado pela preferência!</p>
                     <p class="text-muted">Este documento não possui valor fiscal</p>
+                    <div class="mt-3">
+                        <a asp-action="Index" class="btn btn-primary">Nova Venda</a>
+                        <button onclick="window.print()" class="btn btn-secondary">Imprimir</button>
+                        <a asp-action="ImportarNFCe" class="btn btn-warning">Importar NFC-e</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal para Cancelamento de NFC-e -->
+@if (Model.PossuiNFCe && Model.StatusNFCe != "Cancelada")
+{
+    <div class="modal fade" id="cancelarNFCeModal" tabindex="-1" aria-labelledby="cancelarNFCeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelarNFCeModalLabel">Cancelar NFC-e</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="CancelarNFCe" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="nfceId" value="@Model.NFCeId" />
+                        <div class="mb-3">
+                            <label for="justificativa" class="form-label">Justificativa</label>
+                            <textarea class="form-control" id="justificativa" name="justificativa" rows="3" required></textarea>
+                            <div class="form-text">Informe o motivo do cancelamento da NFC-e.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="submit" class="btn btn-danger">Confirmar Cancelamento</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
 
 @section Styles {
     <style>

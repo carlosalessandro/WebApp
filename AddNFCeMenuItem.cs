@@ -35,7 +35,7 @@ namespace WebApp
                 {
                     Nome = "Acesso a NFC-e",
                     Descricao = "Permite acesso às funcionalidades de NFC-e",
-                    Chave = "NFCe"
+                   // Chave = "NFCe"
                 };
                 
                 context.Permissoes.Add(permissao);

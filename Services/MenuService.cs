@@ -36,7 +36,10 @@ namespace WebApp.Services
         {
             try
             {
-                return await _context.MenuItems.FindAsync(id);
+                return await _context.MenuItems
+                    .Include(m => m.MenuPai)
+                    .Include(m => m.SubMenus.OrderBy(s => s.Ordem))
+                    .FirstOrDefaultAsync(m => m.Id == id);
             }
             catch (Exception ex)
             {

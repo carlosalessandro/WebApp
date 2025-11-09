@@ -1,0 +1,124 @@
+@model IEnumerable<WebApp.Models.RelatorioPCP>
+@{
+    ViewData["Title"] = "Relatórios PCP";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-file-bar-graph"></i> Relatórios PCP</h2>
+        <a asp-action="Builder" class="btn btn-primary">
+            <i class="bi bi-tools"></i> Construir Novo Relatório
+        </a>
+    </div>
+
+    <div class="row">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var relatorio in Model)
+            {
+                var iconClass = relatorio.TipoRelatorio switch
+                {
+                    "Ordens de Produção" => "clipboard-data",
+                    "Apontamentos" => "check2-square",
+                    "Recursos" => "tools",
+                    "Eficiência" => "speedometer2",
+                    _ => "file-text"
+                };
+
+                var cardColor = relatorio.Publico ? "border-success" : "border-primary";
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 @cardColor">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">
+                                    <i class="bi bi-@iconClass"></i> @relatorio.Nome
+                                </h6>
+                                @if (relatorio.Publico)
+                                {
+                                    <span class="badge bg-success">Público</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Privado</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted">
+                                @(string.IsNullOrEmpty(relatorio.Descricao) ? "Sem descrição" : relatorio.Descricao)
+                            </p>
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-tag"></i> Tipo: <strong>@relatorio.TipoRelatorio</strong>
+                                </small>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-person"></i> Criado por: <strong>@relatorio.CriadoPor?.Name</strong>
+                                </small>
+                            </div>
+                            <div>
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar"></i> @relatorio.DataCriacao.ToString("dd/MM/yyyy HH:mm")
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex gap-2">
+                                <a asp-action="Execute" asp-route-id="@relatorio.Id" 
+                                   class="btn btn-sm btn-primary flex-fill">
+                                    <i class="bi bi-play-circle"></i> Executar
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        onclick="excluirRelatorio(@relatorio.Id)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Nenhum relatório criado ainda.
+                    <a asp-action="Builder" class="alert-link">Criar o primeiro relatório</a>.
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    async function excluirRelatorio(id) {
+        if (!confirm('Deseja realmente excluir este relatório?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/RelatorioPCP/Delete/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                alert(result.message);
+                location.reload();
+            } else {
+                alert('Erro: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro ao excluir o relatório');
+        }
+    }
+</script>
+}

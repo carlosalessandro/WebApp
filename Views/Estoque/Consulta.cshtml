@@ -1,0 +1,159 @@
+@model IEnumerable<WebApp.Models.Estoque>
+@{
+    ViewData["Title"] = "Consulta de Estoque";
+    var filtro = ViewBag.Filtro as string;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-search me-2"></i>Consulta de Estoque</h2>
+                <div>
+                    <a href="@Url.Action("Entrada")" class="btn btn-success me-2">
+                        <i class="bi bi-plus-circle me-2"></i>Entrada
+                    </a>
+                    <a href="@Url.Action("Saida")" class="btn btn-warning">
+                        <i class="bi bi-dash-circle me-2"></i>Saída
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-8">
+                            <label for="filtro" class="form-label">Buscar por nome ou código do produto</label>
+                            <input type="text" class="form-control" id="filtro" name="filtro" 
+                                   value="@filtro" placeholder="Digite o nome ou código do produto...">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="bi bi-search me-2"></i>Buscar
+                            </button>
+                            <a href="@Url.Action("Consulta")" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Limpar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th>Código</th>
+                                        <th>Qtd. Atual</th>
+                                        <th>Qtd. Mínima</th>
+                                        <th>Qtd. Máxima</th>
+                                        <th>Custo Médio</th>
+                                        <th>Valor Total</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var estoque in Model)
+                                    {
+                                        <tr class="@(estoque.EstoqueBaixo ? "table-warning" : estoque.QuantidadeAtual <= 0 ? "table-danger" : "")">
+                                            <td>@(estoque.Produto?.Nome ?? "N/A")</td>
+                                            <td>@(estoque.Produto?.Codigo ?? "N/A")</td>
+                                            <td>
+                                                <span class="fw-bold">@estoque.QuantidadeAtual</span>
+                                            </td>
+                                            <td>@estoque.QuantidadeMinima</td>
+                                            <td>@estoque.QuantidadeMaxima</td>
+                                            <td>@estoque.CustoMedio.ToString("C")</td>
+                                            <td>@estoque.ValorEstoque.ToString("C")</td>
+                                            <td>
+                                                @if (estoque.QuantidadeAtual <= 0)
+                                                {
+                                                    <span class="badge bg-danger">Sem Estoque</span>
+                                                }
+                                                else if (estoque.EstoqueBaixo)
+                                                {
+                                                    <span class="badge bg-warning">Estoque Baixo</span>
+                                                }
+                                                else if (estoque.EstoqueAlto)
+                                                {
+                                                    <span class="badge bg-info">Estoque Alto</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">Normal</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="@Url.Action("Entrada", new { produtoId = estoque.ProdutoId })" 
+                                                       class="btn btn-sm btn-outline-success" title="Entrada">
+                                                        <i class="bi bi-plus-circle"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("Saida", new { produtoId = estoque.ProdutoId })" 
+                                                       class="btn btn-sm btn-outline-warning" title="Saída">
+                                                        <i class="bi bi-dash-circle"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("Ajuste", new { produtoId = estoque.ProdutoId })" 
+                                                       class="btn btn-sm btn-outline-info" title="Ajuste">
+                                                        <i class="bi bi-gear"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("Movimentacoes", new { produtoId = estoque.ProdutoId })" 
+                                                       class="btn btn-sm btn-outline-primary" title="Movimentações">
+                                                        <i class="bi bi-list"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox fs-1 text-muted"></i>
+                            <h4 class="text-muted mt-3">
+                                @if (!string.IsNullOrEmpty(filtro))
+                                {
+                                    <text>Nenhum produto encontrado para "@filtro"</text>
+                                }
+                                else
+                                {
+                                    <text>Nenhum produto em estoque</text>
+                                }
+                            </h4>
+                            <p class="text-muted">
+                                @if (!string.IsNullOrEmpty(filtro))
+                                {
+                                    <text>Tente usar outros termos de busca ou </text>
+                                    <a href="@Url.Action("Consulta")">ver todos os produtos</a>
+                                }
+                                else
+                                {
+                                    <text>Adicione produtos ao estoque para começar.</text>
+                                }
+                            </p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

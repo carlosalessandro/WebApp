@@ -27,6 +27,18 @@ namespace WebApp.Controllers
             return View(tarefas);
         }
 
+        // GET: Tarefa/GetAll - API endpoint para Angular
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var tarefas = await _context.Tarefas
+                .OrderBy(t => t.Ordem)
+                .ThenBy(t => t.DataCriacao)
+                .ToListAsync();
+
+            return Json(tarefas);
+        }
+
         // GET: Tarefa/Kanban
         public async Task<IActionResult> Kanban()
         {
@@ -226,13 +238,24 @@ namespace WebApp.Controllers
                 tarefa.Status = request.NovoStatus;
                 tarefa.DataAtualizacao = DateTime.Now;
 
-                // Reordenar tarefas se necessário
+                // Atualizar a ordem da tarefa movida
                 if (statusAnterior != request.NovoStatus)
                 {
-                    await ReordenarTarefas(request.NovoStatus, request.NovaOrdem, tarefa.Id);
+                    // Definir a nova ordem para a tarefa movida
+                    var tarefasNoNovoStatus = await _context.Tarefas
+                        .Where(t => t.Status == request.NovoStatus && t.Id != tarefa.Id)
+                        .CountAsync();
+                    
+                    tarefa.Ordem = request.NovaOrdem > 0 ? request.NovaOrdem : tarefasNoNovoStatus + 1;
                 }
 
                 await _context.SaveChangesAsync();
+                
+                // Reordenar tarefas após salvar a mudança principal
+                if (statusAnterior != request.NovoStatus)
+                {
+                    await ReordenarTarefas(request.NovoStatus, tarefa.Ordem, tarefa.Id);
+                }
                 _logger.LogInformation("Tarefa {TarefaId} atualizada com sucesso para status {NovoStatus}", tarefa.Id, request.NovoStatus);
                 
                 return Json(new { success = true, message = "Tarefa atualizada com sucesso" });
@@ -286,7 +309,11 @@ namespace WebApp.Controllers
                 {
                     tarefasNoStatus[i].Ordem = i + 1;
                 }
+                tarefasNoStatus[i].DataAtualizacao = DateTime.Now;
             }
+
+            // Salvar as mudanças no banco de dados
+            await _context.SaveChangesAsync();
         }
 
         private bool TarefaExists(int id)

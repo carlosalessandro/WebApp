@@ -17,6 +17,56 @@ namespace WebApp.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
 
+            modelBuilder.Entity("WebApp.Models.ApontamentoProducao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DataHoraApontamento")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MotivoParada")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Observacoes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("OperadorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrdemProducaoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("QuantidadeProduzida")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("QuantidadeRefugo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("QuantidadeRetrabalho")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TempoParadoMinutos")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TempoProducaoMinutos")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TempoSetupMinutos")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperadorId");
+
+                    b.HasIndex("OrdemProducaoId");
+
+                    b.ToTable("ApontamentosProducao");
+                });
+
             modelBuilder.Entity("WebApp.Models.Categoria", b =>
                 {
                     b.Property<int>("Id")
@@ -57,7 +107,7 @@ namespace WebApp.Migrations
                         {
                             Id = 1,
                             Ativa = true,
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1065),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8534),
                             Descricao = "Permissões relacionadas à administração do sistema",
                             Nome = "Administração",
                             Ordem = 1
@@ -66,7 +116,7 @@ namespace WebApp.Migrations
                         {
                             Id = 2,
                             Ativa = true,
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1067),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8537),
                             Descricao = "Permissões relacionadas ao gerenciamento de usuários",
                             Nome = "Usuários",
                             Ordem = 2
@@ -75,7 +125,7 @@ namespace WebApp.Migrations
                         {
                             Id = 3,
                             Ativa = true,
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1069),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8538),
                             Descricao = "Permissões relacionadas ao gerenciamento de clientes",
                             Nome = "Clientes",
                             Ordem = 3
@@ -84,7 +134,7 @@ namespace WebApp.Migrations
                         {
                             Id = 4,
                             Ativa = true,
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1070),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8541),
                             Descricao = "Permissões relacionadas à visualização de relatórios",
                             Nome = "Relatórios",
                             Ordem = 4
@@ -258,7 +308,7 @@ namespace WebApp.Migrations
                             Action = "Index",
                             Ativo = true,
                             Controller = "Home",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1027),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8493),
                             EMenuPai = false,
                             Icone = "bi-house",
                             Ordem = 1,
@@ -269,7 +319,7 @@ namespace WebApp.Migrations
                             Id = 2,
                             AbrirNovaAba = false,
                             Ativo = true,
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1032),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8498),
                             EMenuPai = true,
                             Icone = "bi-folder",
                             Ordem = 2,
@@ -282,7 +332,7 @@ namespace WebApp.Migrations
                             Action = "Index",
                             Ativo = true,
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1035),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8502),
                             EMenuPai = false,
                             Icone = "bi-people",
                             MenuPaiId = 2,
@@ -296,7 +346,7 @@ namespace WebApp.Migrations
                             Action = "Privacy",
                             Ativo = true,
                             Controller = "Home",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1037),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8504),
                             EMenuPai = false,
                             Icone = "bi-shield",
                             Ordem = 3,
@@ -372,6 +422,65 @@ namespace WebApp.Migrations
                     b.ToTable("NFCes");
                 });
 
+            modelBuilder.Entity("WebApp.Models.OrdemProducao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("CriadoPorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DataFimPrevista")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DataFimReal")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DataInicioPrevista")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DataInicioReal")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NumeroOrdem")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Observacoes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Prioridade")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ProdutoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("QuantidadeProduzida")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CriadoPorId");
+
+                    b.HasIndex("ProdutoId");
+
+                    b.ToTable("OrdensProducao");
+                });
+
             modelBuilder.Entity("WebApp.Models.Permissao", b =>
                 {
                     b.Property<int>("Id")
@@ -434,7 +543,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 1,
                             Codigo = "SISTEMA_GERENCIAR",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1099),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8577),
                             Descricao = "Permissão para gerenciar configurações do sistema",
                             Nome = "Gerenciar Sistema",
                             Ordem = 1
@@ -447,7 +556,7 @@ namespace WebApp.Migrations
                             CategoriaId = 1,
                             Codigo = "MENU_GERENCIAR",
                             Controller = "Menu",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1103),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8585),
                             Descricao = "Permissão para gerenciar itens do menu",
                             Nome = "Gerenciar Menu",
                             Ordem = 2
@@ -458,7 +567,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 2,
                             Codigo = "USUARIO_VISUALIZAR",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1105),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8587),
                             Descricao = "Permissão para visualizar lista de usuários",
                             Nome = "Visualizar Usuários",
                             Ordem = 1
@@ -469,7 +578,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 2,
                             Codigo = "USUARIO_CRIAR",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1106),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8589),
                             Descricao = "Permissão para criar novos usuários",
                             Nome = "Criar Usuários",
                             Ordem = 2
@@ -480,7 +589,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 2,
                             Codigo = "USUARIO_EDITAR",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1108),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8591),
                             Descricao = "Permissão para editar usuários existentes",
                             Nome = "Editar Usuários",
                             Ordem = 3
@@ -491,7 +600,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 2,
                             Codigo = "USUARIO_EXCLUIR",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1110),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8593),
                             Descricao = "Permissão para excluir usuários",
                             Nome = "Excluir Usuários",
                             Ordem = 4
@@ -504,7 +613,7 @@ namespace WebApp.Migrations
                             CategoriaId = 3,
                             Codigo = "CLIENTE_VISUALIZAR",
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1112),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8595),
                             Descricao = "Permissão para visualizar lista de clientes",
                             Nome = "Visualizar Clientes",
                             Ordem = 1
@@ -517,7 +626,7 @@ namespace WebApp.Migrations
                             CategoriaId = 3,
                             Codigo = "CLIENTE_CRIAR",
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1114),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8597),
                             Descricao = "Permissão para criar novos clientes",
                             Nome = "Criar Clientes",
                             Ordem = 2
@@ -530,7 +639,7 @@ namespace WebApp.Migrations
                             CategoriaId = 3,
                             Codigo = "CLIENTE_EDITAR",
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1116),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8599),
                             Descricao = "Permissão para editar clientes existentes",
                             Nome = "Editar Clientes",
                             Ordem = 3
@@ -543,7 +652,7 @@ namespace WebApp.Migrations
                             CategoriaId = 3,
                             Codigo = "CLIENTE_EXCLUIR",
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(1117),
+                            DataCriacao = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8601),
                             Descricao = "Permissão para excluir clientes",
                             Nome = "Excluir Clientes",
                             Ordem = 4
@@ -683,6 +792,146 @@ namespace WebApp.Migrations
                     b.ToTable("ProdutoImagens");
                 });
 
+            modelBuilder.Entity("WebApp.Models.Recurso", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("CapacidadePorHora")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("CustoPorHora")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DataCadastro")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Descricao")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Disponivel")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("EmManutencao")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Localizacao")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Recursos");
+                });
+
+            modelBuilder.Entity("WebApp.Models.RecursoAlocado", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("DataFimAlocacao")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DataInicioAlocacao")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("HorasPlanejadas")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("HorasUtilizadas")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Observacoes")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OrdemProducaoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RecursoId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrdemProducaoId");
+
+                    b.HasIndex("RecursoId");
+
+                    b.ToTable("RecursosAlocados");
+                });
+
+            modelBuilder.Entity("WebApp.Models.RelatorioPCP", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Agrupamento")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CamposSelecionados")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ConfiguracaoJson")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CriadoPorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("DataAtualizacao")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Descricao")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Filtros")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Ordenacao")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Publico")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TipoRelatorio")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CriadoPorId");
+
+                    b.ToTable("RelatoriosPCP");
+                });
+
             modelBuilder.Entity("WebApp.Models.Tarefa", b =>
                 {
                     b.Property<int>("Id")
@@ -783,7 +1032,7 @@ namespace WebApp.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(890),
+                            CreatedAt = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8208),
                             Email = "admin@teste.com",
                             Name = "Administrador",
                             Password = "123456"
@@ -791,7 +1040,7 @@ namespace WebApp.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 10, 24, 20, 4, 34, 951, DateTimeKind.Local).AddTicks(892),
+                            CreatedAt = new DateTime(2025, 11, 7, 8, 33, 7, 665, DateTimeKind.Local).AddTicks(8211),
                             Email = "usuario@teste.com",
                             Name = "Usuário Teste",
                             Password = "123456"
@@ -941,6 +1190,23 @@ namespace WebApp.Migrations
                     b.ToTable("WhatsAppIntegracoes");
                 });
 
+            modelBuilder.Entity("WebApp.Models.ApontamentoProducao", b =>
+                {
+                    b.HasOne("WebApp.Models.User", "Operador")
+                        .WithMany()
+                        .HasForeignKey("OperadorId");
+
+                    b.HasOne("WebApp.Models.OrdemProducao", "OrdemProducao")
+                        .WithMany("Apontamentos")
+                        .HasForeignKey("OrdemProducaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Operador");
+
+                    b.Navigation("OrdemProducao");
+                });
+
             modelBuilder.Entity("WebApp.Models.ItemVenda", b =>
                 {
                     b.HasOne("WebApp.Models.Produto", "Produto")
@@ -981,6 +1247,23 @@ namespace WebApp.Migrations
                     b.Navigation("Venda");
                 });
 
+            modelBuilder.Entity("WebApp.Models.OrdemProducao", b =>
+                {
+                    b.HasOne("WebApp.Models.User", "CriadoPor")
+                        .WithMany()
+                        .HasForeignKey("CriadoPorId");
+
+                    b.HasOne("WebApp.Models.Produto", "Produto")
+                        .WithMany()
+                        .HasForeignKey("ProdutoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CriadoPor");
+
+                    b.Navigation("Produto");
+                });
+
             modelBuilder.Entity("WebApp.Models.Permissao", b =>
                 {
                     b.HasOne("WebApp.Models.Categoria", "Categoria")
@@ -1011,6 +1294,36 @@ namespace WebApp.Migrations
                         .IsRequired();
 
                     b.Navigation("Produto");
+                });
+
+            modelBuilder.Entity("WebApp.Models.RecursoAlocado", b =>
+                {
+                    b.HasOne("WebApp.Models.OrdemProducao", "OrdemProducao")
+                        .WithMany("RecursosAlocados")
+                        .HasForeignKey("OrdemProducaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApp.Models.Recurso", "Recurso")
+                        .WithMany("Alocacoes")
+                        .HasForeignKey("RecursoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrdemProducao");
+
+                    b.Navigation("Recurso");
+                });
+
+            modelBuilder.Entity("WebApp.Models.RelatorioPCP", b =>
+                {
+                    b.HasOne("WebApp.Models.User", "CriadoPor")
+                        .WithMany()
+                        .HasForeignKey("CriadoPorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CriadoPor");
                 });
 
             modelBuilder.Entity("WebApp.Models.UsuarioPermissao", b =>
@@ -1065,6 +1378,13 @@ namespace WebApp.Migrations
                     b.Navigation("SubMenus");
                 });
 
+            modelBuilder.Entity("WebApp.Models.OrdemProducao", b =>
+                {
+                    b.Navigation("Apontamentos");
+
+                    b.Navigation("RecursosAlocados");
+                });
+
             modelBuilder.Entity("WebApp.Models.Permissao", b =>
                 {
                     b.Navigation("UsuarioPermissoes");
@@ -1073,6 +1393,11 @@ namespace WebApp.Migrations
             modelBuilder.Entity("WebApp.Models.Produto", b =>
                 {
                     b.Navigation("Imagens");
+                });
+
+            modelBuilder.Entity("WebApp.Models.Recurso", b =>
+                {
+                    b.Navigation("Alocacoes");
                 });
 
             modelBuilder.Entity("WebApp.Models.User", b =>

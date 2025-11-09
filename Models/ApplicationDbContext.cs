@@ -8,19 +8,42 @@ namespace WebApp.Models
         {
         }
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<Cliente> Clientes { get; set; }
-        public DbSet<MenuItem> MenuItems { get; set; }
-        public DbSet<Categoria> Categorias { get; set; }
-        public DbSet<Permissao> Permissoes { get; set; }
-        public DbSet<UsuarioPermissao> UsuarioPermissoes { get; set; }
-        public DbSet<Tarefa> Tarefas { get; set; }
-        public DbSet<Produto> Produtos { get; set; }
-        public DbSet<ProdutoImagem> ProdutoImagens { get; set; }
-        public DbSet<Venda> Vendas { get; set; }
-        public DbSet<ItemVenda> ItensVenda { get; set; }
-        public DbSet<WhatsAppIntegracao> WhatsAppIntegracoes { get; set; }
-        public DbSet<NFCe> NFCes { get; set; }
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Cliente> Clientes { get; set; } = null!;
+        public DbSet<MenuItem> MenuItems { get; set; } = null!;
+        public DbSet<Categoria> Categorias { get; set; } = null!;
+        public DbSet<Permissao> Permissoes { get; set; } = null!;
+        public DbSet<UsuarioPermissao> UsuarioPermissoes { get; set; } = null!;
+        public DbSet<Tarefa> Tarefas { get; set; } = null!;
+        public DbSet<Produto> Produtos { get; set; } = null!;
+        public DbSet<ProdutoImagem> ProdutoImagens { get; set; } = null!;
+        public DbSet<Venda> Vendas { get; set; } = null!;
+        public DbSet<ItemVenda> ItensVenda { get; set; } = null!;
+        public DbSet<WhatsAppIntegracao> WhatsAppIntegracoes { get; set; } = null!;
+        public DbSet<NFCe> NFCes { get; set; } = null!;
+        
+        // PCP - Planejamento e Controle da Produção
+        public DbSet<OrdemProducao> OrdensProducao { get; set; } = null!;
+        public DbSet<Recurso> Recursos { get; set; } = null!;
+        public DbSet<RecursoAlocado> RecursosAlocados { get; set; } = null!;
+        public DbSet<ApontamentoProducao> ApontamentosProducao { get; set; } = null!;
+        public DbSet<RelatorioPCP> RelatoriosPCP { get; set; } = null!;
+
+        // Módulo Financeiro
+        public DbSet<ContaPagar> ContasPagar { get; set; } = null!;
+        public DbSet<ContaReceber> ContasReceber { get; set; } = null!;
+        public DbSet<ContaBancaria> ContasBancarias { get; set; } = null!;
+        public DbSet<CategoriaFinanceira> CategoriasFinanceiras { get; set; } = null!;
+        public DbSet<MovimentacaoFinanceira> MovimentacoesFinanceiras { get; set; } = null!;
+
+        // Módulo Estoque
+        public DbSet<Estoque> Estoques { get; set; } = null!;
+        public DbSet<MovimentacaoEstoque> MovimentacoesEstoque { get; set; } = null!;
+
+        // Módulo Compras
+        public DbSet<Fornecedor> Fornecedores { get; set; } = null!;
+        public DbSet<PedidoCompra> PedidosCompra { get; set; } = null!;
+        public DbSet<ItemPedidoCompra> ItensPedidoCompra { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -43,7 +43,7 @@ namespace WebApp
                 
                 // Adicionar permissão ao usuário admin (assumindo que o ID 1 é o admin)
                 var admin = context.Users.Find(1);
-                var nfcePermissao = context.Permissoes.FirstOrDefault(p => p.Chave == "NFCe");
+                var nfcePermissao = context.Permissoes.FirstOrDefault(p => p.Codigo == "NFCe");
                 
                 if (admin != null && nfcePermissao != null)
                 {

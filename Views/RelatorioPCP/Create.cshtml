@@ -1,0 +1,144 @@
+@model WebApp.Models.RelatorioPCP
+@{
+    ViewData["Title"] = "Criar Relatório PCP";
+    var tiposRelatorio = ViewBag.TiposRelatorio as string[] ?? new string[0];
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-file-plus"></i> Criar Novo Relatório PCP</h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Informações do Relatório
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Nome" class="form-label">Nome do Relatório</label>
+                                    <input asp-for="Nome" class="form-control" placeholder="Digite o nome do relatório" />
+                                    <span asp-validation-for="Nome" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="TipoRelatorio" class="form-label">Tipo de Relatório</label>
+                                    <select asp-for="TipoRelatorio" class="form-select">
+                                        <option value="">Selecione o tipo</option>
+                                        @foreach (var tipo in tiposRelatorio)
+                                        {
+                                            <option value="@tipo">@tipo</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="TipoRelatorio" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Descricao" class="form-label">Descrição</label>
+                            <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Descreva o objetivo e conteúdo do relatório"></textarea>
+                            <span asp-validation-for="Descricao" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Ordenacao" class="form-label">Ordenação</label>
+                                    <input asp-for="Ordenacao" class="form-control" placeholder="Ex: Nome ASC, Data DESC" />
+                                    <span asp-validation-for="Ordenacao" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Agrupamento" class="form-label">Agrupamento</label>
+                                    <input asp-for="Agrupamento" class="form-control" placeholder="Ex: Categoria, Status" />
+                                    <span asp-validation-for="Agrupamento" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input asp-for="Publico" class="form-check-input" type="checkbox" />
+                                <label asp-for="Publico" class="form-check-label">
+                                    Relatório Público
+                                </label>
+                                <div class="form-text">
+                                    Marque esta opção se o relatório deve ser visível para todos os usuários
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Salvar Relatório
+                            </button>
+                            <a asp-action="Builder" class="btn btn-outline-primary">
+                                <i class="bi bi-tools"></i> Usar Construtor Avançado
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightbulb"></i> Dicas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-primary">Tipos de Relatório:</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Personalizado:</strong> Relatório customizável com campos específicos</li>
+                        <li><strong>Ordens de Produção:</strong> Relatório focado em ordens de produção</li>
+                        <li><strong>Apontamentos:</strong> Relatório de apontamentos de produção</li>
+                        <li><strong>Recursos:</strong> Relatório de recursos disponíveis</li>
+                        <li><strong>Eficiência:</strong> Relatório de eficiência produtiva</li>
+                        <li><strong>Refugo e Retrabalho:</strong> Relatório de perdas</li>
+                        <li><strong>Tempo de Produção:</strong> Relatório de tempos</li>
+                    </ul>
+
+                    <hr>
+
+                    <h6 class="text-primary">Construtor Avançado:</h6>
+                    <p class="small text-muted">
+                        Use o construtor avançado para criar relatórios mais complexos com:
+                    </p>
+                    <ul class="small">
+                        <li>Seleção de campos específicos</li>
+                        <li>Filtros personalizados</li>
+                        <li>Agrupamentos avançados</li>
+                        <li>Configurações de layout</li>
+                    </ul>
+
+                    <a asp-action="Builder" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-tools"></i> Abrir Construtor
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

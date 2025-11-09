@@ -1,0 +1,100 @@
+<div class="database-explorer">
+  <!-- Header -->
+  <div class="explorer-header">
+    <h6 class="mb-3">
+      <i class="bi bi-database"></i>
+      Tabelas do Banco
+    </h6>
+    
+    <!-- Search -->
+    <div class="search-box mb-3">
+      <div class="input-group input-group-sm">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input 
+          type="text" 
+          class="form-control" 
+          placeholder="Buscar tabelas/campos..."
+          [(ngModel)]="searchTerm"
+          (input)="filterTables()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Tables List -->
+  <div class="tables-list">
+    <div *ngFor="let table of filteredTables" class="table-item">
+      <!-- Table Header -->
+      <div 
+        class="table-header draggable-item"
+        draggable="true"
+        (dragstart)="onDragStart($event, table, 'table')"
+        (click)="toggleTable(table.name)">
+        
+        <div class="table-info">
+          <i class="bi" [class.bi-chevron-right]="!isTableExpanded(table.name)" 
+                        [class.bi-chevron-down]="isTableExpanded(table.name)"></i>
+          <i class="bi bi-table text-primary ms-1"></i>
+          <span class="table-name">{{ table.name }}</span>
+          <span class="table-alias text-muted" *ngIf="table.alias">({{ table.alias }})</span>
+        </div>
+        
+        <div class="table-actions">
+          <span class="badge bg-light text-dark" *ngIf="table.columns">
+            {{ table.columns?.length || 0 }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Columns List -->
+      <div class="columns-list" *ngIf="isTableExpanded(table.name) && table.columns">
+        <div 
+          *ngFor="let column of table.columns" 
+          class="column-item draggable-item"
+          draggable="true"
+          (dragstart)="onDragStart($event, column, 'column')"
+          [title]="getColumnTooltip(column)">
+          
+          <div class="column-info">
+            <i class="bi" [class]="getColumnIcon(column)"></i>
+            <span class="column-name">{{ column.name }}</span>
+            <span class="column-type text-muted">{{ column.type }}</span>
+          </div>
+          
+          <div class="column-badges">
+            <span class="badge badge-pk" *ngIf="column.isPrimaryKey" title="Chave Primária">PK</span>
+            <span class="badge badge-fk" *ngIf="column.isForeignKey" title="Chave Estrangeira">FK</span>
+            <span class="badge badge-nullable" *ngIf="!column.nullable" title="Não Nulo">NN</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-columns" *ngIf="isTableExpanded(table.name) && (!table.columns || table.columns.length === 0)">
+        <div class="text-center text-muted py-2">
+          <div class="loading-spinner me-2"></div>
+          Carregando colunas...
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredTables.length === 0">
+      <div class="text-center text-muted py-4">
+        <i class="bi bi-database-x" style="font-size: 2rem;"></i>
+        <p class="mt-2 mb-0">
+          {{ searchTerm ? 'Nenhuma tabela encontrada' : 'Nenhuma tabela disponível' }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Text -->
+  <div class="help-text">
+    <small class="text-muted">
+      <i class="bi bi-info-circle"></i>
+      Arraste tabelas e campos para construir sua consulta
+    </small>
+  </div>
+</div>

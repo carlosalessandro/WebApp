@@ -1,0 +1,127 @@
+@model IEnumerable<WebApp.Models.ContaPagar>
+@{
+    ViewData["Title"] = "Contas a Pagar";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-credit-card me-2"></i>Contas a Pagar</h2>
+                <a href="@Url.Action("CriarContaPagar")" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Nova Conta
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Documento</th>
+                                        <th>Fornecedor</th>
+                                        <th>Descrição</th>
+                                        <th>Valor</th>
+                                        <th>Vencimento</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var conta in Model)
+                                    {
+                                        <tr class="@(conta.Vencida ? "table-danger" : "")">
+                                            <td>@conta.NumeroDocumento</td>
+                                            <td>@(conta.Fornecedor?.RazaoSocial ?? "N/A")</td>
+                                            <td>@conta.Descricao</td>
+                                            <td>@conta.ValorTotal.ToString("C")</td>
+                                            <td>
+                                                @conta.DataVencimento.ToString("dd/MM/yyyy")
+                                                @if (conta.Vencida)
+                                                {
+                                                    <span class="badge bg-danger ms-2">
+                                                        @conta.DiasVencimento dias
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @switch (conta.Status)
+                                                {
+                                                    case WebApp.Models.StatusConta.Aberta:
+                                                        <span class="badge bg-warning">Aberta</span>
+                                                        break;
+                                                    case WebApp.Models.StatusConta.Paga:
+                                                        <span class="badge bg-success">Paga</span>
+                                                        break;
+                                                    case WebApp.Models.StatusConta.Cancelada:
+                                                        <span class="badge bg-secondary">Cancelada</span>
+                                                        break;
+                                                    case WebApp.Models.StatusConta.Parcial:
+                                                        <span class="badge bg-info">Parcial</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                            onclick="verDetalhes(@conta.Id)">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    @if (conta.Status == WebApp.Models.StatusConta.Aberta)
+                                                    {
+                                                        <button type="button" class="btn btn-sm btn-outline-success" 
+                                                                onclick="pagarConta(@conta.Id)">
+                                                            <i class="bi bi-check-circle"></i>
+                                                        </button>
+                                                    }
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                                            onclick="editarConta(@conta.Id)">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox fs-1 text-muted"></i>
+                            <h4 class="text-muted mt-3">Nenhuma conta a pagar encontrada</h4>
+                            <p class="text-muted">Clique no botão "Nova Conta" para adicionar uma conta a pagar.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function verDetalhes(id) {
+    // Implementar visualização de detalhes
+    alert('Ver detalhes da conta: ' + id);
+}
+
+function pagarConta(id) {
+    if (confirm('Confirma o pagamento desta conta?')) {
+        // Implementar pagamento
+        alert('Pagamento registrado para conta: ' + id);
+    }
+}
+
+function editarConta(id) {
+    // Implementar edição
+    alert('Editar conta: ' + id);
+}
+</script>

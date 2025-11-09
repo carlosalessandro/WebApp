@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApp.Models;
 using WebApp.Services;
 
@@ -8,11 +9,13 @@ namespace WebApp.Controllers
     {
         private readonly IMenuService _menuService;
         private readonly ILogger<MenuController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public MenuController(IMenuService menuService, ILogger<MenuController> logger)
+        public MenuController(IMenuService menuService, ILogger<MenuController> logger, ApplicationDbContext context)
         {
             _menuService = menuService;
             _logger = logger;
+            _context = context;
         }
 
         // GET: Menu
@@ -211,6 +214,56 @@ namespace WebApp.Controllers
                 _logger.LogError(ex, "Erro ao remover itens duplicados do menu");
                 TempData["ErrorMessage"] = "Ocorreu um erro ao remover os itens duplicados. Tente novamente.";
             }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Menu/ReorganizeByModules
+        public IActionResult ReorganizeByModules()
+        {
+            return View();
+        }
+
+        // POST: Menu/ReorganizeByModules
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReorganizeByModulesConfirm()
+        {
+            try
+            {
+                var sqlScript = await System.IO.File.ReadAllTextAsync("SQL/ReorganizarMenusPorModulo.sql");
+                
+                // Dividir por comandos e executar cada um
+                var commands = sqlScript.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                
+                foreach (var command in commands)
+                {
+                    var trimmedCommand = command.Trim();
+                    if (!string.IsNullOrWhiteSpace(trimmedCommand) && !trimmedCommand.StartsWith("--"))
+                    {
+                        await _context.Database.ExecuteSqlRawAsync(trimmedCommand);
+                    }
+                }
+
+                // Limpar cache do menu após reorganização
+                _menuService.ClearMenuCache();
+
+                TempData["SuccessMessage"] = "Menus reorganizados por módulos com sucesso! Cache limpo.";
+                _logger.LogInformation("Menus reorganizados por módulos e cache limpo");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao reorganizar menus por módulos");
+                TempData["ErrorMessage"] = $"Erro ao reorganizar menus: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Menu/ClearCache
+        public IActionResult ClearCache()
+        {
+            _menuService.ClearMenuCache();
+            TempData["SuccessMessage"] = "Cache do menu limpo com sucesso!";
             return RedirectToAction(nameof(Index));
         }
 

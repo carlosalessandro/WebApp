@@ -1,0 +1,191 @@
+<div class="sql-builder-container">
+  <!-- Header -->
+  <div class="sql-builder-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h2 class="mb-0">
+        <i class="bi bi-database"></i>
+        SQL Query Builder
+      </h2>
+      <div class="header-controls">
+        <select class="form-select me-2" [(ngModel)]="selectedDatabaseType" (change)="onDatabaseTypeChange()">
+          <option value="MySQL">MySQL</option>
+          <option value="PostgreSQL">PostgreSQL</option>
+          <option value="SQL Server">SQL Server</option>
+          <option value="SQLite">SQLite</option>
+        </select>
+        <button class="btn btn-outline-secondary me-2" (click)="toggleSqlPreview()">
+          <i class="bi bi-code-slash"></i>
+          {{ showSqlPreview ? 'Ocultar' : 'Mostrar' }} SQL
+        </button>
+        <button class="btn btn-warning me-2" (click)="resetQuery()">
+          <i class="bi bi-arrow-clockwise"></i>
+          Reset
+        </button>
+        <button class="btn btn-success" [disabled]="!canExecute" (click)="executeQuery()">
+          <i class="bi bi-play-fill"></i>
+          {{ isExecuting ? 'Executando...' : 'Executar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sql-builder-content">
+    <div class="row h-100">
+      <!-- Sidebar com tabelas e campos -->
+      <div class="col-md-3 sidebar">
+        <app-database-explorer 
+          [tables]="tables"
+          (dragStart)="onDragStart($event.event, $event.item, $event.type)">
+        </app-database-explorer>
+      </div>
+
+      <!-- Área principal de construção -->
+      <div class="col-md-6 query-builder">
+        <!-- Tabs de navegação -->
+        <ul class="nav nav-tabs mb-3">
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'select'" (click)="setActiveTab('select')">
+              <i class="bi bi-list-ul"></i>
+              SELECT
+              <span class="badge bg-primary ms-1" *ngIf="hasSelectColumns">{{currentQuery.select.columns.length}}</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'from'" (click)="setActiveTab('from')">
+              <i class="bi bi-table"></i>
+              FROM
+              <span class="badge bg-success ms-1" *ngIf="hasFromTable">1</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'joins'" (click)="setActiveTab('joins')">
+              <i class="bi bi-diagram-3"></i>
+              JOINS
+              <span class="badge bg-info ms-1" *ngIf="currentQuery.joins.length > 0">{{currentQuery.joins.length}}</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'where'" (click)="setActiveTab('where')">
+              <i class="bi bi-funnel"></i>
+              WHERE
+              <span class="badge bg-warning ms-1" *ngIf="hasWhereConditions">{{currentQuery.where.conditions.length}}</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'groupby'" (click)="setActiveTab('groupby')">
+              <i class="bi bi-collection"></i>
+              GROUP BY
+              <span class="badge bg-secondary ms-1" *ngIf="hasGroupBy">{{currentQuery.groupBy.columns.length}}</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'orderby'" (click)="setActiveTab('orderby')">
+              <i class="bi bi-sort-down"></i>
+              ORDER BY
+              <span class="badge bg-dark ms-1" *ngIf="hasOrderBy">{{currentQuery.orderBy.columns.length}}</span>
+            </a>
+          </li>
+        </ul>
+
+        <!-- Conteúdo das tabs -->
+        <div class="tab-content">
+          <!-- SELECT Tab -->
+          <div class="tab-pane" [class.active]="activeTab === 'select'">
+            <app-select-builder 
+              [columns]="currentQuery.select.columns"
+              [distinct]="currentQuery.select.distinct"
+              (columnAdded)="addSelectColumn($event)"
+              (columnRemoved)="removeSelectColumn($event)"
+              (distinctChanged)="currentQuery.select.distinct = $event; generateSql()"
+              (drop)="onDrop($event, 'select')"
+              (dragover)="onDragOver($event)">
+            </app-select-builder>
+          </div>
+
+          <!-- FROM Tab -->
+          <div class="tab-pane" [class.active]="activeTab === 'from'">
+            <app-from-builder 
+              [table]="currentQuery.from.table"
+              (tableSet)="setFromTable($event)"
+              (drop)="onDrop($event, 'from')"
+              (dragover)="onDragOver($event)">
+            </app-from-builder>
+          </div>
+
+          <!-- JOINS Tab -->
+          <div class="tab-pane" [class.active]="activeTab === 'joins'">
+            <app-joins-builder 
+              [joins]="currentQuery.joins"
+              [availableTables]="tables"
+              (joinAdded)="sqlBuilderService.addJoin($event)"
+              (joinRemoved)="sqlBuilderService.removeJoin($event)">
+            </app-joins-builder>
+          </div>
+
+          <!-- WHERE Tab -->
+          <div class="tab-pane" [class.active]="activeTab === 'where'">
+            <app-where-builder 
+              [conditions]="currentQuery.where.conditions"
+              [logicalOperator]="currentQuery.where.logicalOperator"
+              (conditionAdded)="addWhereCondition($event)"
+              (conditionRemoved)="removeWhereCondition($event)"
+              (logicalOperatorChanged)="currentQuery.where.logicalOperator = $event; generateSql()"
+              (drop)="onDrop($event, 'where')"
+              (dragover)="onDragOver($event)">
+            </app-where-builder>
+          </div>
+
+          <!-- GROUP BY Tab -->
+          <div class="tab-pane" [class.active]="activeTab === 'groupby'">
+            <app-groupby-builder 
+              [columns]="currentQuery.groupBy.columns"
+              (columnAdded)="addGroupByColumn($event)"
+              (columnRemoved)="removeGroupByColumn($event)"
+              (drop)="onDrop($event, 'groupby')"
+              (dragover)="onDragOver($event)">
+            </app-groupby-builder>
+          </div>
+
+          <!-- ORDER BY Tab -->
+          <div class="tab-pane" [class.active]="activeTab === 'orderby'">
+            <app-orderby-builder 
+              [columns]="currentQuery.orderBy.columns"
+              (columnAdded)="addOrderByColumn($event)"
+              (columnRemoved)="removeOrderByColumn($event)"
+              (drop)="onDrop($event, 'orderby')"
+              (dragover)="onDragOver($event)">
+            </app-orderby-builder>
+          </div>
+        </div>
+      </div>
+
+      <!-- Painel direito - SQL Preview e Resultados -->
+      <div class="col-md-3 results-panel">
+        <!-- SQL Preview -->
+        <div class="sql-preview" *ngIf="showSqlPreview">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0">
+                <i class="bi bi-code-slash"></i>
+                SQL Gerado
+              </h6>
+              <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard()">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+            <div class="card-body">
+              <pre class="sql-code">{{generatedSql}}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="query-results mt-3" *ngIf="showResults">
+          <app-query-results 
+            [result]="queryResult">
+          </app-query-results>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

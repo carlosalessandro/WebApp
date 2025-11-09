@@ -1,0 +1,289 @@
+@model WebApp.Models.NFCe
+
+@{
+    ViewData["Title"] = "Detalhes da NFC-e";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-receipt"></i>
+                        Detalhes da NFC-e
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @if (TempData["Sucesso"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle"></i>
+                            @TempData["Sucesso"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["Erro"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            @TempData["Erro"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Informações da NFC-e</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-2">
+                                        <div class="col-sm-4"><strong>Número:</strong></div>
+                                        <div class="col-sm-8">@Model.Numero</div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-sm-4"><strong>Série:</strong></div>
+                                        <div class="col-sm-8">@Model.Serie</div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-sm-4"><strong>Chave de Acesso:</strong></div>
+                                        <div class="col-sm-8">
+                                            <code>@Model.ChaveAcesso</code>
+                                            <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copiarChave()">
+                                                <i class="bi bi-clipboard"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-sm-4"><strong>Status:</strong></div>
+                                        <div class="col-sm-8">
+                                            @if (Model.Status == "Autorizada")
+                                            {
+                                                <span class="badge bg-success">@Model.Status</span>
+                                            }
+                                            else if (Model.Status == "Cancelada")
+                                            {
+                                                <span class="badge bg-danger">@Model.Status</span>
+                                            }
+                                            else if (Model.Status == "Rejeitada")
+                                            {
+                                                <span class="badge bg-warning">@Model.Status</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">@Model.Status</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-sm-4"><strong>Data de Emissão:</strong></div>
+                                        <div class="col-sm-8">@Model.DataEmissao.ToString("dd/MM/yyyy HH:mm:ss")</div>
+                                    </div>
+                                    @if (Model.Venda != null)
+                                    {
+                                        <div class="row mb-2">
+                                            <div class="col-sm-4"><strong>Valor Total:</strong></div>
+                                            <div class="col-sm-8">@Model.Venda.ValorTotal.ToString("C")</div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Informações da Venda</h5>
+                                </div>
+                                <div class="card-body">
+                                    @if (Model.Venda != null)
+                                    {
+                                        <div class="row mb-2">
+                                            <div class="col-sm-4"><strong>ID da Venda:</strong></div>
+                                            <div class="col-sm-8">#@Model.Venda.Id</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-sm-4"><strong>Data da Venda:</strong></div>
+                                            <div class="col-sm-8">@Model.Venda.DataVenda.ToString("dd/MM/yyyy HH:mm:ss")</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-sm-4"><strong>Valor Total:</strong></div>
+                                            <div class="col-sm-8">@Model.Venda.ValorTotal.ToString("C")</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-sm-4"><strong>Desconto:</strong></div>
+                                            <div class="col-sm-8">@Model.Venda.Desconto.ToString("C")</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-sm-4"><strong>Valor Final:</strong></div>
+                                            <div class="col-sm-8">@Model.Venda.ValorFinal.ToString("C")</div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted">Informações da venda não disponíveis.</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.ProtocoloAutorizacao))
+                    {
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Informações de Autorização</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-2">
+                                    <div class="col-sm-3"><strong>Protocolo:</strong></div>
+                                    <div class="col-sm-9">@Model.ProtocoloAutorizacao</div>
+                                </div>
+                                @if (Model.DataAutorizacao.HasValue)
+                                {
+                                    <div class="row mb-2">
+                                        <div class="col-sm-3"><strong>Data de Autorização:</strong></div>
+                                        <div class="col-sm-9">@Model.DataAutorizacao.Value.ToString("dd/MM/yyyy HH:mm:ss")</div>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.MensagemRetorno))
+                                {
+                                    <div class="row mb-2">
+                                        <div class="col-sm-3"><strong>Mensagem:</strong></div>
+                                        <div class="col-sm-9">@Model.MensagemRetorno</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.UrlConsulta))
+                    {
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Consulta</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-3"><strong>URL de Consulta:</strong></div>
+                                    <div class="col-sm-9">
+                                        <a href="@Model.UrlConsulta" target="_blank" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-link-45deg"></i>
+                                            Consultar NFC-e
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i>
+                                Voltar ao PDV
+                            </a>
+                        </div>
+                        <div>
+                            @if (Model.Status == "Autorizada")
+                            {
+                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#cancelarModal">
+                                    <i class="bi bi-x-circle"></i>
+                                    Cancelar NFC-e
+                                </button>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(Model.Xml))
+                            {
+                                <button type="button" class="btn btn-info ms-2" onclick="visualizarXml()">
+                                    <i class="bi bi-file-code"></i>
+                                    Visualizar XML
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para cancelar NFC-e -->
+<div class="modal fade" id="cancelarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="CancelarNFCe" method="post">
+                <input type="hidden" name="nfceId" value="@Model.Id" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Cancelar NFC-e</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+                    </div>
+                    <div class="mb-3">
+                        <label for="justificativa" class="form-label">Justificativa para o cancelamento:</label>
+                        <textarea class="form-control" id="justificativa" name="justificativa" rows="3" required 
+                                  placeholder="Digite o motivo do cancelamento..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-circle"></i>
+                        Confirmar Cancelamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para visualizar XML -->
+<div class="modal fade" id="xmlModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">XML da NFC-e</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <pre id="xmlContent" class="bg-light p-3" style="max-height: 400px; overflow-y: auto;"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" onclick="copiarXml()">
+                    <i class="bi bi-clipboard"></i>
+                    Copiar XML
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copiarChave() {
+    const chave = '@Model.ChaveAcesso';
+    navigator.clipboard.writeText(chave).then(function() {
+        alert('Chave de acesso copiada para a área de transferência!');
+    });
+}
+
+function visualizarXml() {
+    const xml = @Html.Raw(Json.Serialize(Model.Xml ?? ""));
+    document.getElementById('xmlContent').textContent = xml;
+    new bootstrap.Modal(document.getElementById('xmlModal')).show();
+}
+
+function copiarXml() {
+    const xml = document.getElementById('xmlContent').textContent;
+    navigator.clipboard.writeText(xml).then(function() {
+        alert('XML copiado para a área de transferência!');
+    });
+}
+</script>

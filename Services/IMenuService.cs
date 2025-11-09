@@ -12,5 +12,6 @@ namespace WebApp.Services
         Task<bool> ToggleMenuItemStatusAsync(int id);
         Task<IEnumerable<MenuItem>> GetDuplicateMenuItemsAsync();
         Task<int> RemoveDuplicateMenuItemsAsync();
+        void ClearMenuCache();
     }
 }

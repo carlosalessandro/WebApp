@@ -1,0 +1,311 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2><i class="bi bi-kanban"></i> Kanban Board</h2>
+        <div>
+          <button class="btn btn-primary me-2">
+            <i class="bi bi-plus-circle"></i> Nova Tarefa
+          </button>
+          <a routerLink="/tarefas" class="btn btn-outline-secondary">
+            <i class="bi bi-list"></i> Lista
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row kanban-board">
+    <!-- Coluna: A Fazer -->
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="kanban-column">
+        <div class="kanban-column-header todo">
+          <span>
+            <i class="{{getStatusIcon(StatusTarefa.ToDo)}}"></i> 
+            {{getStatusName(StatusTarefa.ToDo)}}
+          </span>
+          <span class="badge bg-light text-dark">
+            {{getTarefasByStatus(StatusTarefa.ToDo).length}}
+          </span>
+        </div>
+        
+        <div class="kanban-drop-zone" 
+             (drop)="onDrop($event, StatusTarefa.ToDo)"
+             (dragover)="onDragOver($event)"
+             (dragenter)="$event.currentTarget.classList.add('drag-over')"
+             (dragleave)="$event.currentTarget.classList.remove('drag-over')">
+          
+          <div *ngFor="let tarefa of getTarefasByStatus(StatusTarefa.ToDo)" 
+               class="kanban-card"
+               draggable="true"
+               (dragstart)="onDragStart($event, tarefa)"
+               [style.border-left-color]="tarefa.cor">
+            
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h6 class="card-title mb-0">{{tarefa.titulo}}</h6>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#"><i class="bi bi-eye"></i> Ver</a></li>
+                  <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i> Editar</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i> Excluir</a></li>
+                </ul>
+              </div>
+            </div>
+            
+            <p *ngIf="tarefa.descricao" class="card-text small text-muted">
+              {{tarefa.descricao.length > 100 ? (tarefa.descricao.substring(0, 100) + '...') : tarefa.descricao}}
+            </p>
+            
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <small *ngIf="tarefa.responsavel" class="text-muted">
+                  <i class="bi bi-person"></i> {{tarefa.responsavel}}
+                </small>
+              </div>
+              <div>
+                <small *ngIf="tarefa.dataVencimento" 
+                       [class.text-danger]="isAtrasada(tarefa)"
+                       [class.text-muted]="!isAtrasada(tarefa)">
+                  <i class="bi bi-calendar"></i> {{formatDate(tarefa.dataVencimento)}}
+                </small>
+              </div>
+            </div>
+            
+            <div class="mt-2">
+              <span class="badge priority-badge {{getPrioridadeClass(tarefa.prioridade)}}">
+                {{getPrioridadeNome(tarefa.prioridade)}}
+              </span>
+              
+              <span *ngIf="tarefa.tags" class="badge bg-light text-dark ms-1">
+                {{tarefa.tags.split(',')[0]}}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coluna: Em Progresso -->
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="kanban-column">
+        <div class="kanban-column-header in-progress">
+          <span>
+            <i class="{{getStatusIcon(StatusTarefa.InProgress)}}"></i> 
+            {{getStatusName(StatusTarefa.InProgress)}}
+          </span>
+          <span class="badge bg-light text-dark">
+            {{getTarefasByStatus(StatusTarefa.InProgress).length}}
+          </span>
+        </div>
+        
+        <div class="kanban-drop-zone" 
+             (drop)="onDrop($event, StatusTarefa.InProgress)"
+             (dragover)="onDragOver($event)"
+             (dragenter)="$event.currentTarget.classList.add('drag-over')"
+             (dragleave)="$event.currentTarget.classList.remove('drag-over')">
+          
+          <div *ngFor="let tarefa of getTarefasByStatus(StatusTarefa.InProgress)" 
+               class="kanban-card"
+               draggable="true"
+               (dragstart)="onDragStart($event, tarefa)"
+               [style.border-left-color]="tarefa.cor">
+            
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h6 class="card-title mb-0">{{tarefa.titulo}}</h6>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#"><i class="bi bi-eye"></i> Ver</a></li>
+                  <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i> Editar</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i> Excluir</a></li>
+                </ul>
+              </div>
+            </div>
+            
+            <p *ngIf="tarefa.descricao" class="card-text small text-muted">
+              {{tarefa.descricao.length > 100 ? (tarefa.descricao.substring(0, 100) + '...') : tarefa.descricao}}
+            </p>
+            
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <small *ngIf="tarefa.responsavel" class="text-muted">
+                  <i class="bi bi-person"></i> {{tarefa.responsavel}}
+                </small>
+              </div>
+              <div>
+                <small *ngIf="tarefa.dataVencimento" 
+                       [class.text-danger]="isAtrasada(tarefa)"
+                       [class.text-muted]="!isAtrasada(tarefa)">
+                  <i class="bi bi-calendar"></i> {{formatDate(tarefa.dataVencimento)}}
+                </small>
+              </div>
+            </div>
+            
+            <div class="mt-2">
+              <span class="badge priority-badge {{getPrioridadeClass(tarefa.prioridade)}}">
+                {{getPrioridadeNome(tarefa.prioridade)}}
+              </span>
+              
+              <span *ngIf="tarefa.tags" class="badge bg-light text-dark ms-1">
+                {{tarefa.tags.split(',')[0]}}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coluna: Em Revisão -->
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="kanban-column">
+        <div class="kanban-column-header in-review">
+          <span>
+            <i class="{{getStatusIcon(StatusTarefa.InReview)}}"></i> 
+            {{getStatusName(StatusTarefa.InReview)}}
+          </span>
+          <span class="badge bg-light text-dark">
+            {{getTarefasByStatus(StatusTarefa.InReview).length}}
+          </span>
+        </div>
+        
+        <div class="kanban-drop-zone" 
+             (drop)="onDrop($event, StatusTarefa.InReview)"
+             (dragover)="onDragOver($event)"
+             (dragenter)="$event.currentTarget.classList.add('drag-over')"
+             (dragleave)="$event.currentTarget.classList.remove('drag-over')">
+          
+          <div *ngFor="let tarefa of getTarefasByStatus(StatusTarefa.InReview)" 
+               class="kanban-card"
+               draggable="true"
+               (dragstart)="onDragStart($event, tarefa)"
+               [style.border-left-color]="tarefa.cor">
+            
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h6 class="card-title mb-0">{{tarefa.titulo}}</h6>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#"><i class="bi bi-eye"></i> Ver</a></li>
+                  <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i> Editar</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i> Excluir</a></li>
+                </ul>
+              </div>
+            </div>
+            
+            <p *ngIf="tarefa.descricao" class="card-text small text-muted">
+              {{tarefa.descricao.length > 100 ? (tarefa.descricao.substring(0, 100) + '...') : tarefa.descricao}}
+            </p>
+            
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <small *ngIf="tarefa.responsavel" class="text-muted">
+                  <i class="bi bi-person"></i> {{tarefa.responsavel}}
+                </small>
+              </div>
+              <div>
+                <small *ngIf="tarefa.dataVencimento" 
+                       [class.text-danger]="isAtrasada(tarefa)"
+                       [class.text-muted]="!isAtrasada(tarefa)">
+                  <i class="bi bi-calendar"></i> {{formatDate(tarefa.dataVencimento)}}
+                </small>
+              </div>
+            </div>
+            
+            <div class="mt-2">
+              <span class="badge priority-badge {{getPrioridadeClass(tarefa.prioridade)}}">
+                {{getPrioridadeNome(tarefa.prioridade)}}
+              </span>
+              
+              <span *ngIf="tarefa.tags" class="badge bg-light text-dark ms-1">
+                {{tarefa.tags.split(',')[0]}}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coluna: Concluída -->
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="kanban-column">
+        <div class="kanban-column-header done">
+          <span>
+            <i class="{{getStatusIcon(StatusTarefa.Done)}}"></i> 
+            {{getStatusName(StatusTarefa.Done)}}
+          </span>
+          <span class="badge bg-light text-dark">
+            {{getTarefasByStatus(StatusTarefa.Done).length}}
+          </span>
+        </div>
+        
+        <div class="kanban-drop-zone" 
+             (drop)="onDrop($event, StatusTarefa.Done)"
+             (dragover)="onDragOver($event)"
+             (dragenter)="$event.currentTarget.classList.add('drag-over')"
+             (dragleave)="$event.currentTarget.classList.remove('drag-over')">
+          
+          <div *ngFor="let tarefa of getTarefasByStatus(StatusTarefa.Done)" 
+               class="kanban-card"
+               draggable="true"
+               (dragstart)="onDragStart($event, tarefa)"
+               [style.border-left-color]="tarefa.cor">
+            
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h6 class="card-title mb-0">{{tarefa.titulo}}</h6>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#"><i class="bi bi-eye"></i> Ver</a></li>
+                  <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i> Editar</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i> Excluir</a></li>
+                </ul>
+              </div>
+            </div>
+            
+            <p *ngIf="tarefa.descricao" class="card-text small text-muted">
+              {{tarefa.descricao.length > 100 ? (tarefa.descricao.substring(0, 100) + '...') : tarefa.descricao}}
+            </p>
+            
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <small *ngIf="tarefa.responsavel" class="text-muted">
+                  <i class="bi bi-person"></i> {{tarefa.responsavel}}
+                </small>
+              </div>
+              <div>
+                <small *ngIf="tarefa.dataVencimento" 
+                       [class.text-danger]="isAtrasada(tarefa)"
+                       [class.text-muted]="!isAtrasada(tarefa)">
+                  <i class="bi bi-calendar"></i> {{formatDate(tarefa.dataVencimento)}}
+                </small>
+              </div>
+            </div>
+            
+            <div class="mt-2">
+              <span class="badge priority-badge {{getPrioridadeClass(tarefa.prioridade)}}">
+                {{getPrioridadeNome(tarefa.prioridade)}}
+              </span>
+              
+              <span *ngIf="tarefa.tags" class="badge bg-light text-dark ms-1">
+                {{tarefa.tags.split(',')[0]}}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,207 @@
+@{
+    ViewData["Title"] = "Importar NFC-e";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-download"></i>
+                        Importar NFC-e
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @if (TempData["Sucesso"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle"></i>
+                            @TempData["Sucesso"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["Erro"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            @TempData["Erro"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Instruções:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Digite ou cole a chave de acesso da NFC-e que deseja importar</li>
+                            <li>A chave de acesso deve ter 44 dígitos</li>
+                            <li>O sistema buscará as informações da NFC-e automaticamente</li>
+                        </ul>
+                    </div>
+
+                    <form asp-action="ImportarNFCe" method="post">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="chaveAcesso" class="form-label">
+                                        <strong>Chave de Acesso da NFC-e:</strong>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-key"></i>
+                                        </span>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="chaveAcesso" 
+                                               name="chaveAcesso" 
+                                               placeholder="Digite a chave de acesso (44 dígitos)"
+                                               maxlength="44"
+                                               pattern="[0-9]{44}"
+                                               title="A chave de acesso deve conter exatamente 44 dígitos numéricos"
+                                               required>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="colarChave()">
+                                            <i class="bi bi-clipboard"></i>
+                                            Colar
+                                        </button>
+                                    </div>
+                                    <div class="form-text">
+                                        Exemplo: 12345678901234567890123456789012345678901234
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="confirmarImportacao" required>
+                                        <label class="form-check-label" for="confirmarImportacao">
+                                            Confirmo que a chave de acesso está correta e autorizo a importação da NFC-e
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i>
+                                Voltar ao PDV
+                            </a>
+                            <button type="submit" class="btn btn-info" id="btnImportar" disabled>
+                                <i class="bi bi-download"></i>
+                                Importar NFC-e
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Card com informações adicionais -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-question-circle"></i>
+                        Como encontrar a chave de acesso?
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Na NFC-e impressa:</h6>
+                            <ul>
+                                <li>Procure por "Chave de Acesso" no documento</li>
+                                <li>Geralmente está no rodapé ou no cabeçalho</li>
+                                <li>É uma sequência de 44 números</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>No QR Code:</h6>
+                            <ul>
+                                <li>Use um leitor de QR Code</li>
+                                <li>A chave de acesso estará na URL</li>
+                                <li>Copie apenas os 44 dígitos numéricos</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Importante:</strong> Certifique-se de que a NFC-e foi emitida por um estabelecimento autorizado 
+                        e que você tem permissão para importar estes dados.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chaveInput = document.getElementById('chaveAcesso');
+    const confirmarCheck = document.getElementById('confirmarImportacao');
+    const btnImportar = document.getElementById('btnImportar');
+
+    function validarFormulario() {
+        const chaveValida = chaveInput.value.length === 44 && /^[0-9]{44}$/.test(chaveInput.value);
+        const confirmado = confirmarCheck.checked;
+        
+        btnImportar.disabled = !(chaveValida && confirmado);
+    }
+
+    chaveInput.addEventListener('input', function() {
+        // Remove caracteres não numéricos
+        this.value = this.value.replace(/[^0-9]/g, '');
+        
+        // Limita a 44 caracteres
+        if (this.value.length > 44) {
+            this.value = this.value.substring(0, 44);
+        }
+        
+        validarFormulario();
+        
+        // Feedback visual
+        if (this.value.length === 44) {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        } else if (this.value.length > 0) {
+            this.classList.remove('is-valid');
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-valid', 'is-invalid');
+        }
+    });
+
+    confirmarCheck.addEventListener('change', validarFormulario);
+});
+
+async function colarChave() {
+    try {
+        const text = await navigator.clipboard.readText();
+        const chaveInput = document.getElementById('chaveAcesso');
+        
+        // Extrai apenas números do texto colado
+        const numeros = text.replace(/[^0-9]/g, '');
+        
+        if (numeros.length >= 44) {
+            chaveInput.value = numeros.substring(0, 44);
+        } else {
+            chaveInput.value = numeros;
+        }
+        
+        // Dispara o evento input para validação
+        chaveInput.dispatchEvent(new Event('input'));
+        
+        if (numeros.length === 44) {
+            alert('Chave de acesso colada com sucesso!');
+        } else {
+            alert('Texto colado, mas verifique se a chave está completa (44 dígitos).');
+        }
+    } catch (err) {
+        alert('Não foi possível colar do clipboard. Cole manualmente.');
+    }
+}
+</script>

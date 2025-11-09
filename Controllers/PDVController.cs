@@ -65,7 +65,7 @@ namespace WebApp.Controllers
                     UsuarioId = 1 // Substituir pelo usuário logado
                 };
                 _context.Vendas.Add(vendaAberta);
-                _context.SaveChanges();
+                //_context.SaveChanges();
             }
 
             // Obter categorias para filtro

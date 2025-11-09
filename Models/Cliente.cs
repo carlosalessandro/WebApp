@@ -48,5 +48,11 @@ namespace WebApp.Models
         public string Cidade { get; set; } = string.Empty;
 
         public DateTime DataCadastro { get; set; } = DateTime.Now;
+
+        public bool Ativo { get; set; } = true;
+
+        // Navegação
+        public virtual ICollection<ContaReceber>? ContasReceber { get; set; }
+        public virtual ICollection<Venda>? Vendas { get; set; }
     }
 }

@@ -1,0 +1,100 @@
+@model WebApp.Models.OrdemProducao
+@{
+    ViewData["Title"] = "Nova Ordem de Produção";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4><i class="bi bi-plus-circle"></i> Nova Ordem de Produção</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="CreateOrdem" method="post">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="NumeroOrdem" class="form-label"></label>
+                            <input asp-for="NumeroOrdem" class="form-control" />
+                            <span asp-validation-for="NumeroOrdem" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="ProdutoId" class="form-label"></label>
+                            <select asp-for="ProdutoId" class="form-select" asp-items="ViewBag.Produtos">
+                                <option value="">Selecione um produto</option>
+                            </select>
+                            <span asp-validation-for="ProdutoId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label asp-for="Quantidade" class="form-label"></label>
+                            <input asp-for="Quantidade" class="form-control" type="number" min="1" />
+                            <span asp-validation-for="Quantidade" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label asp-for="Status" class="form-label"></label>
+                            <select asp-for="Status" class="form-select" asp-items="ViewBag.Status"></select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label asp-for="Prioridade" class="form-label"></label>
+                            <select asp-for="Prioridade" class="form-select">
+                                <option value="1">1 - Baixa</option>
+                                <option value="2">2 - Normal</option>
+                                <option value="3" selected>3 - Média</option>
+                                <option value="4">4 - Alta</option>
+                                <option value="5">5 - Urgente</option>
+                            </select>
+                            <span asp-validation-for="Prioridade" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="DataInicioPrevista" class="form-label"></label>
+                            <input asp-for="DataInicioPrevista" class="form-control" type="date" />
+                            <span asp-validation-for="DataInicioPrevista" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="DataFimPrevista" class="form-label"></label>
+                            <input asp-for="DataFimPrevista" class="form-control" type="date" />
+                            <span asp-validation-for="DataFimPrevista" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Observacoes" class="form-label"></label>
+                    <textarea asp-for="Observacoes" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Observacoes" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Salvar
+                    </button>
+                    <a asp-action="OrdemProducao" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

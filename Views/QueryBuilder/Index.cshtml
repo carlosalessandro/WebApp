@@ -1,0 +1,258 @@
+@{
+    ViewData["Title"] = "SQL Query Builder";
+}
+
+<div class="container-fluid p-0">
+    <div class="sql-builder-page">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h1 class="page-title">
+                            <i class="bi bi-database"></i>
+                            SQL Query Builder
+                        </h1>
+                        <p class="page-subtitle text-muted">
+                            Construa consultas SQL complexas de forma visual e intuitiva
+                        </p>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary" onclick="showHelp()">
+                                <i class="bi bi-question-circle"></i>
+                                Ajuda
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="showExamples()">
+                                <i class="bi bi-collection"></i>
+                                Exemplos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SQL Builder Interface -->
+        <div class="builder-interface">
+            <div class="container-fluid h-100">
+                <div class="row h-100">
+                    <!-- Sidebar com tabelas -->
+                    <div class="col-md-3 sidebar-panel">
+                        <div class="panel-content">
+                            <h6 class="panel-title">
+                                <i class="bi bi-database"></i>
+                                Tabelas do Banco
+                            </h6>
+                            <div class="search-box mb-3">
+                                <input type="text" class="form-control form-control-sm" placeholder="Buscar tabelas..." id="tableSearch">
+                            </div>
+                            <div class="tables-list" id="tablesList">
+                                <!-- Tabelas serão carregadas aqui via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Área principal de construção -->
+                    <div class="col-md-6 builder-panel">
+                        <div class="panel-content">
+                            <!-- Tabs -->
+                            <ul class="nav nav-tabs mb-3" id="builderTabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-bs-toggle="tab" href="#selectTab">
+                                        <i class="bi bi-list-ul"></i> SELECT
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#fromTab">
+                                        <i class="bi bi-table"></i> FROM
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#whereTab">
+                                        <i class="bi bi-funnel"></i> WHERE
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#orderTab">
+                                        <i class="bi bi-sort-down"></i> ORDER BY
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <!-- Tab Content -->
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="selectTab">
+                                    <div class="drop-zone" data-type="select">
+                                        <div class="drop-zone-content">
+                                            <i class="bi bi-plus-circle-dotted"></i>
+                                            <p>Arraste campos aqui para o SELECT</p>
+                                        </div>
+                                    </div>
+                                    <div class="selected-items" id="selectItems"></div>
+                                </div>
+
+                                <div class="tab-pane fade" id="fromTab">
+                                    <div class="drop-zone" data-type="from">
+                                        <div class="drop-zone-content">
+                                            <i class="bi bi-table"></i>
+                                            <p>Arraste uma tabela aqui para o FROM</p>
+                                        </div>
+                                    </div>
+                                    <div class="selected-items" id="fromItems"></div>
+                                </div>
+
+                                <div class="tab-pane fade" id="whereTab">
+                                    <div class="drop-zone" data-type="where">
+                                        <div class="drop-zone-content">
+                                            <i class="bi bi-funnel"></i>
+                                            <p>Arraste campos aqui para criar condições WHERE</p>
+                                        </div>
+                                    </div>
+                                    <div class="selected-items" id="whereItems"></div>
+                                </div>
+
+                                <div class="tab-pane fade" id="orderTab">
+                                    <div class="drop-zone" data-type="order">
+                                        <div class="drop-zone-content">
+                                            <i class="bi bi-sort-down"></i>
+                                            <p>Arraste campos aqui para ORDER BY</p>
+                                        </div>
+                                    </div>
+                                    <div class="selected-items" id="orderItems"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Painel de SQL e Resultados -->
+                    <div class="col-md-3 results-panel">
+                        <div class="panel-content">
+                            <!-- SQL Preview -->
+                            <div class="sql-preview mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">
+                                        <i class="bi bi-code-slash"></i>
+                                        SQL Gerado
+                                    </h6>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-secondary" onclick="copySQL()" title="Copiar SQL">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                        <button class="btn btn-success" onclick="executeQuery()" title="Executar Query">
+                                            <i class="bi bi-play-fill"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <pre class="sql-code" id="sqlPreview">-- Sua query aparecerá aqui</pre>
+                            </div>
+
+                            <!-- Resultados -->
+                            <div class="query-results" id="queryResults" style="display: none;">
+                                <h6>
+                                    <i class="bi bi-table"></i>
+                                    Resultados
+                                </h6>
+                                <div class="results-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-question-circle"></i>
+                    Como usar o SQL Builder
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="help-content">
+                    <h6>1. Explorando o Banco de Dados</h6>
+                    <p>No painel esquerdo, você encontra todas as tabelas disponíveis. Clique em uma tabela para expandir e ver suas colunas.</p>
+
+                    <h6>2. Construindo a Query</h6>
+                    <ul>
+                        <li><strong>SELECT:</strong> Arraste campos para selecionar quais colunas retornar</li>
+                        <li><strong>FROM:</strong> Arraste uma tabela para definir a fonte principal dos dados</li>
+                        <li><strong>WHERE:</strong> Arraste campos para criar condições de filtro</li>
+                        <li><strong>ORDER BY:</strong> Defina a ordenação dos resultados</li>
+                    </ul>
+
+                    <h6>3. Executando a Query</h6>
+                    <p>O SQL é gerado automaticamente conforme você constrói a query. Clique em "Executar" para ver os resultados.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Examples Modal -->
+<div class="modal fade" id="examplesModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-collection"></i>
+                    Exemplos de Queries
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="examples-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="example-card">
+                                <h6>Consulta Simples</h6>
+                                <pre><code>SELECT id, nome, email
+FROM usuarios
+WHERE ativo = 1
+ORDER BY nome ASC</code></pre>
+                                <p><small class="text-muted">Lista usuários ativos ordenados por nome</small></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="example-card">
+                                <h6>Consulta com Agregação</h6>
+                                <pre><code>SELECT categoria, COUNT(*) as total
+FROM produtos
+WHERE preco > 100
+GROUP BY categoria
+ORDER BY total DESC</code></pre>
+                                <p><small class="text-muted">Conta produtos por categoria com preço > 100</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="~/css/sql-builder.css" asp-append-version="true" />
+
+<script src="~/js/sql-builder.js" asp-append-version="true"></script>
+
+<script>
+function showHelp() {
+    new bootstrap.Modal(document.getElementById('helpModal')).show();
+}
+
+function showExamples() {
+    new bootstrap.Modal(document.getElementById('examplesModal')).show();
+}
+</script>

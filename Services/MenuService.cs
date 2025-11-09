@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using WebApp.Models;
 
 namespace WebApp.Services
@@ -7,29 +8,61 @@ namespace WebApp.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<MenuService> _logger;
+        private readonly IMemoryCache _cache;
+        private const string MENU_CACHE_KEY = "MenuItems_Active";
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
 
-        public MenuService(ApplicationDbContext context, ILogger<MenuService> logger)
+        public MenuService(ApplicationDbContext context, ILogger<MenuService> logger, IMemoryCache cache)
         {
             _context = context;
             _logger = logger;
+            _cache = cache;
         }
 
         public async Task<IEnumerable<MenuItem>> GetMenuItemsAsync()
         {
             try
             {
-                return await _context.MenuItems
+                // Tentar buscar do cache primeiro
+                if (_cache.TryGetValue(MENU_CACHE_KEY, out IEnumerable<MenuItem>? cachedMenu) && cachedMenu != null)
+                {
+                    _logger.LogDebug("Menu carregado do cache");
+                    return cachedMenu;
+                }
+
+                _logger.LogInformation("Carregando menu do banco de dados");
+
+                // Buscar do banco com query otimizada
+                var menuItems = await _context.MenuItems
+                    .AsNoTracking() // Melhor performance para leitura
                     .Include(m => m.SubMenus.Where(s => s.Ativo).OrderBy(s => s.Ordem))
                     .Where(m => m.Ativo && m.MenuPaiId == null)
                     .OrderBy(m => m.Ordem)
                     .ThenBy(m => m.Titulo)
+                    .AsSplitQuery() // Otimiza queries com Include
                     .ToListAsync();
+
+                // Armazenar no cache
+                _cache.Set(MENU_CACHE_KEY, menuItems, new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = CacheDuration,
+                    Priority = CacheItemPriority.High
+                });
+
+                _logger.LogInformation("Menu carregado e armazenado em cache. Total de itens: {Count}", menuItems.Count);
+                return menuItems;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao buscar itens do menu");
                 return new List<MenuItem>();
             }
+        }
+
+        public void ClearMenuCache()
+        {
+            _cache.Remove(MENU_CACHE_KEY);
+            _logger.LogInformation("Cache do menu limpo");
         }
 
         public async Task<MenuItem?> GetMenuItemByIdAsync(int id)
@@ -55,6 +88,7 @@ namespace WebApp.Services
                 menuItem.DataCriacao = DateTime.Now;
                 _context.MenuItems.Add(menuItem);
                 await _context.SaveChangesAsync();
+                ClearMenuCache(); // Limpar cache após criar
                 return menuItem;
             }
             catch (Exception ex)
@@ -71,6 +105,7 @@ namespace WebApp.Services
                 menuItem.DataAtualizacao = DateTime.Now;
                 _context.MenuItems.Update(menuItem);
                 await _context.SaveChangesAsync();
+                ClearMenuCache(); // Limpar cache após atualizar
                 return menuItem;
             }
             catch (Exception ex)
@@ -89,6 +124,7 @@ namespace WebApp.Services
                 {
                     _context.MenuItems.Remove(menuItem);
                     await _context.SaveChangesAsync();
+                    ClearMenuCache(); // Limpar cache após excluir
                     return true;
                 }
                 return false;
@@ -110,6 +146,7 @@ namespace WebApp.Services
                     menuItem.Ativo = !menuItem.Ativo;
                     menuItem.DataAtualizacao = DateTime.Now;
                     await _context.SaveChangesAsync();
+                    ClearMenuCache(); // Limpar cache após alterar status
                     return true;
                 }
                 return false;

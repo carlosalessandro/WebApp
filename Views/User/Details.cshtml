@@ -1,0 +1,118 @@
+@model WebApp.Models.User
+@{
+    ViewData["Title"] = "Detalhes do Usuário";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-person"></i> Detalhes do Usuário</h2>
+        <div class="d-flex gap-2">
+            <a asp-action="ManagePermissions" asp-route-id="@Model.Id" class="btn btn-primary">
+                <i class="bi bi-shield-check"></i> Gerenciar Permissões
+            </a>
+            <a asp-action="Permissions" asp-route-id="@Model.Id" class="btn btn-outline-info">
+                <i class="bi bi-list-check"></i> Ver Permissões
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Informações Pessoais
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Nome:</dt>
+                        <dd class="col-sm-9">
+                            <strong>@Model.Name</strong>
+                        </dd>
+
+                        <dt class="col-sm-3">Email:</dt>
+                        <dd class="col-sm-9">
+                            <i class="bi bi-envelope"></i> @Model.Email
+                        </dd>
+
+                        <dt class="col-sm-3">Data de Criação:</dt>
+                        <dd class="col-sm-9">
+                            <i class="bi bi-calendar"></i> @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-shield-check"></i> Resumo de Permissões
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.UsuarioPermissoes != null && Model.UsuarioPermissoes.Any(up => up.Concedida))
+                    {
+                        var permissoesPorCategoria = Model.UsuarioPermissoes
+                            .Where(up => up.Concedida)
+                            .GroupBy(up => up.Permissao?.Categoria?.Nome)
+                            .OrderBy(g => g.Key);
+
+                        @foreach (var categoria in permissoesPorCategoria)
+                        {
+                            <div class="mb-3">
+                                <h6 class="text-primary">@categoria.Key</h6>
+                                <ul class="list-unstyled ms-3">
+                                    @foreach (var permissao in categoria.OrderBy(p => p.Permissao?.Nome))
+                                    {
+                                        <li>
+                                            <i class="bi bi-check text-success"></i> @permissao.Permissao?.Nome
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
+                        <div class="mt-3">
+                            <a asp-action="Permissions" asp-route-id="@Model.Id" class="btn btn-outline-info btn-sm">
+                                <i class="bi bi-list-check"></i> Ver Todas as Permissões
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i> Nenhuma permissão concedida.
+                        </div>
+                        <a asp-action="ManagePermissions" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">
+                            <i class="bi bi-shield-plus"></i> Conceder Permissões
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear"></i> Ações
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="ManagePermissions" asp-route-id="@Model.Id" class="btn btn-primary">
+                            <i class="bi bi-shield-check"></i> Gerenciar Permissões
+                        </a>
+                        <a asp-action="Permissions" asp-route-id="@Model.Id" class="btn btn-outline-info">
+                            <i class="bi bi-list-check"></i> Listar Permissões
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

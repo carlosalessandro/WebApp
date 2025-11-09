@@ -1,0 +1,102 @@
+@model WebApp.Models.UsuarioPermissao
+@{
+    ViewData["Title"] = "Detalhes da Permissão";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-shield-check"></i> Detalhes da Permissão</h2>
+        <div class="d-flex gap-2">
+            <a asp-action="Manage" asp-route-id="@Model.UsuarioId" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Gerenciar Permissões
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-info-circle"></i> Informações da Permissão
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Usuário:</dt>
+                        <dd class="col-sm-8">
+                            <i class="bi bi-person"></i> @Model.Usuario?.Name
+                        </dd>
+
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">
+                            <i class="bi bi-envelope"></i> @Model.Usuario?.Email
+                        </dd>
+
+                        <dt class="col-sm-4">Categoria:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-secondary fs-6">@Model.Permissao?.Categoria?.Nome</span>
+                        </dd>
+
+                        <dt class="col-sm-4">Permissão:</dt>
+                        <dd class="col-sm-8">
+                            <strong>@Model.Permissao?.Nome</strong>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Status:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.Concedida)
+                            {
+                                <span class="badge bg-success fs-6">
+                                    <i class="bi bi-check-circle"></i> Concedida
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger fs-6">
+                                    <i class="bi bi-x-circle"></i> Negada
+                                </span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Data de Concessão:</dt>
+                        <dd class="col-sm-8">
+                            <i class="bi bi-calendar"></i> @Model.DataConcessao.ToString("dd/MM/yyyy HH:mm")
+                        </dd>
+
+                        <dt class="col-sm-4">Descrição:</dt>
+                        <dd class="col-sm-8">
+                            @if (!string.IsNullOrEmpty(Model.Permissao?.Descricao))
+                            {
+                                @Model.Permissao.Descricao
+                            }
+                            else
+                            {
+                                <span class="text-muted">Sem descrição</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent">
+            <div class="d-flex gap-2">
+                <a asp-action="Manage" asp-route-id="@Model.UsuarioId" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Gerenciar Permissões do Usuário
+                </a>
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
+                    <i class="bi bi-trash"></i> Remover Permissão
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-list"></i> Listar Todas
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

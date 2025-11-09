@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Local - Sistema de Gestão</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="bi bi-gear-fill"></i> Sistema de Gestão</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                            <i class="bi bi-house"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-diagram-3"></i> PCP
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="showSection('pcp-dashboard')">
+                                <i class="bi bi-speedometer2"></i> Dashboard PCP
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showSection('pcp-ordens')">
+                                <i class="bi bi-list-task"></i> Ordens de Produção
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showSection('pcp-recursos')">
+                                <i class="bi bi-tools"></i> Recursos
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showSection('pcp-apontamento')">
+                                <i class="bi bi-clock-history"></i> Apontamentos
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-cash-register"></i> PDV
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="showSection('pdv-vendas')">
+                                <i class="bi bi-cart"></i> Vendas
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showSection('pdv-produtos')">
+                                <i class="bi bi-box"></i> Produtos
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showSection('pdv-nfce')">
+                                <i class="bi bi-receipt"></i> NFC-e
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-graph-up"></i> Relatórios
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="showSection('relatorio-vendas')">
+                                <i class="bi bi-bar-chart"></i> Vendas
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showSection('relatorio-producao')">
+                                <i class="bi bi-pie-chart"></i> Produção
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showSection('relatorio-estoque')">
+                                <i class="bi bi-boxes"></i> Estoque
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear"></i> Configurações
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="showSection('config-usuarios')">
+                                <i class="bi bi-people"></i> Usuários
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showSection('config-permissoes')">
+                                <i class="bi bi-shield-check"></i> Permissões
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showSection('config-sistema')">
+                                <i class="bi bi-sliders"></i> Sistema
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section">
+            <div class="row">
+                <div class="col-12">
+                    <h2><i class="bi bi-house"></i> Dashboard Principal</h2>
+                    <div class="row mt-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h4>150</h4>
+                                            <p>Vendas Hoje</p>
+                                        </div>
+                                        <div class="align-self-center">
+                                            <i class="bi bi-cart-fill fs-1"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h4>25</h4>
+                                            <p>Ordens Ativas</p>
+                                        </div>
+                                        <div class="align-self-center">
+                                            <i class="bi bi-list-task fs-1"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h4>R$ 12.500</h4>
+                                            <p>Faturamento</p>
+                                        </div>
+                                        <div class="align-self-center">
+                                            <i class="bi bi-currency-dollar fs-1"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h4>320</h4>
+                                            <p>Produtos</p>
+                                        </div>
+                                        <div class="align-self-center">
+                                            <i class="bi bi-box-seam fs-1"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PCP Dashboard Section -->
+        <div id="pcp-dashboard" class="content-section" style="display: none;">
+            <div class="row">
+                <div class="col-12">
+                    <h2><i class="bi bi-diagram-3"></i> Dashboard PCP</h2>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Ordens por Status</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <span class="badge bg-primary">Planejadas: 8</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="badge bg-warning">Em Andamento: 12</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="badge bg-success">Concluídas: 45</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="badge bg-danger">Pausadas: 3</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Recursos Disponíveis</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <span class="badge bg-success">Máquinas: 15/18</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="badge bg-warning">Ferramentas: 8/12</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="badge bg-info">Operadores: 25/30</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PCP Ordens Section -->
+        <div id="pcp-ordens" class="content-section" style="display: none;">
+            <div class="row">
+                <div class="col-12">
+                    <h2><i class="bi bi-list-task"></i> Ordens de Produção</h2>
+                    <button class="btn btn-primary mb-3" onclick="showModal('modalNovaOrdem')">
+                        <i class="bi bi-plus"></i> Nova Ordem
+                    </button>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Produto</th>
+                                            <th>Quantidade</th>
+                                            <th>Status</th>
+                                            <th>Prioridade</th>
+                                            <th>Data Início</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>001</td>
+                                            <td>Produto A</td>
+                                            <td>100</td>
+                                            <td><span class="badge bg-warning">Em Andamento</span></td>
+                                            <td><span class="badge bg-danger">Alta</span></td>
+                                            <td>07/11/2025</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">Editar</button>
+                                                <button class="btn btn-sm btn-outline-success">Apontar</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>002</td>
+                                            <td>Produto B</td>
+                                            <td>50</td>
+                                            <td><span class="badge bg-primary">Planejada</span></td>
+                                            <td><span class="badge bg-warning">Média</span></td>
+                                            <td>08/11/2025</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">Editar</button>
+                                                <button class="btn btn-sm btn-outline-success">Iniciar</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDV Vendas Section -->
+        <div id="pdv-vendas" class="content-section" style="display: none;">
+            <div class="row">
+                <div class="col-12">
+                    <h2><i class="bi bi-cash-register"></i> Ponto de Venda</h2>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Produtos</h5>
+                                    <input type="text" class="form-control mt-2" placeholder="Buscar produto...">
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card product-card" onclick="addToCart('Produto 1', 25.90)">
+                                                <div class="card-body text-center">
+                                                    <i class="bi bi-box fs-1 text-primary"></i>
+                                                    <h6>Produto 1</h6>
+                                                    <p class="text-success">R$ 25,90</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card product-card" onclick="addToCart('Produto 2', 15.50)">
+                                                <div class="card-body text-center">
+                                                    <i class="bi bi-box fs-1 text-primary"></i>
+                                                    <h6>Produto 2</h6>
+                                                    <p class="text-success">R$ 15,50</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card product-card" onclick="addToCart('Produto 3', 35.00)">
+                                                <div class="card-body text-center">
+                                                    <i class="bi bi-box fs-1 text-primary"></i>
+                                                    <h6>Produto 3</h6>
+                                                    <p class="text-success">R$ 35,00</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Carrinho</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="cart-items">
+                                        <p class="text-muted">Carrinho vazio</p>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <strong>Total: <span id="cart-total">R$ 0,00</span></strong>
+                                    </div>
+                                    <button class="btn btn-success w-100 mt-3" onclick="finalizeSale()">
+                                        <i class="bi bi-check-circle"></i> Finalizar Venda
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other sections would be added here -->
+        <div id="pcp-recursos" class="content-section" style="display: none;">
+            <h2><i class="bi bi-tools"></i> Recursos</h2>
+            <p>Gerenciamento de recursos de produção.</p>
+        </div>
+
+        <div id="pcp-apontamento" class="content-section" style="display: none;">
+            <h2><i class="bi bi-clock-history"></i> Apontamentos</h2>
+            <p>Registro de apontamentos de produção.</p>
+        </div>
+
+        <div id="pdv-produtos" class="content-section" style="display: none;">
+            <h2><i class="bi bi-box"></i> Produtos</h2>
+            <p>Gerenciamento de produtos.</p>
+        </div>
+
+        <div id="pdv-nfce" class="content-section" style="display: none;">
+            <h2><i class="bi bi-receipt"></i> NFC-e</h2>
+            <p>Gerenciamento de Notas Fiscais de Consumidor Eletrônica.</p>
+        </div>
+
+        <div id="relatorio-vendas" class="content-section" style="display: none;">
+            <h2><i class="bi bi-bar-chart"></i> Relatório de Vendas</h2>
+            <p>Relatórios de vendas e faturamento.</p>
+        </div>
+
+        <div id="relatorio-producao" class="content-section" style="display: none;">
+            <h2><i class="bi bi-pie-chart"></i> Relatório de Produção</h2>
+            <p>Relatórios de produção e eficiência.</p>
+        </div>
+
+        <div id="relatorio-estoque" class="content-section" style="display: none;">
+            <h2><i class="bi bi-boxes"></i> Relatório de Estoque</h2>
+            <p>Relatórios de estoque e movimentação.</p>
+        </div>
+
+        <div id="config-usuarios" class="content-section" style="display: none;">
+            <h2><i class="bi bi-people"></i> Usuários</h2>
+            <p>Gerenciamento de usuários do sistema.</p>
+        </div>
+
+        <div id="config-permissoes" class="content-section" style="display: none;">
+            <h2><i class="bi bi-shield-check"></i> Permissões</h2>
+            <p>Gerenciamento de permissões e acessos.</p>
+        </div>
+
+        <div id="config-sistema" class="content-section" style="display: none;">
+            <h2><i class="bi bi-sliders"></i> Configurações do Sistema</h2>
+            <p>Configurações gerais do sistema.</p>
+        </div>
+    </div>
+
+    <!-- Modal Nova Ordem -->
+    <div class="modal fade" id="modalNovaOrdem" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nova Ordem de Produção</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Produto</label>
+                            <select class="form-select">
+                                <option>Selecione um produto</option>
+                                <option>Produto A</option>
+                                <option>Produto B</option>
+                                <option>Produto C</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Quantidade</label>
+                            <input type="number" class="form-control" min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Prioridade</label>
+                            <select class="form-select">
+                                <option>Baixa</option>
+                                <option>Média</option>
+                                <option>Alta</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Data Prevista</label>
+                            <input type="date" class="form-control">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Criar Ordem</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

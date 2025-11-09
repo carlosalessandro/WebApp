@@ -1,0 +1,63 @@
+@{
+    ViewData["Title"] = "Reorganizar Menus por Módulos";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="bi bi-diagram-3-fill"></i> Reorganizar Menus por Módulos</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle-fill"></i> 
+                <strong>Atenção!</strong> Esta ação irá reorganizar todos os menus do sistema agrupando-os por módulos funcionais.
+            </div>
+
+            <h5>O que será feito:</h5>
+            <ul class="list-group mb-4">
+                <li class="list-group-item">
+                    <i class="bi bi-speedometer2 text-success"></i> <strong>Dashboard</strong> - Menu principal
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-cart-check-fill text-success"></i> <strong>Vendas</strong> - PDV e NFC-e
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-folder-fill text-success"></i> <strong>Cadastros</strong> - Clientes e Produtos
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-list-check text-success"></i> <strong>Tarefas</strong> - Gerenciamento de tarefas
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-plugin text-success"></i> <strong>Integrações</strong> - WhatsApp e outros
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-graph-up-arrow text-success"></i> <strong>Relatórios</strong> - Relatórios do sistema
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-gear-fill text-success"></i> <strong>Administração</strong> - Usuários, Permissões e Menus
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-gear-wide-connected text-success"></i> <strong>PCP</strong> - Planejamento e Controle da Produção (Drag & Drop)
+                </li>
+            </ul>
+
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <strong>Importante:</strong> Os menus existentes serão atualizados com novos ícones e organização hierárquica.
+            </div>
+
+            <form asp-action="ReorganizeByModulesConfirm" method="post">
+                @Html.AntiForgeryToken()
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="bi bi-check-circle"></i> Confirmar Reorganização
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

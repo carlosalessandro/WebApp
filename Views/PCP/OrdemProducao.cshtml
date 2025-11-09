@@ -1,0 +1,118 @@
+@model IEnumerable<WebApp.Models.OrdemProducao>
+@{
+    ViewData["Title"] = "Ordens de Produção";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-clipboard-data"></i> Ordens de Produção</h2>
+        <a asp-action="CreateOrdem" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nova Ordem
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tabelaOrdens">
+                        <thead>
+                            <tr>
+                                <th>Número</th>
+                                <th>Produto</th>
+                                <th>Qtd Total</th>
+                                <th>Qtd Produzida</th>
+                                <th>Status</th>
+                                <th>Prioridade</th>
+                                <th>Data Início</th>
+                                <th>Data Fim</th>
+                                <th>Progresso</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ordem in Model)
+                            {
+                                var progresso = ordem.Quantidade > 0 ? (ordem.QuantidadeProduzida * 100 / ordem.Quantidade) : 0;
+                                var statusClass = ordem.Status switch
+                                {
+                                    "Concluída" => "success",
+                                    "EmAndamento" => "warning",
+                                    "Pausada" => "secondary",
+                                    "Cancelada" => "danger",
+                                    _ => "info"
+                                };
+
+                                <tr>
+                                    <td><strong>@ordem.NumeroOrdem</strong></td>
+                                    <td>@ordem.Produto?.Nome</td>
+                                    <td class="text-center">@ordem.Quantidade</td>
+                                    <td class="text-center">@ordem.QuantidadeProduzida</td>
+                                    <td><span class="badge bg-@statusClass">@ordem.Status</span></td>
+                                    <td class="text-center">
+                                        @for (int i = 0; i < ordem.Prioridade; i++)
+                                        {
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        }
+                                    </td>
+                                    <td>@ordem.DataInicioPrevista?.ToString("dd/MM/yyyy")</td>
+                                    <td>@ordem.DataFimPrevista?.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <div class="progress" style="height: 20px; min-width: 100px;">
+                                            <div class="progress-bar bg-@statusClass" role="progressbar" 
+                                                 style="width: @progresso%" 
+                                                 aria-valuenow="@progresso" aria-valuemin="0" aria-valuemax="100">
+                                                @progresso%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="EditOrdem" asp-route-id="@ordem.Id" 
+                                               class="btn btn-sm btn-outline-primary" title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a asp-controller="PCP" asp-action="CreateApontamento" asp-route-id="@ordem.Id" 
+                                               class="btn btn-sm btn-outline-success" title="Apontar Produção">
+                                                <i class="bi bi-check-square"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Nenhuma ordem de produção cadastrada.
+                    <a asp-action="CreateOrdem" class="alert-link">Criar a primeira ordem</a>.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#tabelaOrdens').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json'
+                },
+                order: [[4, 'desc'], [5, 'desc']]
+            });
+        });
+    </script>
+}

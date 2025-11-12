@@ -1,0 +1,101 @@
+<div class="diagram-canvas-container" #canvasContainer>
+  <div class="canvas-toolbar">
+    <div class="toolbar-group">
+      <button mat-icon-button (click)="zoomOut()" [disabled]="isReadOnly" title="Zoom Out">
+        <mat-icon>zoom_out</mat-icon>
+      </button>
+      <span class="zoom-level">{{ (canvasSettings.zoom * 100) | number:'1.0-0' }}%</span>
+      <button mat-icon-button (click)="zoomIn()" [disabled]="isReadOnly" title="Zoom In">
+        <mat-icon>zoom_in</mat-icon>
+      </button>
+      <button mat-icon-button (click)="resetZoom()" [disabled]="isReadOnly" title="Reset Zoom">
+        <mat-icon>center_focus_strong</mat-icon>
+      </button>
+    </div>
+    
+    <div class="toolbar-group">
+      <button mat-icon-button 
+              (click)="toggleGrid()" 
+              [class.active]="canvasSettings.gridEnabled"
+              [disabled]="isReadOnly" 
+              title="Toggle Grid">
+        <mat-icon>grid_on</mat-icon>
+      </button>
+      <button mat-icon-button 
+              (click)="toggleSnapToGrid()" 
+              [class.active]="canvasSettings.snapToGrid"
+              [disabled]="isReadOnly" 
+              title="Snap to Grid">
+        <mat-icon>grid_3x3</mat-icon>
+      </button>
+    </div>
+    
+    <div class="toolbar-group" *ngIf="selectedComponent">
+      <span class="selected-info">
+        {{ selectedComponent.type | titlecase }} selected
+      </span>
+      <button mat-icon-button 
+              (click)="deleteComponent(selectedComponent.id)" 
+              [disabled]="isReadOnly" 
+              title="Delete Component"
+              color="warn">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="canvas-wrapper" 
+       [style.cursor]="isDragging ? 'grabbing' : 'default'"
+       cdkDropList
+       (cdkDropListDropped)="onComponentDrop($event)">
+    
+    <canvas #canvas 
+            class="diagram-canvas"
+            [width]="canvasSettings.width"
+            [height]="canvasSettings.height"
+            [style.transform]="'scale(' + canvasSettings.zoom + ')'"
+            [style.transform-origin]="'top left'">
+    </canvas>
+    
+    <!-- Component overlays for better interaction -->
+    <div class="component-overlay" 
+         *ngFor="let component of diagram?.components; trackBy: trackByComponentId"
+         [style.left.px]="component.x * canvasSettings.zoom"
+         [style.top.px]="component.y * canvasSettings.zoom"
+         [style.width.px]="component.width * canvasSettings.zoom"
+         [style.height.px]="component.height * canvasSettings.zoom"
+         [style.transform]="'rotate(' + component.rotation + 'deg)'"
+         [class.selected]="selectedComponentId === component.id"
+         (click)="selectComponent(component)"
+         (dblclick)="onComponentDoubleClick(component)">
+    </div>
+  </div>
+
+  <!-- Context menu -->
+  <div class="context-menu" 
+       *ngIf="contextMenuVisible" 
+       [style.left.px]="contextMenuPosition.x"
+       [style.top.px]="contextMenuPosition.y">
+    <mat-menu #contextMenu="matMenu">
+      <button mat-menu-item (click)="copyComponent()" [disabled]="!selectedComponent">
+        <mat-icon>content_copy</mat-icon>
+        <span>Copy</span>
+      </button>
+      <button mat-menu-item (click)="pasteComponent()" [disabled]="!clipboardComponent">
+        <mat-icon>content_paste</mat-icon>
+        <span>Paste</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="deleteComponent(selectedComponent?.id!)" [disabled]="!selectedComponent">
+        <mat-icon>delete</mat-icon>
+        <span>Delete</span>
+      </button>
+    </mat-menu>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading diagram...</p>
+  </div>
+</div>

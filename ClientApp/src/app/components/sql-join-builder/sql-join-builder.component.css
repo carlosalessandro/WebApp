@@ -1,0 +1,387 @@
+.sql-join-builder {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.builder-card {
+  margin-bottom: 20px;
+}
+
+.query-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.section {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fafafa;
+}
+
+.section h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Examples Section */
+.examples-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.examples-section h3 {
+  color: white;
+  margin-bottom: 16px;
+}
+
+.example-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.example-buttons button {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.example-buttons button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Field Rows */
+.field-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.field-row mat-form-field {
+  flex: 1;
+  min-width: 150px;
+}
+
+/* JOIN Configuration */
+.join-row {
+  margin-bottom: 16px;
+}
+
+.join-card {
+  background-color: #f8f9fa;
+  border-left: 4px solid #007bff;
+}
+
+.join-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.join-header h4 {
+  margin: 0;
+  color: #007bff;
+  font-weight: 500;
+}
+
+.join-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.join-condition {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.join-condition mat-form-field {
+  flex: 1;
+  min-width: 120px;
+}
+
+.join-preview {
+  background-color: #e3f2fd;
+  padding: 12px;
+  border-radius: 4px;
+  border-left: 4px solid #2196f3;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #1565c0;
+}
+
+/* Condition Rows */
+.condition-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.condition-row mat-form-field {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Group By and Order By Rows */
+.group-by-row,
+.order-by-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.group-by-row mat-form-field,
+.order-by-row mat-form-field {
+  flex: 1;
+  min-width: 150px;
+}
+
+/* SQL Preview */
+.sql-preview-card {
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+}
+
+.sql-preview-card mat-card-header {
+  background-color: transparent;
+}
+
+.sql-preview-card mat-card-title {
+  color: white;
+}
+
+.sql-code {
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  padding: 16px;
+  border-radius: 4px;
+  font-family: 'Courier New', Monaco, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  border: 1px solid #444;
+}
+
+/* Info Card */
+.info-card {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.info-card mat-card-header {
+  background-color: transparent;
+}
+
+.info-card mat-card-title {
+  color: white;
+}
+
+.info-card mat-expansion-panel {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.info-card .mat-expansion-panel-header {
+  color: white;
+}
+
+.join-example,
+.aggregate-example {
+  margin-top: 12px;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.join-example pre,
+.aggregate-example pre {
+  margin: 8px 0 0 0;
+  font-family: 'Courier New', Monaco, monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #e8f5e8;
+}
+
+.function-info {
+  margin-bottom: 8px;
+  padding: 4px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sql-join-builder {
+    padding: 10px;
+  }
+
+  .field-row,
+  .condition-row,
+  .group-by-row,
+  .order-by-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .join-condition {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .example-buttons {
+    flex-direction: column;
+  }
+
+  .example-buttons button {
+    width: 100%;
+  }
+}
+
+/* Button Styling */
+button[mat-raised-button] {
+  margin: 4px;
+}
+
+button[mat-icon-button] {
+  margin: 0 4px;
+}
+
+/* Form Field Styling */
+mat-form-field {
+  margin: 4px 0;
+}
+
+mat-form-field.mat-form-field-appearance-outline .mat-form-field-outline {
+  color: rgba(0, 0, 0, 0.12);
+}
+
+mat-form-field.mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: #007bff;
+}
+
+/* Card Actions */
+mat-card-actions {
+  padding: 16px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.field-row,
+.condition-row,
+.join-row,
+.group-by-row,
+.order-by-row {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Hover Effects */
+.join-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+.section:hover {
+  border-color: #007bff;
+  transition: border-color 0.3s ease;
+}
+
+/* Syntax Highlighting for SQL */
+.sql-code {
+  position: relative;
+}
+
+.sql-code::before {
+  content: 'SQL';
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  font-size: 10px;
+  color: #888;
+  background-color: #333;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+/* Loading States */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Success/Error States */
+.success {
+  border-left-color: #28a745 !important;
+}
+
+.error {
+  border-left-color: #dc3545 !important;
+}
+
+/* Accessibility */
+button:focus,
+mat-form-field:focus-within {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .sql-join-builder {
+    padding: 0;
+  }
+  
+  .examples-section,
+  .info-card {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .sql-preview-card {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .sql-code {
+    background: #f5f5f5 !important;
+    color: black !important;
+    border: 1px solid #ccc !important;
+  }
+}

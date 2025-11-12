@@ -1,0 +1,395 @@
+<div class="sql-join-builder">
+  <mat-card class="builder-card">
+    <mat-card-header>
+      <mat-card-title>SQL JOIN Builder</mat-card-title>
+      <mat-card-subtitle>Build complex SQL queries with INNER JOIN, LEFT JOIN, SUM, and ON clauses</mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="queryForm" class="query-form">
+        
+        <!-- Quick Examples -->
+        <div class="examples-section">
+          <h3>Quick Examples</h3>
+          <div class="example-buttons">
+            <button mat-raised-button color="primary" (click)="loadInnerJoinExample()" type="button">
+              <mat-icon>join_inner</mat-icon>
+              INNER JOIN Example
+            </button>
+            <button mat-raised-button color="accent" (click)="loadLeftJoinExample()" type="button">
+              <mat-icon>join_left</mat-icon>
+              LEFT JOIN Example
+            </button>
+            <button mat-raised-button color="warn" (click)="loadSumExample()" type="button">
+              <mat-icon>functions</mat-icon>
+              SUM with JOINs
+            </button>
+          </div>
+        </div>
+
+        <!-- Query Name -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Query Name</mat-label>
+          <input matInput formControlName="name" placeholder="Enter query name">
+        </mat-form-field>
+
+        <!-- Table Selection -->
+        <div class="section">
+          <h3>1. Select Tables</h3>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tables</mat-label>
+            <mat-select multiple (selectionChange)="onTablesChange($event.value)">
+              <mat-option *ngFor="let table of availableTables" [value]="table.name">
+                {{table.name}} ({{table.columns.length}} columns)
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Field Selection -->
+        <div class="section">
+          <h3>2. Select Fields</h3>
+          <div formArrayName="fields">
+            <div *ngFor="let field of fieldsArray.controls; let i = index" [formGroupName]="i" class="field-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Table</mat-label>
+                <mat-select formControlName="table">
+                  <mat-option *ngFor="let table of currentQuery.tables" [value]="table.name">
+                    {{table.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Column</mat-label>
+                <mat-select formControlName="column">
+                  <mat-option *ngFor="let column of getColumnsForTable(field.get('table')?.value)" [value]="column.name">
+                    {{column.name}} ({{column.type}})
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Aggregate Function</mat-label>
+                <mat-select formControlName="aggregateFunction">
+                  <mat-option value="">None</mat-option>
+                  <mat-option *ngFor="let func of aggregateFunctions" [value]="func.value">
+                    {{func.label}} - {{func.description}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Alias</mat-label>
+                <input matInput formControlName="alias" placeholder="Optional alias">
+              </mat-form-field>
+
+              <button mat-icon-button color="warn" (click)="removeField(i)" type="button">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          <button mat-raised-button (click)="addField()" type="button">
+            <mat-icon>add</mat-icon>
+            Add Field
+          </button>
+        </div>
+
+        <!-- JOIN Configuration -->
+        <div class="section">
+          <h3>3. Configure JOINs</h3>
+          <div formArrayName="joins">
+            <div *ngFor="let join of joinsArray.controls; let i = index" [formGroupName]="i" class="join-row">
+              <mat-card class="join-card">
+                <mat-card-content>
+                  <div class="join-header">
+                    <h4>JOIN {{i + 1}}</h4>
+                    <button mat-icon-button color="warn" (click)="removeJoin(i)" type="button">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+
+                  <div class="join-fields">
+                    <mat-form-field appearance="outline">
+                      <mat-label>JOIN Type</mat-label>
+                      <mat-select formControlName="type">
+                        <mat-option *ngFor="let joinType of joinTypes" [value]="joinType.value">
+                          {{joinType.label}}
+                        </mat-option>
+                      </mat-select>
+                      <mat-hint>{{joinTypes.find(jt => jt.value === join.get('type')?.value)?.description}}</mat-hint>
+                    </mat-form-field>
+
+                    <div class="join-condition">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Left Table</mat-label>
+                        <mat-select formControlName="leftTable">
+                          <mat-option *ngFor="let table of currentQuery.tables" [value]="table.name">
+                            {{table.name}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Left Column</mat-label>
+                        <mat-select formControlName="leftColumn">
+                          <mat-option *ngFor="let column of getColumnsForTable(join.get('leftTable')?.value)" [value]="column.name">
+                            {{column.name}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Operator</mat-label>
+                        <mat-select formControlName="operator">
+                          <mat-option *ngFor="let op of operators" [value]="op.value">
+                            {{op.label}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Right Table</mat-label>
+                        <mat-select formControlName="rightTable">
+                          <mat-option *ngFor="let table of currentQuery.tables" [value]="table.name">
+                            {{table.name}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Right Column</mat-label>
+                        <mat-select formControlName="rightColumn">
+                          <mat-option *ngFor="let column of getColumnsForTable(join.get('rightTable')?.value)" [value]="column.name">
+                            {{column.name}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="join-preview">
+                      <strong>ON Clause:</strong> 
+                      {{join.get('leftTable')?.value}}.{{join.get('leftColumn')?.value}} 
+                      {{join.get('operator')?.value}} 
+                      {{join.get('rightTable')?.value}}.{{join.get('rightColumn')?.value}}
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+          <button mat-raised-button (click)="addJoin()" type="button">
+            <mat-icon>add</mat-icon>
+            Add JOIN
+          </button>
+        </div>
+
+        <!-- WHERE Conditions -->
+        <div class="section">
+          <h3>4. WHERE Conditions</h3>
+          <div formArrayName="conditions">
+            <div *ngFor="let condition of conditionsArray.controls; let i = index" [formGroupName]="i" class="condition-row">
+              <mat-form-field appearance="outline" *ngIf="i > 0">
+                <mat-label>Logic</mat-label>
+                <mat-select formControlName="logicalOperator">
+                  <mat-option value="AND">AND</mat-option>
+                  <mat-option value="OR">OR</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Table</mat-label>
+                <mat-select formControlName="leftTable">
+                  <mat-option *ngFor="let table of currentQuery.tables" [value]="table.name">
+                    {{table.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Column</mat-label>
+                <mat-select formControlName="leftColumn">
+                  <mat-option *ngFor="let column of getColumnsForTable(condition.get('leftTable')?.value)" [value]="column.name">
+                    {{column.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Operator</mat-label>
+                <mat-select formControlName="operator">
+                  <mat-option *ngFor="let op of operators" [value]="op.value">
+                    {{op.label}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Value</mat-label>
+                <input matInput formControlName="rightValue" placeholder="Enter value">
+              </mat-form-field>
+
+              <button mat-icon-button color="warn" (click)="removeCondition(i)" type="button">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          <button mat-raised-button (click)="addCondition()" type="button">
+            <mat-icon>add</mat-icon>
+            Add Condition
+          </button>
+        </div>
+
+        <!-- GROUP BY -->
+        <div class="section">
+          <h3>5. GROUP BY (for aggregates)</h3>
+          <div formArrayName="groupBy">
+            <div *ngFor="let groupBy of groupByArray.controls; let i = index" [formGroupName]="i" class="group-by-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Table</mat-label>
+                <mat-select formControlName="table">
+                  <mat-option *ngFor="let table of currentQuery.tables" [value]="table.name">
+                    {{table.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Column</mat-label>
+                <mat-select formControlName="column">
+                  <mat-option *ngFor="let column of getColumnsForTable(groupBy.get('table')?.value)" [value]="column.name">
+                    {{column.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <button mat-icon-button color="warn" (click)="removeGroupBy(i)" type="button">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          <button mat-raised-button (click)="addGroupBy()" type="button">
+            <mat-icon>add</mat-icon>
+            Add GROUP BY
+          </button>
+        </div>
+
+        <!-- ORDER BY -->
+        <div class="section">
+          <h3>6. ORDER BY</h3>
+          <div formArrayName="orderBy">
+            <div *ngFor="let orderBy of orderByArray.controls; let i = index" [formGroupName]="i" class="order-by-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Table</mat-label>
+                <mat-select formControlName="table">
+                  <mat-option *ngFor="let table of currentQuery.tables" [value]="table.name">
+                    {{table.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Column</mat-label>
+                <mat-select formControlName="column">
+                  <mat-option *ngFor="let column of getColumnsForTable(orderBy.get('table')?.value)" [value]="column.name">
+                    {{column.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Direction</mat-label>
+                <mat-select formControlName="direction">
+                  <mat-option value="ASC">Ascending</mat-option>
+                  <mat-option value="DESC">Descending</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <button mat-icon-button color="warn" (click)="removeOrderBy(i)" type="button">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          <button mat-raised-button (click)="addOrderBy()" type="button">
+            <mat-icon>add</mat-icon>
+            Add ORDER BY
+          </button>
+        </div>
+
+        <!-- LIMIT -->
+        <div class="section">
+          <h3>7. LIMIT</h3>
+          <mat-form-field appearance="outline">
+            <mat-label>Limit Results</mat-label>
+            <input matInput type="number" formControlName="limit" placeholder="Optional limit">
+          </mat-form-field>
+        </div>
+
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="executeQuery()">
+        <mat-icon>play_arrow</mat-icon>
+        Execute Query
+      </button>
+      <button mat-raised-button (click)="resetQuery()">
+        <mat-icon>refresh</mat-icon>
+        Reset
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Generated SQL Preview -->
+  <mat-card class="sql-preview-card">
+    <mat-card-header>
+      <mat-card-title>Generated SQL</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <pre class="sql-code">{{generatedSql}}</pre>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button (click)="executeQuery()" [disabled]="!generatedSql.trim()">
+        <mat-icon>play_arrow</mat-icon>
+        Execute
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Educational Information -->
+  <mat-card class="info-card">
+    <mat-card-header>
+      <mat-card-title>SQL JOIN Types Explained</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-expansion-panel *ngFor="let joinType of joinTypes">
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{joinType.label}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <p>{{joinType.description}}</p>
+        <div class="join-example">
+          <strong>Example:</strong>
+          <pre>SELECT users.name, orders.total
+FROM users
+{{joinType.value}} orders ON users.id = orders.user_id</pre>
+        </div>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Aggregate Functions</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div *ngFor="let func of aggregateFunctions" class="function-info">
+          <strong>{{func.label}}:</strong> {{func.description}}
+        </div>
+        <div class="aggregate-example">
+          <strong>Example with SUM:</strong>
+          <pre>SELECT users.name, SUM(orders.total) AS total_spent
+FROM users
+INNER JOIN orders ON users.id = orders.user_id
+GROUP BY users.id, users.name</pre>
+        </div>
+      </mat-expansion-panel>
+    </mat-card-content>
+  </mat-card>
+</div>

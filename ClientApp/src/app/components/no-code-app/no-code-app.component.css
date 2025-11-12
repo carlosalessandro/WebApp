@@ -1,0 +1,515 @@
+.no-code-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #fafafa;
+}
+
+/* Main Toolbar */
+.main-toolbar {
+  position: relative;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-title {
+  font-size: 20px;
+  font-weight: 500;
+  margin-left: 16px;
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-actions button {
+  margin: 0 4px;
+}
+
+/* Main Content Layout */
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.main-content.sidebar-open {
+  margin-left: 0;
+}
+
+.main-content.properties-open {
+  margin-right: 0;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 320px;
+  min-width: 280px;
+  max-width: 400px;
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.sidebar-tabs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-tabs .mat-tab-body-wrapper {
+  flex: 1;
+  display: flex;
+}
+
+.sidebar-tabs .mat-tab-body {
+  flex: 1;
+  display: flex;
+}
+
+.sidebar-tabs .mat-tab-body-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* SQL Sidebar */
+.sql-sidebar {
+  padding: 16px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sql-sidebar h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.tables-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.table-columns {
+  padding: 8px 0;
+}
+
+.column-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.column-item:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+.column-item mat-icon {
+  margin-right: 8px;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Work Area */
+.work-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.main-tabs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-tabs .mat-tab-body-wrapper {
+  flex: 1;
+  display: flex;
+}
+
+.main-tabs .mat-tab-body {
+  flex: 1;
+  display: flex;
+}
+
+.main-tabs .mat-tab-body-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Workspace Areas */
+.diagram-workspace,
+.sql-workspace,
+.settings-workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.settings-workspace {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  text-align: center;
+}
+
+.empty-state mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.empty-state p {
+  margin: 0 0 24px 0;
+  font-size: 16px;
+}
+
+/* Properties Panel */
+.properties-panel {
+  width: 300px;
+  min-width: 250px;
+  max-width: 400px;
+  background-color: #ffffff;
+  border-left: 1px solid #e0e0e0;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.properties-panel mat-card {
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  height: 100%;
+}
+
+.properties-panel mat-card-content {
+  padding: 16px;
+}
+
+.component-properties,
+.query-properties,
+.query-results {
+  margin-bottom: 24px;
+}
+
+.component-properties h4,
+.query-properties h4,
+.query-results h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.query-results .success {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.query-results .error {
+  color: #f44336;
+  font-weight: 500;
+}
+
+.error-message {
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #c62828;
+}
+
+.no-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  color: #999;
+}
+
+.no-selection mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+/* Settings */
+.settings-section {
+  margin-bottom: 32px;
+}
+
+.settings-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+.setting-description {
+  margin: 8px 0 0 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shortcut-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.shortcut-key {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  background-color: #e0e0e0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.shortcut-desc {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Tutorial Overlay */
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.tutorial-card {
+  max-width: 500px;
+  margin: 24px;
+}
+
+.tutorial-card mat-card-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-overlay p {
+  margin-top: 16px;
+  font-size: 16px;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .properties-panel {
+    width: 250px;
+  }
+  
+  .sidebar {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: 300px;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .properties-panel {
+    width: 100%;
+    height: 200px;
+    border-left: none;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .toolbar-actions {
+    gap: 4px;
+  }
+  
+  .toolbar-actions button {
+    margin: 0 2px;
+  }
+  
+  .app-title {
+    font-size: 16px;
+    margin-left: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tutorial-card {
+    margin: 16px;
+  }
+  
+  .settings-workspace {
+    padding: 16px;
+  }
+  
+  .sidebar {
+    height: 250px;
+  }
+  
+  .properties-panel {
+    height: 150px;
+  }
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.sidebar {
+  animation: slideIn 0.3s ease;
+}
+
+.properties-panel {
+  animation: slideIn 0.3s ease;
+}
+
+/* Active states */
+.mat-icon-button.active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.mat-icon-button.active mat-icon {
+  color: #ffffff;
+}
+
+/* Tab customization */
+.mat-tab-group.sidebar-tabs .mat-tab-header {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.mat-tab-group.main-tabs .mat-tab-header {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Scrollbar customization */
+.sidebar::-webkit-scrollbar,
+.properties-panel::-webkit-scrollbar,
+.settings-workspace::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.properties-panel::-webkit-scrollbar-track,
+.settings-workspace::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.properties-panel::-webkit-scrollbar-thumb,
+.settings-workspace::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover,
+.properties-panel::-webkit-scrollbar-thumb:hover,
+.settings-workspace::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

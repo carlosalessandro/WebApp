@@ -1,0 +1,143 @@
+@{
+    ViewData["Title"] = "Dashboard Test";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Dashboard Test Page</h3>
+                </div>
+                <div class="card-body">
+                    <h4>Teste de Funcionalidade do Dashboard</h4>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Links do Dashboard:</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <a href="/Dashboard" class="btn btn-primary">Dashboard Principal</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <a href="/Dashboard/Clientes" class="btn btn-success">Dashboard Clientes</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <a href="/Dashboard/Tarefas" class="btn btn-info">Dashboard Tarefas</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <a href="/Dashboard/Usuarios" class="btn btn-warning">Dashboard Usuários</a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5>APIs do Dashboard:</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <button onclick="testApi('/Dashboard/GetEstatisticasGerais')" class="btn btn-outline-primary btn-sm">
+                                        Estatísticas Gerais
+                                    </button>
+                                </li>
+                                <li class="list-group-item">
+                                    <button onclick="testApi('/Dashboard/GetClientesPorMes')" class="btn btn-outline-success btn-sm">
+                                        Clientes por Mês
+                                    </button>
+                                </li>
+                                <li class="list-group-item">
+                                    <button onclick="testApi('/Dashboard/GetTarefasPorStatus')" class="btn btn-outline-info btn-sm">
+                                        Tarefas por Status
+                                    </button>
+                                </li>
+                                <li class="list-group-item">
+                                    <button onclick="testApi('/Dashboard/GetTarefasAtrasadas')" class="btn btn-outline-warning btn-sm">
+                                        Tarefas Atrasadas
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5>Resultado dos Testes de API:</h5>
+                            <div id="apiResults" class="border p-3" style="background-color: #f8f9fa; min-height: 200px;">
+                                <em>Clique nos botões acima para testar as APIs...</em>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5>Diagnóstico:</h5>
+                            <div class="alert alert-info">
+                                <h6>Possíveis problemas identificados:</h6>
+                                <ul>
+                                    <li>Dependências JavaScript (Chart.js) podem não estar carregando</li>
+                                    <li>APIs podem estar retornando dados vazios</li>
+                                    <li>Problemas de conectividade com o banco de dados</li>
+                                    <li>Erros de JavaScript no console do navegador</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function testApi(endpoint) {
+    const resultsDiv = document.getElementById('apiResults');
+    resultsDiv.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"></div> Testando ${endpoint}...`;
+    
+    try {
+        const response = await fetch(endpoint);
+        const data = await response.json();
+        
+        resultsDiv.innerHTML = `
+            <h6>Resultado para ${endpoint}:</h6>
+            <div class="alert alert-success">
+                <strong>Status:</strong> ${response.status} ${response.statusText}<br>
+                <strong>Dados:</strong>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            </div>
+        `;
+    } catch (error) {
+        resultsDiv.innerHTML = `
+            <h6>Erro para ${endpoint}:</h6>
+            <div class="alert alert-danger">
+                <strong>Erro:</strong> ${error.message}
+            </div>
+        `;
+    }
+}
+
+// Teste automático ao carregar a página
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Dashboard Test Page carregada');
+    
+    // Verificar se jQuery está disponível
+    if (typeof $ !== 'undefined') {
+        console.log('✅ jQuery está disponível');
+    } else {
+        console.log('❌ jQuery não está disponível');
+    }
+    
+    // Verificar se Bootstrap está disponível
+    if (typeof bootstrap !== 'undefined') {
+        console.log('✅ Bootstrap JavaScript está disponível');
+    } else {
+        console.log('❌ Bootstrap JavaScript não está disponível');
+    }
+    
+    // Verificar se Chart.js está disponível (usado no Dashboard)
+    if (typeof Chart !== 'undefined') {
+        console.log('✅ Chart.js está disponível');
+    } else {
+        console.log('❌ Chart.js não está disponível - isso pode causar problemas no Dashboard');
+    }
+});
+</script>

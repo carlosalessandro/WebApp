@@ -22,6 +22,11 @@ namespace WebApp.Models
         public DbSet<WhatsAppIntegracao> WhatsAppIntegracoes { get; set; } = null!;
         public DbSet<NFCe> NFCes { get; set; } = null!;
         
+        // No-Code Builder
+        public DbSet<DiagramModel> Diagrams { get; set; } = null!;
+        public DbSet<SqlQueryModel> SqlQueries { get; set; } = null!;
+        public DbSet<ComponentPaletteModel> ComponentPalettes { get; set; } = null!;
+        
         // PCP - Planejamento e Controle da Produção
         public DbSet<OrdemProducao> OrdensProducao { get; set; } = null!;
         public DbSet<Recurso> Recursos { get; set; } = null!;

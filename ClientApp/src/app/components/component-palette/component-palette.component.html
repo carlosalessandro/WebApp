@@ -1,0 +1,145 @@
+<div class="component-palette">
+  <div class="palette-header">
+    <h3>Components</h3>
+    <button mat-icon-button 
+            (click)="createCustomPalette()" 
+            [disabled]="isReadOnly"
+            title="Create Custom Palette">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <div class="search-container">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search components</mat-label>
+      <input matInput 
+             [(ngModel)]="searchTerm" 
+             (ngModelChange)="onSearchChange()"
+             placeholder="Type to search...">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <div class="palettes-container">
+    <mat-accordion multi="true">
+      <mat-expansion-panel 
+        *ngFor="let palette of filteredPalettes; trackBy: trackByPaletteId"
+        [expanded]="isPaletteExpanded(palette.id)"
+        (opened)="expandedPalettes.add(palette.id)"
+        (closed)="expandedPalettes.delete(palette.id)"
+        class="palette-panel">
+        
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon class="palette-icon">{{ palette.category === 'Basic' ? 'category' : 
+                                              palette.category === 'Diagrams' ? 'account_tree' :
+                                              palette.category === 'Technical' ? 'settings' : 'extension' }}</mat-icon>
+            {{ palette.name }}
+            <span class="component-count">({{ palette.components.length }})</span>
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ palette.description }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="palette-actions" *ngIf="palette.isCustom">
+          <button mat-icon-button 
+                  (click)="editPalette(palette)" 
+                  [disabled]="isReadOnly"
+                  title="Edit Palette">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button 
+                  (click)="addComponentToPalette(palette.id)" 
+                  [disabled]="isReadOnly"
+                  title="Add Component">
+            <mat-icon>add_circle</mat-icon>
+          </button>
+          <button mat-icon-button 
+                  (click)="deletePalette(palette)" 
+                  [disabled]="isReadOnly"
+                  title="Delete Palette"
+                  color="warn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+
+        <div class="components-grid">
+          <div *ngFor="let template of palette.components; trackBy: trackByTemplateId"
+               class="component-item"
+               [class.selected]="selectedTemplate?.id === template.id"
+               cdkDrag
+               [cdkDragData]="template"
+               (cdkDragStarted)="onDragStart($event, template)"
+               (cdkDragEnded)="onDragEnd($event)"
+               (click)="selectTemplate(template)">
+            
+            <div class="component-preview" [style]="getComponentPreviewStyle(template)">
+              <mat-icon class="component-icon">{{ getComponentIcon(template.type) }}</mat-icon>
+            </div>
+            
+            <div class="component-info">
+              <span class="component-name">{{ template.name }}</span>
+              <span class="component-type">{{ template.type | titlecase }}</span>
+            </div>
+
+            <div class="component-actions" *ngIf="palette.isCustom">
+              <button mat-icon-button 
+                      size="small"
+                      (click)="editComponent(template); $event.stopPropagation()"
+                      [disabled]="isReadOnly"
+                      title="Edit Component">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button 
+                      size="small"
+                      (click)="deleteComponent(template); $event.stopPropagation()"
+                      [disabled]="isReadOnly"
+                      title="Delete Component"
+                      color="warn">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-palette" *ngIf="palette.components.length === 0">
+          <mat-icon>inbox</mat-icon>
+          <p>No components in this palette</p>
+          <button mat-stroked-button 
+                  (click)="addComponentToPalette(palette.id)"
+                  [disabled]="isReadOnly || !palette.isCustom">
+            Add Component
+          </button>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+  <div class="no-results" *ngIf="filteredPalettes.length === 0 && searchTerm">
+    <mat-icon>search_off</mat-icon>
+    <p>No components found for "{{ searchTerm }}"</p>
+    <button mat-stroked-button (click)="searchTerm = ''; onSearchChange()">
+      Clear Search
+    </button>
+  </div>
+
+  <div class="palette-footer">
+    <div class="selected-component" *ngIf="selectedTemplate">
+      <h4>Selected Component</h4>
+      <div class="selected-preview">
+        <div class="preview-icon" [style]="getComponentPreviewStyle(selectedTemplate)">
+          <mat-icon>{{ getComponentIcon(selectedTemplate.type) }}</mat-icon>
+        </div>
+        <div class="selected-info">
+          <span class="name">{{ selectedTemplate.name }}</span>
+          <span class="type">{{ selectedTemplate.type | titlecase }}</span>
+          <span class="size">{{ selectedTemplate.defaultSize.width }}×{{ selectedTemplate.defaultSize.height }}</span>
+        </div>
+      </div>
+      <p class="component-description" *ngIf="selectedTemplate.propertySchema.length > 0">
+        Properties: {{ selectedTemplate.propertySchema.length }}
+      </p>
+    </div>
+  </div>
+</div>

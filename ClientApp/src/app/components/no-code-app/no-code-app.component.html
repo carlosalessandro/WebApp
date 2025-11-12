@@ -1,0 +1,305 @@
+<div class="no-code-app" (keydown)="onKeyDown($event)" tabindex="0">
+  <!-- Main Toolbar -->
+  <mat-toolbar class="main-toolbar" color="primary">
+    <button mat-icon-button (click)="toggleSidebar()" title="Toggle Sidebar">
+      <mat-icon>menu</mat-icon>
+    </button>
+    
+    <span class="app-title">No-Code Builder</span>
+    
+    <div class="toolbar-spacer"></div>
+    
+    <!-- Diagram Actions -->
+    <div class="toolbar-actions" *ngIf="currentTab === 0">
+      <button mat-icon-button (click)="createNewDiagram()" title="New Diagram">
+        <mat-icon>add</mat-icon>
+      </button>
+      <button mat-icon-button (click)="saveDiagram()" [disabled]="!currentDiagram" title="Save Diagram">
+        <mat-icon>save</mat-icon>
+      </button>
+      <button mat-icon-button (click)="undo()" [disabled]="!canUndo()" title="Undo (Ctrl+Z)">
+        <mat-icon>undo</mat-icon>
+      </button>
+      <button mat-icon-button (click)="redo()" [disabled]="!canRedo()" title="Redo (Ctrl+Shift+Z)">
+        <mat-icon>redo</mat-icon>
+      </button>
+      
+      <button mat-button [matMenuTriggerFor]="exportMenu" title="Export">
+        <mat-icon>download</mat-icon>
+        Export
+      </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportDiagram('json')">
+          <mat-icon>code</mat-icon>
+          <span>Export as JSON</span>
+        </button>
+        <button mat-menu-item (click)="exportDiagram('svg')">
+          <mat-icon>image</mat-icon>
+          <span>Export as SVG</span>
+        </button>
+        <button mat-menu-item (click)="exportDiagram('png')">
+          <mat-icon>photo</mat-icon>
+          <span>Export as PNG</span>
+        </button>
+      </mat-menu>
+    </div>
+    
+    <!-- SQL Builder Actions -->
+    <div class="toolbar-actions" *ngIf="currentTab === 1">
+      <button mat-icon-button (click)="sqlQueryBuilder?.newQuery()" title="New Query">
+        <mat-icon>add</mat-icon>
+      </button>
+      <button mat-icon-button (click)="sqlQueryBuilder?.saveQuery()" [disabled]="!currentQuery" title="Save Query">
+        <mat-icon>save</mat-icon>
+      </button>
+      <button mat-icon-button (click)="sqlQueryBuilder?.executeQuery()" [disabled]="!currentQuery" title="Execute Query">
+        <mat-icon>play_arrow</mat-icon>
+      </button>
+    </div>
+    
+    <!-- Global Actions -->
+    <button mat-icon-button (click)="toggleTutorialMode()" [class.active]="tutorialMode" title="Toggle Tutorial (F1)">
+      <mat-icon>help</mat-icon>
+    </button>
+    
+    <button mat-icon-button (click)="togglePropertiesPanel()" title="Toggle Properties Panel">
+      <mat-icon>settings</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <!-- Main Content Area -->
+  <div class="main-content" [class.sidebar-open]="sidebarOpen" [class.properties-open]="propertiesPanelOpen">
+    
+    <!-- Sidebar -->
+    <div class="sidebar" *ngIf="sidebarOpen">
+      <mat-tab-group [(selectedIndex)]="currentTab" (selectedTabChange)="onTabChange($event)" class="sidebar-tabs">
+        <mat-tab label="Components" class="diagram-tab">
+          <app-component-palette 
+            #componentPalette
+            [isReadOnly]="false"
+            (componentSelected)="onComponentSelected($event)"
+            (componentDragStart)="onComponentDragStart($event)"
+            (componentDragEnd)="onComponentDragEnd()">
+          </app-component-palette>
+        </mat-tab>
+        
+        <mat-tab label="Tables" class="sql-tab">
+          <div class="sql-sidebar">
+            <h3>Database Tables</h3>
+            <div class="tables-list">
+              <!-- This would be populated with available database tables -->
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <mat-icon>table_chart</mat-icon>
+                    Users
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="table-columns">
+                  <div class="column-item" *ngFor="let column of ['id', 'name', 'email', 'created_at']">
+                    <mat-icon>view_column</mat-icon>
+                    {{ column }}
+                  </div>
+                </div>
+              </mat-expansion-panel>
+              
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <mat-icon>table_chart</mat-icon>
+                    Orders
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="table-columns">
+                  <div class="column-item" *ngFor="let column of ['id', 'user_id', 'total', 'status', 'created_at']">
+                    <mat-icon>view_column</mat-icon>
+                    {{ column }}
+                  </div>
+                </div>
+              </mat-expansion-panel>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <!-- Main Work Area -->
+    <div class="work-area">
+      <mat-tab-group [(selectedIndex)]="currentTab" (selectedTabChange)="onTabChange($event)" class="main-tabs">
+        
+        <!-- Diagram Builder Tab -->
+        <mat-tab label="Diagram Builder">
+          <div class="diagram-workspace">
+            <app-diagram-canvas 
+              #diagramCanvas
+              [diagram]="currentDiagram!"
+              [selectedComponentId]="selectedComponentId"
+              [isReadOnly]="false"
+              (componentSelected)="onCanvasComponentSelected($event)"
+              (componentAdded)="onComponentAdded($event)"
+              (componentUpdated)="onComponentUpdated($event)"
+              (componentDeleted)="onComponentDeleted($event)"
+              (diagramChanged)="onDiagramChanged($event)"
+              *ngIf="currentDiagram">
+            </app-diagram-canvas>
+            
+            <div class="empty-state" *ngIf="!currentDiagram">
+              <mat-icon>account_tree</mat-icon>
+              <h2>No Diagram Loaded</h2>
+              <p>Create a new diagram to get started</p>
+              <button mat-raised-button color="primary" (click)="createNewDiagram()">
+                Create New Diagram
+              </button>
+            </div>
+          </div>
+        </mat-tab>
+        
+        <!-- SQL Query Builder Tab -->
+        <mat-tab label="SQL Query Builder">
+          <div class="sql-workspace">
+            <app-sql-query-builder 
+              #sqlQueryBuilder
+              [isReadOnly]="false"
+              [showTutorial]="tutorialMode"
+              (queryExecuted)="onQueryExecuted($event)"
+              (queryChanged)="onQueryChanged($event)">
+            </app-sql-query-builder>
+          </div>
+        </mat-tab>
+        
+        <!-- Settings Tab -->
+        <mat-tab label="Settings">
+          <div class="settings-workspace">
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title>Application Settings</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="settings-section">
+                  <h3>Tutorial & Help</h3>
+                  <mat-slide-toggle [(ngModel)]="tutorialMode" (change)="toggleTutorialMode()">
+                    Enable Tutorial Mode
+                  </mat-slide-toggle>
+                  <p class="setting-description">Show helpful tooltips and guidance throughout the application</p>
+                </div>
+                
+                <div class="settings-section">
+                  <h3>Interface</h3>
+                  <mat-slide-toggle [(ngModel)]="sidebarOpen" (change)="toggleSidebar()">
+                    Show Sidebar
+                  </mat-slide-toggle>
+                  <mat-slide-toggle [(ngModel)]="propertiesPanelOpen" (change)="togglePropertiesPanel()">
+                    Show Properties Panel
+                  </mat-slide-toggle>
+                </div>
+                
+                <div class="settings-section">
+                  <h3>Keyboard Shortcuts</h3>
+                  <div class="shortcuts-list">
+                    <div class="shortcut-item">
+                      <span class="shortcut-key">Ctrl + N</span>
+                      <span class="shortcut-desc">New Diagram</span>
+                    </div>
+                    <div class="shortcut-item">
+                      <span class="shortcut-key">Ctrl + S</span>
+                      <span class="shortcut-desc">Save</span>
+                    </div>
+                    <div class="shortcut-item">
+                      <span class="shortcut-key">Ctrl + Z</span>
+                      <span class="shortcut-desc">Undo</span>
+                    </div>
+                    <div class="shortcut-item">
+                      <span class="shortcut-key">Ctrl + Shift + Z</span>
+                      <span class="shortcut-desc">Redo</span>
+                    </div>
+                    <div class="shortcut-item">
+                      <span class="shortcut-key">F1</span>
+                      <span class="shortcut-desc">Toggle Tutorial</span>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <!-- Properties Panel -->
+    <div class="properties-panel" *ngIf="propertiesPanelOpen">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Properties</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Diagram Component Properties -->
+          <div *ngIf="currentTab === 0 && selectedComponentId" class="component-properties">
+            <h4>Component Properties</h4>
+            <p>Selected: {{ selectedComponentId }}</p>
+            <!-- Component property editor would go here -->
+          </div>
+          
+          <!-- SQL Query Properties -->
+          <div *ngIf="currentTab === 1 && currentQuery" class="query-properties">
+            <h4>Query Information</h4>
+            <p><strong>Name:</strong> {{ currentQuery.name }}</p>
+            <p><strong>Type:</strong> {{ currentQuery.type }}</p>
+            <p><strong>Tables:</strong> {{ currentQuery.tables.length }}</p>
+            <p><strong>Fields:</strong> {{ currentQuery.fields.length }}</p>
+          </div>
+          
+          <!-- Query Results -->
+          <div *ngIf="currentTab === 1 && queryResult" class="query-results">
+            <h4>Query Results</h4>
+            <p><strong>Status:</strong> 
+              <span [class]="queryResult.success ? 'success' : 'error'">
+                {{ queryResult.success ? 'Success' : 'Error' }}
+              </span>
+            </p>
+            <p><strong>Rows:</strong> {{ queryResult.rowCount }}</p>
+            <p><strong>Execution Time:</strong> {{ queryResult.executionTime }}ms</p>
+            <div *ngIf="!queryResult.success" class="error-message">
+              {{ queryResult.error }}
+            </div>
+          </div>
+          
+          <!-- Default state -->
+          <div *ngIf="!selectedComponentId && !currentQuery" class="no-selection">
+            <mat-icon>info</mat-icon>
+            <p>Select a component or query to view properties</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Tutorial Overlay -->
+  <div class="tutorial-overlay" *ngIf="tutorialMode">
+    <mat-card class="tutorial-card">
+      <mat-card-header>
+        <mat-card-title>{{ getCurrentTutorialStep().title }}</mat-card-title>
+        <mat-card-subtitle>Step {{ currentTutorialStep + 1 }} of {{ tutorialSteps.length }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ getCurrentTutorialStep().description }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button (click)="previousTutorialStep()" [disabled]="currentTutorialStep === 0">
+          Previous
+        </button>
+        <button mat-button (click)="skipTutorial()">
+          Skip Tutorial
+        </button>
+        <button mat-raised-button color="primary" (click)="nextTutorialStep()">
+          {{ currentTutorialStep === tutorialSteps.length - 1 ? 'Finish' : 'Next' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading...</p>
+  </div>
+</div>

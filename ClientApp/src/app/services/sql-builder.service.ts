@@ -1,19 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { 
-  DatabaseTable, 
-  DatabaseColumn, 
   SqlQuery, 
+  QueryType,
   QueryExecutionResult,
-  SelectClause,
-  FromClause,
-  WhereClause,
+  DatabaseSchema,
+  TableSchema,
+  SqlCommand,
+  SqlCommandCategory,
+  ComparisonOperator,
+  LogicalOperator,
+  JoinType,
+  AggregateFunction,
   JoinClause,
-  GroupByClause,
-  OrderByClause,
-  DatabaseType
-} from '../models/sql-builder.model';
+  SelectField,
+  WhereCondition,
+  OrderByField
+} from '../models/sql-builder.models';
 
 @Injectable({
   providedIn: 'root'

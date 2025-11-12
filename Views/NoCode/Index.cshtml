@@ -1,0 +1,82 @@
+@{
+    ViewData["Title"] = "No-Code Builder";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - No-Code Builder</title>
+    <base href="/" />
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Inline Styles -->
+    <style type="text/css">
+        body {
+            margin: 0;
+            font-family: Roboto, "Helvetica Neue", sans-serif;
+            background-color: #fafafa;
+        }
+        
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #fafafa;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #1976d2;
+            border-radius: 50%;
+            animation: spin-animation 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @@keyframes spin-animation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #666;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Carregando No-Code Builder...</div>
+    </div>
+    
+    <app-no-code-app>
+        <!-- Fallback content -->
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Inicializando aplicação...</div>
+        </div>
+    </app-no-code-app>
+
+    <script>
+        // Hide loading screen when Angular app is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const loading = document.getElementById('loading');
+                if (loading) {
+                    loading.style.display = 'none';
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

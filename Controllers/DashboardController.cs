@@ -40,6 +40,12 @@ namespace WebApp.Controllers
             return View();
         }
 
+        // GET: Dashboard/Test
+        public IActionResult Test()
+        {
+            return View();
+        }
+
         // API Endpoints para dados dos gráficos
 
         // GET: Dashboard/GetClientesPorMes

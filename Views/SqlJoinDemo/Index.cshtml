@@ -1,0 +1,319 @@
+@{
+    ViewData["Title"] = "SQL JOIN Builder Demo";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-database"></i>
+                    SQL JOIN Builder Demo
+                </h1>
+                <p class="page-subtitle">
+                    Interactive SQL query builder with support for INNER JOIN, LEFT JOIN, SUM, and ON clauses
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-tools"></i>
+                        Visual SQL Builder
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <app-sql-join-builder></app-sql-join-builder>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="fas fa-lightbulb"></i>
+                        Key Features
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <ul class="feature-list">
+                        <li>
+                            <strong>INNER JOIN:</strong> Returns records that have matching values in both tables
+                        </li>
+                        <li>
+                            <strong>LEFT JOIN:</strong> Returns all records from the left table, and matched records from the right table
+                        </li>
+                        <li>
+                            <strong>SUM Function:</strong> Calculate the sum of values with GROUP BY support
+                        </li>
+                        <li>
+                            <strong>ON Clauses:</strong> Visual configuration of join conditions
+                        </li>
+                        <li>
+                            <strong>Real-time SQL Generation:</strong> See your SQL query as you build it
+                        </li>
+                        <li>
+                            <strong>Educational Mode:</strong> Learn SQL with explanations and examples
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="fas fa-database"></i>
+                        Sample Database Schema
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="schema-info">
+                        <div class="table-info">
+                            <h5>users</h5>
+                            <ul>
+                                <li>id (Primary Key)</li>
+                                <li>name</li>
+                                <li>email</li>
+                                <li>age</li>
+                                <li>created_at</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="table-info">
+                            <h5>orders</h5>
+                            <ul>
+                                <li>id (Primary Key)</li>
+                                <li>user_id (Foreign Key → users.id)</li>
+                                <li>total</li>
+                                <li>status</li>
+                                <li>created_at</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="table-info">
+                            <h5>order_items</h5>
+                            <ul>
+                                <li>id (Primary Key)</li>
+                                <li>order_id (Foreign Key → orders.id)</li>
+                                <li>product_name</li>
+                                <li>quantity</li>
+                                <li>price</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="table-info">
+                            <h5>products</h5>
+                            <ul>
+                                <li>id (Primary Key)</li>
+                                <li>name</li>
+                                <li>price</li>
+                                <li>category_id</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="fas fa-code"></i>
+                        Example Queries
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="example-query">
+                                <h5>INNER JOIN Example</h5>
+                                <pre><code>SELECT users.name, users.email, SUM(orders.total) AS total_orders
+FROM users
+INNER JOIN orders ON users.id = orders.user_id
+GROUP BY users.id, users.name</code></pre>
+                                <p class="example-description">
+                                    Gets all users who have placed orders, along with their total order amounts.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="example-query">
+                                <h5>LEFT JOIN Example</h5>
+                                <pre><code>SELECT users.name, users.email, orders.total
+FROM users
+LEFT JOIN orders ON users.id = orders.user_id</code></pre>
+                                <p class="example-description">
+                                    Gets all users, including those who haven't placed any orders.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="example-query">
+                                <h5>Multiple JOINs with SUM</h5>
+                                <pre><code>SELECT users.name, 
+       SUM(order_items.price) AS total_spent,
+       SUM(order_items.quantity) AS total_items
+FROM users
+INNER JOIN orders ON users.id = orders.user_id
+INNER JOIN order_items ON orders.id = order_items.order_id
+GROUP BY users.id, users.name</code></pre>
+                                <p class="example-description">
+                                    Complex query with multiple JOINs and aggregate functions.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 300;
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+}
+
+.feature-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.feature-list li:last-child {
+    border-bottom: none;
+}
+
+.schema-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.table-info {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 5px;
+    border-left: 4px solid #007bff;
+}
+
+.table-info h5 {
+    color: #007bff;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.table-info ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.table-info li {
+    padding: 0.2rem 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.example-query {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 5px;
+    border-left: 4px solid #28a745;
+    height: 100%;
+}
+
+.example-query h5 {
+    color: #28a745;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.example-query pre {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    padding: 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    overflow-x: auto;
+}
+
+.example-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+    border-radius: 8px;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 8px 8px 0 0;
+}
+
+.card-title {
+    margin: 0;
+    color: #495057;
+    font-weight: 600;
+}
+
+@@media (max-width: 768px) {
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .schema-info {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any JavaScript initialization here
+    console.log('SQL JOIN Builder Demo loaded');
+});
+</script>

@@ -1,0 +1,66 @@
+@{
+    ViewData["Title"] = "Test Page";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Test Page</h1>
+            <p>Esta é uma página de teste para verificar se as views estão funcionando corretamente.</p>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>Links de Teste</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <a href="/NoCode" class="btn btn-primary">No-Code Builder</a>
+                            <span class="text-muted"> - Sistema de diagramas e SQL builder</span>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/SqlJoinDemo" class="btn btn-success">SQL JOIN Demo</a>
+                            <span class="text-muted"> - Demonstração do construtor de JOINs</span>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/api/diagram" class="btn btn-info" target="_blank">API Diagrams</a>
+                            <span class="text-muted"> - API REST para diagramas</span>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/Cliente" class="btn btn-secondary">Clientes</a>
+                            <span class="text-muted"> - Gerenciamento de clientes</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3>Status do Sistema</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Controllers Criados:</h5>
+                            <ul>
+                                <li>✅ NoCodeController</li>
+                                <li>✅ SqlJoinDemoController</li>
+                                <li>✅ DiagramController (API)</li>
+                                <li>✅ SqlBuilderController (API)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Views Criadas:</h5>
+                            <ul>
+                                <li>✅ NoCode/Index.cshtml</li>
+                                <li>✅ SqlJoinDemo/Index.cshtml</li>
+                                <li>✅ Test/Index.cshtml</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

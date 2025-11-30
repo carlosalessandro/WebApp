@@ -22,6 +22,32 @@ namespace WebApp.Controllers
             var inicioMes = new DateTime(hoje.Year, hoje.Month, 1);
             var fimMes = inicioMes.AddMonths(1).AddDays(-1);
 
+            // Carrega em memória para evitar problemas de tradução de agregação no SQLite
+            var contasPagarMes = await _context.ContasPagar
+                .Where(c => c.Status == StatusConta.Aberta &&
+                           c.DataVencimento >= inicioMes &&
+                           c.DataVencimento <= fimMes)
+                .ToListAsync();
+
+            var contasReceberMes = await _context.ContasReceber
+                .Where(c => c.Status == StatusConta.Aberta &&
+                           c.DataVencimento >= inicioMes &&
+                           c.DataVencimento <= fimMes)
+                .ToListAsync();
+
+            var contasBancariasAtivas = await _context.ContasBancarias
+                .Where(c => c.Ativa)
+                .ToListAsync();
+
+            var totalPagarMes = contasPagarMes
+                .Sum(c => c.ValorOriginal + c.ValorJuros + c.ValorMulta - c.ValorDesconto);
+
+            var totalReceberMes = contasReceberMes
+                .Sum(c => c.ValorOriginal + c.ValorJuros - c.ValorDesconto);
+
+            var saldoContas = contasBancariasAtivas
+                .Sum(c => c.SaldoAtual);
+
             var dashboard = new
             {
                 ContasPagarVencidas = await _context.ContasPagar
@@ -32,21 +58,11 @@ namespace WebApp.Controllers
                     .Where(c => c.Status == StatusConta.Aberta && c.DataVencimento < hoje)
                     .CountAsync(),
 
-                TotalPagarMes = await _context.ContasPagar
-                    .Where(c => c.Status == StatusConta.Aberta && 
-                               c.DataVencimento >= inicioMes && 
-                               c.DataVencimento <= fimMes)
-                    .SumAsync(c => c.ValorTotal),
+                TotalPagarMes = totalPagarMes,
 
-                TotalReceberMes = await _context.ContasReceber
-                    .Where(c => c.Status == StatusConta.Aberta && 
-                               c.DataVencimento >= inicioMes && 
-                               c.DataVencimento <= fimMes)
-                    .SumAsync(c => c.ValorTotal),
+                TotalReceberMes = totalReceberMes,
 
-                SaldoContas = await _context.ContasBancarias
-                    .Where(c => c.Ativa)
-                    .SumAsync(c => c.SaldoAtual)
+                SaldoContas = saldoContas
             };
 
             return View(dashboard);
@@ -226,8 +242,11 @@ namespace WebApp.Controllers
             switch (tipo)
             {
                 case "receitas-despesas":
-                    var dadosFinanceiros = await _context.MovimentacoesFinanceiras
+                    var movs = await _context.MovimentacoesFinanceiras
                         .Where(m => m.DataMovimentacao >= dataInicio)
+                        .ToListAsync();
+
+                    var dadosFinanceiros = movs
                         .GroupBy(m => new { m.DataMovimentacao.Year, m.DataMovimentacao.Month, m.Tipo })
                         .Select(g => new
                         {
@@ -236,22 +255,25 @@ namespace WebApp.Controllers
                             Tipo = g.Key.Tipo.ToString(),
                             Valor = g.Sum(m => m.Valor)
                         })
-                        .ToListAsync();
+                        .ToList();
                     
                     return Json(dadosFinanceiros);
 
                 case "contas-vencer":
-                    var contasVencer = await _context.ContasPagar
+                    var contasPagar = await _context.ContasPagar
                         .Where(c => c.Status == StatusConta.Aberta && c.DataVencimento >= DateTime.Today)
+                        .ToListAsync();
+
+                    var contasVencer = contasPagar
                         .GroupBy(c => c.DataVencimento.Date)
                         .Select(g => new
                         {
                             Data = g.Key,
-                            Valor = g.Sum(c => c.ValorTotal)
+                            Valor = g.Sum(c => c.ValorOriginal + c.ValorJuros + c.ValorMulta - c.ValorDesconto)
                         })
                         .OrderBy(x => x.Data)
                         .Take(30)
-                        .ToListAsync();
+                        .ToList();
                     
                     return Json(contasVencer);
 

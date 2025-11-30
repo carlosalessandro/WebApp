@@ -1,0 +1,270 @@
+@model WebApp.Models.Venda
+@{
+    ViewData["Title"] = "Aplicar Desconto";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-percent me-2"></i>Aplicar Desconto</h2>
+                <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar ao PDV
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Resumo da Venda -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-receipt"></i> Resumo da Venda #@Model.Id</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th class="text-center">Qtd</th>
+                                    <th class="text-end">Preço Unit.</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Itens != null)
+                                {
+                                    @foreach (var item in Model.Itens)
+                                    {
+                                        <tr>
+                                            <td>@(item.Produto?.Nome ?? "Produto não encontrado")</td>
+                                            <td class="text-center">@item.Quantidade</td>
+                                            <td class="text-end">@item.PrecoUnitario.ToString("C")</td>
+                                            <td class="text-end">@item.Subtotal.ToString("C")</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Subtotal:</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            <strong>@Model.ValorTotal.ToString("C")</strong>
+                        </div>
+                    </div>
+                    
+                    @if (Model.Desconto > 0)
+                    {
+                        <div class="row text-success">
+                            <div class="col-6">
+                                Desconto Atual:
+                            </div>
+                            <div class="col-6 text-end">
+                                -@Model.Desconto.ToString("C")
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Total Final:</strong>
+                            </div>
+                            <div class="col-6 text-end">
+                                <strong>@Model.ValorFinal.ToString("C")</strong>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário de Desconto -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-calculator"></i> Aplicar Desconto</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="formDesconto">
+                        <input type="hidden" name="vendaId" value="@Model.Id" />
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Desconto</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="tipoDesconto" id="tipoValor" value="valor" checked>
+                                <label class="btn btn-outline-primary" for="tipoValor">
+                                    <i class="bi bi-currency-dollar"></i> Valor (R$)
+                                </label>
+
+                                <input type="radio" class="btn-check" name="tipoDesconto" id="tipoPercentual" value="percentual">
+                                <label class="btn btn-outline-primary" for="tipoPercentual">
+                                    <i class="bi bi-percent"></i> Percentual (%)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="desconto" class="form-label">Valor do Desconto</label>
+                            <div class="input-group">
+                                <span class="input-group-text" id="simboloDesconto">R$</span>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="desconto" 
+                                       name="desconto" 
+                                       step="0.01" 
+                                       min="0" 
+                                       max="@Model.ValorTotal" 
+                                       required>
+                            </div>
+                            <div class="form-text">
+                                <span id="textoLimite">Máximo: @Model.ValorTotal.ToString("C")</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i>
+                                <strong>Novo Total:</strong> 
+                                <span id="novoTotal">@Model.ValorFinal.ToString("C")</span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle"></i> Aplicar Desconto
+                            </button>
+                            
+                            @if (Model.Desconto > 0)
+                            {
+                                <button type="button" class="btn btn-outline-warning" onclick="removerDesconto()">
+                                    <i class="bi bi-x-circle"></i> Remover Desconto
+                                </button>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Descontos Rápidos -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-lightning"></i> Descontos Rápidos</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button type="button" class="btn btn-outline-primary w-100" onclick="aplicarDescontoRapido(5, 'percentual')">
+                                5%
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-outline-primary w-100" onclick="aplicarDescontoRapido(10, 'percentual')">
+                                10%
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-outline-primary w-100" onclick="aplicarDescontoRapido(15, 'percentual')">
+                                15%
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-outline-primary w-100" onclick="aplicarDescontoRapido(20, 'percentual')">
+                                20%
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const valorTotal = @Model.ValorTotal;
+    const descontoAtual = @Model.Desconto;
+    
+    // Atualizar interface quando tipo de desconto muda
+    document.querySelectorAll('input[name="tipoDesconto"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const simbolo = document.getElementById('simboloDesconto');
+            const input = document.getElementById('desconto');
+            const textoLimite = document.getElementById('textoLimite');
+            
+            if (this.value === 'percentual') {
+                simbolo.textContent = '%';
+                input.max = '100';
+                textoLimite.textContent = 'Máximo: 100%';
+            } else {
+                simbolo.textContent = 'R$';
+                input.max = valorTotal;
+                textoLimite.textContent = 'Máximo: ' + valorTotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+            }
+            
+            input.value = '';
+            atualizarNovoTotal();
+        });
+    });
+    
+    // Atualizar novo total quando valor muda
+    document.getElementById('desconto').addEventListener('input', atualizarNovoTotal);
+    
+    function atualizarNovoTotal() {
+        const desconto = parseFloat(document.getElementById('desconto').value) || 0;
+        const tipoDesconto = document.querySelector('input[name="tipoDesconto"]:checked').value;
+        
+        let valorDesconto = desconto;
+        if (tipoDesconto === 'percentual') {
+            valorDesconto = (valorTotal * desconto) / 100;
+        }
+        
+        const novoTotal = Math.max(0, valorTotal - valorDesconto);
+        document.getElementById('novoTotal').textContent = novoTotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+    }
+    
+    function aplicarDescontoRapido(valor, tipo) {
+        document.getElementById(tipo === 'percentual' ? 'tipoPercentual' : 'tipoValor').checked = true;
+        document.getElementById('desconto').value = valor;
+        
+        // Trigger change event
+        document.querySelector('input[name="tipoDesconto"]:checked').dispatchEvent(new Event('change'));
+        atualizarNovoTotal();
+    }
+    
+    function removerDesconto() {
+        if (confirm('Deseja realmente remover o desconto atual?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '@Url.Action("AplicarDesconto")';
+            
+            const vendaId = document.createElement('input');
+            vendaId.type = 'hidden';
+            vendaId.name = 'vendaId';
+            vendaId.value = '@Model.Id';
+            
+            const desconto = document.createElement('input');
+            desconto.type = 'hidden';
+            desconto.name = 'desconto';
+            desconto.value = '0';
+            
+            form.appendChild(vendaId);
+            form.appendChild(desconto);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+
+<style>
+    .btn-check:checked + .btn {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+        color: white;
+    }
+</style>

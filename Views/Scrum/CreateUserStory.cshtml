@@ -1,0 +1,337 @@
+@model WebApp.Models.UserStory
+@{
+    ViewData["Title"] = "Criar User Story";
+    var sprints = ViewBag.Sprints as List<WebApp.Models.Sprint> ?? new List<WebApp.Models.Sprint>();
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-plus-circle me-2"></i>Criar User Story</h2>
+                <a href="@Url.Action("Backlog")" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar ao Backlog
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-card-text"></i> Informações da User Story</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateUserStory" method="post">
+                        <!-- Título e Epic -->
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label asp-for="Titulo" class="form-label">Título da User Story *</label>
+                                    <input asp-for="Titulo" class="form-control" 
+                                           placeholder="Como [usuário], eu quero [funcionalidade] para [benefício]" required>
+                                    <span asp-validation-for="Titulo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Epic" class="form-label">Epic</label>
+                                    <input asp-for="Epic" class="form-control" placeholder="Ex: Autenticação, Relatórios">
+                                    <span asp-validation-for="Epic" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descrição -->
+                        <div class="mb-3">
+                            <label asp-for="Descricao" class="form-label">Descrição</label>
+                            <textarea asp-for="Descricao" class="form-control" rows="4" 
+                                      placeholder="Descreva detalhadamente o que deve ser implementado"></textarea>
+                            <span asp-validation-for="Descricao" class="text-danger"></span>
+                        </div>
+
+                        <!-- Critérios de Aceitação -->
+                        <div class="mb-3">
+                            <label asp-for="CriteriosAceitacao" class="form-label">Critérios de Aceitação</label>
+                            <textarea asp-for="CriteriosAceitacao" class="form-control" rows="4" 
+                                      placeholder="Liste os critérios que devem ser atendidos para considerar a story como concluída"></textarea>
+                            <div class="form-text">
+                                <strong>Exemplo:</strong><br>
+                                - Dado que o usuário está na tela de login<br>
+                                - Quando ele insere credenciais válidas<br>
+                                - Então ele deve ser redirecionado para o dashboard
+                            </div>
+                            <span asp-validation-for="CriteriosAceitacao" class="text-danger"></span>
+                        </div>
+
+                        <!-- Prioridade, Story Points e Status -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label asp-for="Prioridade" class="form-label">Prioridade</label>
+                                    <select asp-for="Prioridade" class="form-select">
+                                        <option value="1">Baixa</option>
+                                        <option value="2" selected>Média</option>
+                                        <option value="3">Alta</option>
+                                        <option value="4">Crítica</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label asp-for="StoryPoints" class="form-label">Story Points</label>
+                                    <select asp-for="StoryPoints" class="form-select">
+                                        <option value="">Não estimado</option>
+                                        <option value="1">1 - Muito Simples</option>
+                                        <option value="2">2 - Simples</option>
+                                        <option value="3">3 - Pequeno</option>
+                                        <option value="5">5 - Médio</option>
+                                        <option value="8">8 - Grande</option>
+                                        <option value="13">13 - Muito Grande</option>
+                                        <option value="21">21 - Épico</option>
+                                    </select>
+                                    <div class="form-text">Estimativa de complexidade/esforço</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label asp-for="Status" class="form-label">Status</label>
+                                    <select asp-for="Status" class="form-select">
+                                        <option value="1" selected>Backlog</option>
+                                        <option value="2">Sprint Backlog</option>
+                                        <option value="3">Em Desenvolvimento</option>
+                                        <option value="4">Em Teste</option>
+                                        <option value="5">Em Revisão</option>
+                                        <option value="6">Concluída</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label asp-for="SprintId" class="form-label">Sprint</label>
+                                    <select asp-for="SprintId" class="form-select">
+                                        <option value="">Backlog (sem sprint)</option>
+                                        @foreach (var sprint in sprints)
+                                        {
+                                            <option value="@sprint.Id">@sprint.Nome</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Responsável e Tags -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Responsavel" class="form-label">Responsável</label>
+                                    <input asp-for="Responsavel" class="form-control" 
+                                           placeholder="Nome do desenvolvedor responsável">
+                                    <span asp-validation-for="Responsavel" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Tags" class="form-label">Tags</label>
+                                    <input asp-for="Tags" class="form-control" 
+                                           placeholder="frontend, backend, api, ui/ux (separadas por vírgula)">
+                                    <div class="form-text">Separe as tags com vírgulas</div>
+                                    <span asp-validation-for="Tags" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Templates de User Story -->
+                        <div class="mb-4">
+                            <h6><i class="bi bi-lightning"></i> Templates Rápidos</h6>
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-info w-100" onclick="aplicarTemplate('login')">
+                                        <i class="bi bi-person-check"></i><br>
+                                        Login de Usuário
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-info w-100" onclick="aplicarTemplate('crud')">
+                                        <i class="bi bi-table"></i><br>
+                                        CRUD Básico
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-info w-100" onclick="aplicarTemplate('relatorio')">
+                                        <i class="bi bi-graph-up"></i><br>
+                                        Relatório
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Estimativa de Esforço -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6><i class="bi bi-calculator"></i> Guia de Estimativa (Story Points)</h6>
+                                <div class="row text-center">
+                                    <div class="col-md-2">
+                                        <div class="badge bg-success fs-6">1-2</div>
+                                        <small class="d-block">Horas</small>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="badge bg-info fs-6">3</div>
+                                        <small class="d-block">Meio dia</small>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="badge bg-warning fs-6">5</div>
+                                        <small class="d-block">1-2 dias</small>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="badge bg-orange fs-6">8</div>
+                                        <small class="d-block">3-5 dias</small>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="badge bg-danger fs-6">13</div>
+                                        <small class="d-block">1 semana</small>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="badge bg-dark fs-6">21</div>
+                                        <small class="d-block">Quebrar!</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="@Url.Action("Backlog")" class="btn btn-outline-secondary me-md-2">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Criar User Story
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function aplicarTemplate(tipo) {
+        switch (tipo) {
+            case 'login':
+                document.getElementById('Titulo').value = 'Como usuário, eu quero fazer login no sistema para acessar minhas funcionalidades';
+                document.getElementById('Descricao').value = 'Implementar tela de login com autenticação de usuário, validação de credenciais e redirecionamento para dashboard.';
+                document.getElementById('CriteriosAceitacao').value = `- Dado que o usuário está na tela de login
+- Quando ele insere email e senha válidos
+- Então ele deve ser autenticado e redirecionado para o dashboard
+- E deve ser exibida uma mensagem de boas-vindas
+
+- Dado que o usuário insere credenciais inválidas
+- Quando ele clica em "Entrar"
+- Então deve ser exibida uma mensagem de erro
+- E ele deve permanecer na tela de login`;
+                document.getElementById('Epic').value = 'Autenticação';
+                document.getElementById('StoryPoints').value = '5';
+                document.getElementById('Tags').value = 'frontend, backend, autenticação, segurança';
+                break;
+
+            case 'crud':
+                document.getElementById('Titulo').value = 'Como usuário, eu quero gerenciar [entidade] para manter os dados atualizados';
+                document.getElementById('Descricao').value = 'Implementar funcionalidades completas de CRUD (Create, Read, Update, Delete) para a entidade, incluindo listagem, criação, edição e exclusão.';
+                document.getElementById('CriteriosAceitacao').value = `- Dado que o usuário está na listagem
+- Quando ele clica em "Novo"
+- Então deve abrir o formulário de criação
+
+- Dado que o usuário preenche o formulário corretamente
+- Quando ele clica em "Salvar"
+- Então o registro deve ser criado e ele redirecionado para a listagem
+
+- Dado que o usuário está na listagem
+- Quando ele clica em "Editar" em um item
+- Então deve abrir o formulário preenchido com os dados atuais
+
+- Dado que o usuário clica em "Excluir"
+- Quando ele confirma a ação
+- Então o registro deve ser removido da listagem`;
+                document.getElementById('Epic').value = 'Cadastros';
+                document.getElementById('StoryPoints').value = '8';
+                document.getElementById('Tags').value = 'frontend, backend, crud, formulários';
+                break;
+
+            case 'relatorio':
+                document.getElementById('Titulo').value = 'Como usuário, eu quero visualizar relatório de [dados] para tomar decisões informadas';
+                document.getElementById('Descricao').value = 'Implementar relatório com filtros, gráficos e opções de exportação para análise de dados.';
+                document.getElementById('CriteriosAceitacao').value = `- Dado que o usuário acessa o relatório
+- Quando a página carrega
+- Então deve exibir os dados do período atual
+
+- Dado que o usuário aplica filtros
+- Quando ele clica em "Filtrar"
+- Então os dados devem ser atualizados conforme os critérios
+
+- Dado que o usuário quer exportar
+- Quando ele clica em "Exportar"
+- Então deve ser gerado arquivo Excel/PDF com os dados filtrados
+
+- Dado que há muitos dados
+- Quando o relatório carrega
+- Então deve implementar paginação ou carregamento otimizado`;
+                document.getElementById('Epic').value = 'Relatórios';
+                document.getElementById('StoryPoints').value = '13';
+                document.getElementById('Tags').value = 'frontend, backend, relatórios, gráficos, exportação';
+                break;
+        }
+    }
+
+    // Validação de Story Points vs Complexidade
+    document.getElementById('StoryPoints').addEventListener('change', function() {
+        const points = parseInt(this.value);
+        const alertDiv = document.getElementById('storyPointsAlert');
+        
+        if (alertDiv) {
+            alertDiv.remove();
+        }
+        
+        if (points >= 21) {
+            const alert = document.createElement('div');
+            alert.id = 'storyPointsAlert';
+            alert.className = 'alert alert-warning mt-2';
+            alert.innerHTML = '<i class="bi bi-exclamation-triangle"></i> <strong>Atenção:</strong> Stories com 21+ pontos são muito grandes. Considere quebrar em stories menores.';
+            this.parentNode.appendChild(alert);
+        }
+    });
+
+    // Auto-sugestão de Epic baseado no título
+    document.getElementById('Titulo').addEventListener('blur', function() {
+        const titulo = this.value.toLowerCase();
+        const epicField = document.getElementById('Epic');
+        
+        if (!epicField.value) { // Só sugere se o campo estiver vazio
+            if (titulo.includes('login') || titulo.includes('autenticação') || titulo.includes('senha')) {
+                epicField.value = 'Autenticação';
+            } else if (titulo.includes('relatório') || titulo.includes('gráfico') || titulo.includes('dashboard')) {
+                epicField.value = 'Relatórios';
+            } else if (titulo.includes('cadastro') || titulo.includes('crud') || titulo.includes('gerenciar')) {
+                epicField.value = 'Cadastros';
+            } else if (titulo.includes('api') || titulo.includes('integração') || titulo.includes('webhook')) {
+                epicField.value = 'Integrações';
+            }
+        }
+    });
+</script>
+
+<style>
+    .bg-orange {
+        background-color: #fd7e14 !important;
+    }
+    
+    .btn-outline-info:hover {
+        transform: translateY(-1px);
+    }
+    
+    .badge.fs-6 {
+        font-size: 1rem !important;
+        padding: 0.5rem;
+        min-width: 2rem;
+    }
+</style>

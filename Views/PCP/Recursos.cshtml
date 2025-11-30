@@ -1,0 +1,98 @@
+@model IEnumerable<WebApp.Models.Recurso>
+@{
+    ViewData["Title"] = "Recursos de Produção";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-tools"></i> Recursos de Produção</h2>
+        <a asp-action="CreateRecurso" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Novo Recurso
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tabelaRecursos">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th class="text-end">Capacidade/Hora</th>
+                                <th class="text-end">Custo/Hora</th>
+                                <th class="text-center">Disponível</th>
+                                <th class="text-center">Em Manutenção</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var recurso in Model)
+                            {
+                                <tr>
+                                    <td><strong>@recurso.Codigo</strong></td>
+                                    <td>@recurso.Nome</td>
+                                    <td>@recurso.Tipo</td>
+                                    <td class="text-end">@recurso.CapacidadePorHora.ToString("N2")</td>
+                                    <td class="text-end">@recurso.CustoPorHora.ToString("C2")</td>
+                                    <td class="text-center">
+                                        @if (recurso.Disponivel)
+                                        {
+                                            <span class="badge bg-success">Sim</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Não</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        @if (recurso.EmManutencao)
+                                        {
+                                            <span class="badge bg-warning text-dark">Sim</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Não</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Nenhum recurso cadastrado ainda.
+                    <a asp-action="CreateRecurso" class="alert-link">Cadastrar o primeiro recurso</a>.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            if ($.fn.DataTable) {
+                $('#tabelaRecursos').DataTable({
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json'
+                    },
+                    order: [[1, 'asc']]
+                });
+            }
+        });
+    </script>
+}

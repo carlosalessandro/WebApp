@@ -395,32 +395,67 @@
         
         if (draggedElement) {
             const tarefaId = draggedElement.getAttribute('data-tarefa-id');
-            const novoStatus = parseInt(ev.currentTarget.getAttribute('data-status'));
-            const statusAtual = parseInt(draggedElement.closest('[data-status]').getAttribute('data-status'));
+            const novoStatusAttr = ev.currentTarget.getAttribute('data-status');
+            const statusAtualAttr = draggedElement.closest('[data-status]').getAttribute('data-status');
             
-            console.log('Drop event:', {
+            console.log('Drop event - Raw attributes:', {
                 tarefaId: tarefaId,
+                novoStatusAttr: novoStatusAttr,
+                statusAtualAttr: statusAtualAttr
+            });
+            
+            // Validar ID da tarefa
+            if (!tarefaId || tarefaId === 'null' || tarefaId === '') {
+                console.error('ID da tarefa não encontrado ou inválido');
+                showErrorMessage('Erro: ID da tarefa não encontrado');
+                draggedElement.classList.remove('dragging');
+                draggedElement = null;
+                return;
+            }
+            
+            // Validar status de destino
+            if (!novoStatusAttr || novoStatusAttr === 'null' || novoStatusAttr === '') {
+                console.error('Status de destino não encontrado:', novoStatusAttr);
+                showErrorMessage('Erro: Status de destino inválido');
+                draggedElement.classList.remove('dragging');
+                draggedElement = null;
+                return;
+            }
+            
+            // Converter para números
+            const novoStatus = parseInt(novoStatusAttr);
+            const statusAtual = parseInt(statusAtualAttr);
+            
+            console.log('Drop event - Parsed values:', {
+                tarefaId: parseInt(tarefaId),
                 novoStatus: novoStatus,
                 statusAtual: statusAtual
             });
             
-            if (!tarefaId) {
-                console.error('ID da tarefa não encontrado');
-                alert('Erro: ID da tarefa não encontrado');
+            // Validar conversão para números
+            if (isNaN(novoStatus) || novoStatus < 1 || novoStatus > 4) {
+                console.error('Status de destino inválido após conversão:', novoStatus);
+                showErrorMessage('Erro: Status de destino inválido (deve ser 1-4)');
+                draggedElement.classList.remove('dragging');
+                draggedElement = null;
                 return;
             }
             
-            if (isNaN(novoStatus)) {
-                console.error('Status inválido:', ev.currentTarget.getAttribute('data-status'));
-                alert('Erro: Status de destino inválido');
+            if (isNaN(statusAtual)) {
+                console.error('Status atual inválido:', statusAtual);
+                showErrorMessage('Erro: Status atual inválido');
+                draggedElement.classList.remove('dragging');
+                draggedElement = null;
                 return;
             }
             
+            // Verificar se realmente precisa mover
             if (novoStatus !== statusAtual) {
-                console.log('Atualizando tarefa de status', statusAtual, 'para', novoStatus);
+                console.log('Movendo tarefa de status', statusAtual, 'para', novoStatus);
                 updateTarefaStatus(tarefaId, novoStatus);
             } else {
                 console.log('Tarefa já está no status correto, não fazendo nada');
+                showSuccessMessage('Tarefa já está nesta coluna');
             }
             
             draggedElement.classList.remove('dragging');
@@ -431,38 +466,84 @@
     function updateTarefaStatus(tarefaId, novoStatus) {
         console.log('Atualizando tarefa:', tarefaId, 'para status:', novoStatus);
         
+        // Obter o token antiforgery
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        
         fetch('/Tarefa/UpdateStatus', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
             },
             body: JSON.stringify({
                 tarefaId: parseInt(tarefaId),
-                novoStatus: novoStatus,
+                novoStatus: parseInt(novoStatus),
                 novaOrdem: 0
             })
         })
         .then(response => {
             console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                return response.text().then(text => {
+                    console.error('Response text:', text);
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                });
             }
             return response.json();
         })
         .then(data => {
             console.log('Response data:', data);
             if (data.success) {
-                // Recarregar a página para mostrar as mudanças
-                location.reload();
+                // Mostrar feedback visual antes de recarregar
+                showSuccessMessage('Tarefa movida com sucesso!');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
             } else {
                 console.error('Erro do servidor:', data.message);
-                alert('Erro ao atualizar tarefa: ' + (data.message || 'Erro desconhecido'));
+                showErrorMessage('Erro ao atualizar tarefa: ' + (data.message || 'Erro desconhecido'));
             }
         })
         .catch(error => {
             console.error('Erro na requisição:', error);
-            alert('Erro ao atualizar tarefa: ' + error.message);
+            showErrorMessage('Erro ao atualizar tarefa: ' + error.message);
         });
+    }
+    
+    function showSuccessMessage(message) {
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+        alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alert.innerHTML = `
+            <i class="bi bi-check-circle"></i> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+        
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }, 3000);
+    }
+    
+    function showErrorMessage(message) {
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+        alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alert.innerHTML = `
+            <i class="bi bi-exclamation-triangle"></i> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+        
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }, 5000);
     }
 
     // Função para testar o endpoint
@@ -485,5 +566,30 @@
         if (e.target.classList.contains('card-body')) {
             e.target.classList.remove('drag-over');
         }
+    });
+    
+    // Debug: Verificar se os atributos data-status estão corretos
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('=== DEBUG KANBAN ===');
+        
+        // Verificar colunas
+        const colunas = document.querySelectorAll('[data-status]');
+        console.log('Colunas encontradas:', colunas.length);
+        colunas.forEach((coluna, index) => {
+            const status = coluna.getAttribute('data-status');
+            console.log(`Coluna ${index + 1}: data-status="${status}"`);
+        });
+        
+        // Verificar cards
+        const cards = document.querySelectorAll('.tarefa-card[data-tarefa-id]');
+        console.log('Cards encontrados:', cards.length);
+        cards.forEach((card, index) => {
+            const tarefaId = card.getAttribute('data-tarefa-id');
+            const coluna = card.closest('[data-status]');
+            const status = coluna ? coluna.getAttribute('data-status') : 'não encontrado';
+            console.log(`Card ${index + 1}: tarefa-id="${tarefaId}", status="${status}"`);
+        });
+        
+        console.log('=== FIM DEBUG ===');
     });
 </script>

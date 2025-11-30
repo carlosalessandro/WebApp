@@ -1,0 +1,87 @@
+@model IEnumerable<WebApp.Models.PedidoCompra>
+@{
+    ViewData["Title"] = "Pedidos de Compra";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-cart-plus me-2"></i>Pedidos de Compra</h2>
+        @* Futuramente: botão para criar novo pedido *@
+        @* <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle me-2"></i>Novo Pedido</a> *@
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Número</th>
+                                <th>Fornecedor</th>
+                                <th>Data Pedido</th>
+                                <th>Data Entrega</th>
+                                <th>Status</th>
+                                <th class="text-end">Valor Total</th>
+                                <th class="text-end">Valor Final</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var pedido in Model)
+                            {
+                                <tr>
+                                    <td><strong>@pedido.Numero</strong></td>
+                                    <td>@pedido.Fornecedor?.RazaoSocial</td>
+                                    <td>@pedido.DataPedido.ToString("dd/MM/yyyy")</td>
+                                    <td>@pedido.DataEntrega?.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        @switch (pedido.Status)
+                                        {
+                                            case WebApp.Models.StatusPedidoCompra.Pendente:
+                                                <span class="badge bg-warning text-dark">Pendente</span>
+                                                break;
+                                            case WebApp.Models.StatusPedidoCompra.Aprovado:
+                                                <span class="badge bg-info text-dark">Aprovado</span>
+                                                break;
+                                            case WebApp.Models.StatusPedidoCompra.Enviado:
+                                                <span class="badge bg-primary">Enviado</span>
+                                                break;
+                                            case WebApp.Models.StatusPedidoCompra.RecebidoParcial:
+                                                <span class="badge bg-secondary">Recebido Parcial</span>
+                                                break;
+                                            case WebApp.Models.StatusPedidoCompra.Recebido:
+                                                <span class="badge bg-success">Recebido</span>
+                                                break;
+                                            case WebApp.Models.StatusPedidoCompra.Cancelado:
+                                                <span class="badge bg-danger">Cancelado</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="text-end">@pedido.ValorTotal.ToString("C")</td>
+                                    <td class="text-end">@pedido.ValorFinal.ToString("C")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <h4 class="text-muted mt-3">Nenhum pedido de compra cadastrado</h4>
+                    <p class="text-muted">Assim que você cadastrar pedidos, eles aparecerão aqui.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

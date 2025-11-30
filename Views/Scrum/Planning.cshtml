@@ -1,0 +1,413 @@
+@{
+    ViewData["Title"] = "Sprint Planning";
+    var backlogItems = ViewBag.BacklogItems as List<WebApp.Models.UserStory> ?? new List<WebApp.Models.UserStory>();
+    var sprintsAtivos = ViewBag.SprintsAtivos as List<WebApp.Models.Sprint> ?? new List<WebApp.Models.Sprint>();
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-calendar-event me-2"></i>Sprint Planning</h2>
+                <div>
+                    <a href="@Url.Action("CreateSprint")" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Novo Sprint
+                    </a>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações do Planning -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Sobre o Sprint Planning</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>Objetivo:</strong> Definir o que será desenvolvido no próximo sprint e como o trabalho será realizado.
+                    </p>
+                    <p class="mb-2">
+                        <strong>Duração:</strong> Máximo de 8 horas para um sprint de 4 semanas (proporcional para sprints menores).
+                    </p>
+                    <p class="mb-0">
+                        <strong>Participantes:</strong> Product Owner, Scrum Master, Development Team.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Resumo</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="fw-bold text-primary fs-4">@backlogItems.Count</div>
+                            <small class="text-muted">Backlog Items</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="fw-bold text-success fs-4">@sprintsAtivos.Count</div>
+                            <small class="text-muted">Sprints Ativos</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sprints Ativos -->
+    @if (sprintsAtivos.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-play-circle"></i> Sprints Ativos/Em Planejamento</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach (var sprint in sprintsAtivos)
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-@(sprint.Status == WebApp.Models.StatusSprint.Ativo ? "primary" : "warning")">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title">@sprint.Nome</h6>
+                                                <span class="badge bg-@(sprint.Status == WebApp.Models.StatusSprint.Ativo ? "primary" : "warning")">
+                                                    @sprint.Status
+                                                </span>
+                                            </div>
+                                            
+                                            <p class="card-text small text-muted">
+                                                <i class="bi bi-calendar"></i> 
+                                                @sprint.DataInicio.ToString("dd/MM/yyyy") - @sprint.DataFim.ToString("dd/MM/yyyy")
+                                            </p>
+                                            
+                                            <div class="row text-center">
+                                                <div class="col-4">
+                                                    <div class="fw-bold text-info">@sprint.UserStories.Count</div>
+                                                    <small class="text-muted">Stories</small>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="fw-bold text-primary">@sprint.StoryPointsTotal</div>
+                                                    <small class="text-muted">Points</small>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="fw-bold text-success">@sprint.ProgressoPercentual%</div>
+                                                    <small class="text-muted">Progresso</small>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mt-3">
+                                                <a href="@Url.Action("SprintBoard", new { id = sprint.Id })" 
+                                                   class="btn btn-outline-primary btn-sm me-2">
+                                                    <i class="bi bi-kanban"></i> Board
+                                                </a>
+                                                @if (sprint.Status == WebApp.Models.StatusSprint.Planejamento)
+                                                {
+                                                    <button class="btn btn-success btn-sm" onclick="iniciarSprint(@sprint.Id)">
+                                                        <i class="bi bi-play"></i> Iniciar
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Product Backlog para Planning -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Product Backlog - Itens Disponíveis</h5>
+                </div>
+                <div class="card-body">
+                    @if (backlogItems.Any())
+                    {
+                        <div class="alert alert-info">
+                            <i class="bi bi-lightbulb"></i>
+                            <strong>Dica:</strong> Arraste os itens do backlog para os sprints ou use os botões de ação para organizar o planning.
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 50px;">
+                                            <input type="checkbox" class="form-check-input" id="selectAll">
+                                        </th>
+                                        <th>User Story</th>
+                                        <th style="width: 100px;">Prioridade</th>
+                                        <th style="width: 80px;">Points</th>
+                                        <th style="width: 120px;">Epic</th>
+                                        <th style="width: 150px;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var story in backlogItems.OrderByDescending(s => s.Prioridade).ThenByDescending(s => s.DataCriacao))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="form-check-input story-checkbox" value="@story.Id">
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <strong>@story.Titulo</strong>
+                                                    @if (!string.IsNullOrEmpty(story.Descricao))
+                                                    {
+                                                        <br>
+                                                        <small class="text-muted">
+                                                            @(story.Descricao.Length > 100 ? story.Descricao.Substring(0, 100) + "..." : story.Descricao)
+                                                        </small>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@(story.Prioridade switch {
+                                                    WebApp.Models.PrioridadeUserStory.Critica => "danger",
+                                                    WebApp.Models.PrioridadeUserStory.Alta => "warning",
+                                                    WebApp.Models.PrioridadeUserStory.Media => "info",
+                                                    WebApp.Models.PrioridadeUserStory.Baixa => "success",
+                                                    _ => "secondary"
+                                                })">
+                                                    @story.Prioridade
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (story.StoryPoints.HasValue)
+                                                {
+                                                    <span class="badge bg-primary rounded-pill">@story.StoryPoints</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(story.Epic))
+                                                {
+                                                    <span class="badge bg-secondary">@story.Epic</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (sprintsAtivos.Any())
+                                                {
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <button type="button" class="btn btn-outline-primary dropdown-toggle" 
+                                                                data-bs-toggle="dropdown" title="Adicionar ao Sprint">
+                                                            <i class="bi bi-plus"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            @foreach (var sprint in sprintsAtivos.Where(s => s.Status == WebApp.Models.StatusSprint.Planejamento))
+                                                            {
+                                                                <li>
+                                                                    <a class="dropdown-item" href="#" 
+                                                                       onclick="adicionarAoSprint(@story.Id, @sprint.Id, '@sprint.Nome')">
+                                                                        @sprint.Nome
+                                                                    </a>
+                                                                </li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <small class="text-muted">Sem sprints disponíveis</small>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Ações em Lote -->
+                        @if (sprintsAtivos.Any(s => s.Status == WebApp.Models.StatusSprint.Planejamento))
+                        {
+                            <div class="card bg-light mt-3">
+                                <div class="card-body">
+                                    <h6><i class="bi bi-check2-square"></i> Ações em Lote</h6>
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Adicionar selecionadas ao Sprint</label>
+                                            <select class="form-select" id="sprintDestino">
+                                                <option value="">Selecione um Sprint</option>
+                                                @foreach (var sprint in sprintsAtivos.Where(s => s.Status == WebApp.Models.StatusSprint.Planejamento))
+                                                {
+                                                    <option value="@sprint.Id">@sprint.Nome</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-primary w-100" onclick="adicionarSelecionadasAoSprint()">
+                                                <i class="bi bi-plus"></i> Adicionar
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">
+                                                <i class="bi bi-info-circle"></i>
+                                                Selecione as User Stories e o Sprint de destino para fazer o planning em lote.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-list-ul text-muted" style="font-size: 4rem;"></i>
+                            <h5 class="text-muted mt-3">Backlog vazio</h5>
+                            <p class="text-muted">Não há User Stories disponíveis para planning.</p>
+                            <a href="@Url.Action("CreateUserStory")" class="btn btn-success">
+                                <i class="bi bi-plus-circle"></i> Criar User Story
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guia de Planning -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-question-circle"></i> Guia de Sprint Planning</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Parte 1: O QUE será feito?</h6>
+                            <ul class="small">
+                                <li>Product Owner apresenta os itens do Product Backlog</li>
+                                <li>Team discute e esclarece dúvidas sobre cada item</li>
+                                <li>Team seleciona itens que consegue completar no sprint</li>
+                                <li>Define-se o Sprint Goal (objetivo do sprint)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Parte 2: COMO será feito?</h6>
+                            <ul class="small">
+                                <li>Team quebra User Stories em tasks técnicas</li>
+                                <li>Estima-se o esforço de cada task</li>
+                                <li>Verifica-se a capacidade da equipe</li>
+                                <li>Ajusta-se o escopo se necessário</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Seleção múltipla
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.story-checkbox');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+
+    // Adicionar ao sprint
+    function adicionarAoSprint(storyId, sprintId, sprintNome) {
+        if (confirm(`Adicionar esta User Story ao sprint "${sprintNome}"?`)) {
+            fetch('/Scrum/MoveToSprint', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `userStoryId=${storyId}&sprintId=${sprintId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao adicionar User Story ao sprint');
+            });
+        }
+    }
+
+    // Adicionar selecionadas ao sprint
+    function adicionarSelecionadasAoSprint() {
+        const selected = Array.from(document.querySelectorAll('.story-checkbox:checked')).map(cb => cb.value);
+        const sprintId = document.getElementById('sprintDestino').value;
+
+        if (selected.length === 0) {
+            alert('Selecione pelo menos uma User Story');
+            return;
+        }
+
+        if (!sprintId) {
+            alert('Selecione um Sprint de destino');
+            return;
+        }
+
+        if (confirm(`Adicionar ${selected.length} User Stories ao sprint selecionado?`)) {
+            Promise.all(selected.map(storyId => 
+                fetch('/Scrum/MoveToSprint', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `userStoryId=${storyId}&sprintId=${sprintId}`
+                })
+            ))
+            .then(() => {
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao adicionar User Stories ao sprint');
+            });
+        }
+    }
+
+    // Iniciar sprint (placeholder)
+    function iniciarSprint(sprintId) {
+        if (confirm('Iniciar este sprint? Esta ação mudará o status para "Ativo".')) {
+            // Implementar lógica para iniciar sprint
+            alert('Funcionalidade será implementada: iniciar sprint');
+        }
+    }
+</script>
+
+<style>
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+    }
+</style>

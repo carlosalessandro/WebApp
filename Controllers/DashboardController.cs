@@ -17,9 +17,37 @@ namespace WebApp.Controllers
         }
 
         // GET: Dashboard
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            try
+            {
+                // Carregar estatísticas básicas para exibir mesmo se JavaScript falhar
+                var totalClientes = await _context.Clientes.CountAsync();
+                var totalTarefas = await _context.Tarefas.CountAsync();
+                var tarefasConcluidas = await _context.Tarefas.CountAsync(t => t.Status == StatusTarefa.Done);
+                var tarefasEmProgresso = await _context.Tarefas.CountAsync(t => t.Status == StatusTarefa.InProgress);
+
+                ViewBag.TotalClientes = totalClientes;
+                ViewBag.TotalTarefas = totalTarefas;
+                ViewBag.TarefasConcluidas = tarefasConcluidas;
+                ViewBag.TarefasEmProgresso = tarefasEmProgresso;
+                ViewBag.TaxaConclusao = totalTarefas > 0 ? Math.Round((double)tarefasConcluidas / totalTarefas * 100, 2) : 0;
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao carregar dashboard principal");
+                
+                // Valores padrão em caso de erro
+                ViewBag.TotalClientes = 0;
+                ViewBag.TotalTarefas = 0;
+                ViewBag.TarefasConcluidas = 0;
+                ViewBag.TarefasEmProgresso = 0;
+                ViewBag.TaxaConclusao = 0;
+                
+                return View();
+            }
         }
 
         // GET: Dashboard/Clientes

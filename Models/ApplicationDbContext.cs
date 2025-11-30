@@ -50,6 +50,12 @@ namespace WebApp.Models
         public DbSet<PedidoCompra> PedidosCompra { get; set; } = null!;
         public DbSet<ItemPedidoCompra> ItensPedidoCompra { get; set; } = null!;
 
+        // Módulo Scrum
+        public DbSet<Sprint> Sprints { get; set; } = null!;
+        public DbSet<UserStory> UserStories { get; set; } = null!;
+        public DbSet<TaskUserStory> TaskUserStories { get; set; } = null!;
+        public DbSet<SprintReview> SprintReviews { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -245,7 +251,7 @@ namespace WebApp.Models
                 {
                     Id = 1,
                     Email = "admin@teste.com",
-                    Password = "123456", // Em produção, usar hash da senha
+                    Password = "admin123", // Em produção, usar hash da senha
                     Name = "Administrador",
                     CreatedAt = DateTime.Now
                 },

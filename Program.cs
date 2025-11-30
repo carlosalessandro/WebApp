@@ -1,27 +1,54 @@
-using Microsoft.EntityFrameworkCore;
-using WebApp.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using WebApp.Services;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using WebApp.Models;
+using WebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+const string CorsPolicyName = "ConfiguredOrigins";
+
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>()?
+    .Where(origin => !string.IsNullOrWhiteSpace(origin))
+    .ToArray() ?? Array.Empty<string>();
+
 // Add services to the container.
-builder.Services.AddControllersWithViews()
+builder.Services.AddControllersWithViews(options =>
+    {
+        options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 
-// Add CORS for Angular
+builder.Services.AddMemoryCache();
+
+// Add CORS based on configuration
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngular",
-        builder => builder
-            .WithOrigins("http://localhost:4200")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());
+    options.AddPolicy(CorsPolicyName, policy =>
+    {
+        if (allowedOrigins.Length > 0)
+        {
+            policy.WithOrigins(allowedOrigins)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        }
+        else
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        }
+    });
 });
 
 // Add Entity Framework Core with conditional database provider
@@ -44,6 +71,10 @@ else
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
+        options.Cookie.Name = "WebApp.Auth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.None;
         options.LoginPath = "/Account/Login";
         options.LogoutPath = "/Account/Logout";
         options.AccessDeniedPath = "/Account/AccessDenied";
@@ -51,15 +82,35 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 
+// Configure cookie policy
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.Secure = CookieSecurePolicy.Always;
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.HttpOnly = HttpOnlyPolicy.Always;
+});
+
 // Add Authorization
 builder.Services.AddAuthorization();
 
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.Name = "XSRF-TOKEN";
+    options.Cookie.HttpOnly = false;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.HeaderName = "X-XSRF-TOKEN";
+});
+
 // Add custom services
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IWhatsAppService, WhatsAppService>();
 builder.Services.AddScoped<INFCeService, NFCeService>();
 
 var app = builder.Build();
+
+var antiforgery = app.Services.GetRequiredService<IAntiforgery>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -71,9 +122,30 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCookiePolicy();
+
+app.Use(async (context, next) =>
+{
+    if (HttpMethods.IsGet(context.Request.Method))
+    {
+        var tokens = antiforgery.GetAndStoreTokens(context);
+        if (!string.IsNullOrEmpty(tokens.RequestToken))
+        {
+            context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!, new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Path = "/"
+            });
+        }
+    }
+
+    await next();
+});
 
 // Enable CORS
-app.UseCors("AllowAngular");
+app.UseCors(CorsPolicyName);
 
 app.UseRouting();
 

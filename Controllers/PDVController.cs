@@ -145,21 +145,77 @@ namespace WebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: PDV/AplicarDesconto
+        [HttpGet]
+        public IActionResult AplicarDesconto(int? vendaId)
+        {
+            // Se não há vendaId, buscar venda aberta
+            if (!vendaId.HasValue)
+            {
+                var vendaAberta = _context.Vendas
+                    .FirstOrDefault(v => v.Status == "Aberta");
+                
+                if (vendaAberta != null)
+                {
+                    vendaId = vendaAberta.Id;
+                }
+            }
+
+            if (!vendaId.HasValue)
+            {
+                TempData["Error"] = "Nenhuma venda encontrada para aplicar desconto.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var venda = _context.Vendas
+                .Include(v => v.Itens)
+                .ThenInclude(i => i.Produto)
+                .FirstOrDefault(v => v.Id == vendaId.Value);
+
+            if (venda == null)
+            {
+                TempData["Error"] = "Venda não encontrada.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(venda);
+        }
+
         // POST: PDV/AplicarDesconto
         [HttpPost]
-        public IActionResult AplicarDesconto(int vendaId, decimal desconto)
+        public IActionResult AplicarDesconto(int vendaId, decimal desconto, string? tipoDesconto = "valor")
         {
             var venda = _context.Vendas.Find(vendaId);
             if (venda == null)
             {
-                return NotFound();
+                TempData["Error"] = "Venda não encontrada.";
+                return RedirectToAction(nameof(Index));
             }
 
-            venda.Desconto = desconto;
-            venda.ValorFinal = venda.ValorTotal - desconto;
+            // Calcular desconto baseado no tipo
+            decimal valorDesconto = desconto;
+            if (tipoDesconto == "percentual")
+            {
+                if (desconto > 100)
+                {
+                    TempData["Error"] = "Desconto percentual não pode ser maior que 100%.";
+                    return RedirectToAction(nameof(AplicarDesconto), new { vendaId });
+                }
+                valorDesconto = (venda.ValorTotal * desconto) / 100;
+            }
+
+            if (valorDesconto > venda.ValorTotal)
+            {
+                TempData["Error"] = "Desconto não pode ser maior que o valor total da venda.";
+                return RedirectToAction(nameof(AplicarDesconto), new { vendaId });
+            }
+
+            venda.Desconto = valorDesconto;
+            venda.ValorFinal = venda.ValorTotal - valorDesconto;
             _context.Update(venda);
             _context.SaveChanges();
 
+            TempData["Success"] = $"Desconto de {valorDesconto:C} aplicado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
 

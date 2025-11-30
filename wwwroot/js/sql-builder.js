@@ -5,6 +5,7 @@ class SqlBuilder {
         this.query = {
             select: [],
             from: null,
+            joins: [], // cada join: { type, conditions: [{ leftTable, leftColumn, operator, rightTable, rightColumn }] }
             where: [],
             orderBy: []
         };
@@ -257,6 +258,11 @@ class SqlBuilder {
                     this.addWhereCondition(item);
                 }
                 break;
+            case 'join':
+                if (itemType === 'column') {
+                    this.addJoinCondition(item);
+                }
+                break;
             case 'order':
                 if (itemType === 'column') {
                     this.addOrderByColumn(item);
@@ -301,6 +307,152 @@ class SqlBuilder {
             logicalOperator: 'AND'
         });
         this.renderWhereItems();
+        this.generateSQL();
+    }
+
+    // JOINs (suporta múltiplas condições ON por JOIN)
+    addJoinCondition(column) {
+        // Se não existe JOIN ainda, cria um e inicia primeira condição com esta coluna como lado esquerdo
+        if (this.query.joins.length === 0) {
+            this.query.joins.push({
+                type: 'INNER JOIN',
+                conditions: [
+                    {
+                        leftTable: column.table,
+                        leftColumn: column.name,
+                        operator: '=',
+                        rightTable: null,
+                        rightColumn: null
+                    }
+                ]
+            });
+        } else {
+            const lastJoin = this.query.joins[this.query.joins.length - 1];
+            const lastCond = lastJoin.conditions[lastJoin.conditions.length - 1];
+
+            // Se a última condição ainda não tem lado direito definido, completa com esta coluna
+            if (lastCond && (!lastCond.rightTable || !lastCond.rightColumn)) {
+                lastCond.rightTable = column.table;
+                lastCond.rightColumn = column.name;
+            } else {
+                // Adiciona nova condição a este mesmo JOIN, começando com esta coluna como lado esquerdo
+                lastJoin.conditions.push({
+                    leftTable: column.table,
+                    leftColumn: column.name,
+                    operator: '=',
+                    rightTable: null,
+                    rightColumn: null
+                });
+            }
+        }
+
+        this.renderJoinItems();
+        this.generateSQL();
+    }
+
+    renderJoinItems() {
+        const container = document.getElementById('joinItems');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        this.query.joins.forEach((item, index) => {
+            const itemElement = this.createJoinItemElement(item, index);
+            container.appendChild(itemElement);
+        });
+    }
+
+    createJoinItemElement(item, index) {
+        const div = document.createElement('div');
+        div.className = 'selected-item';
+        
+        // Cabeçalho do JOIN (tipo)
+        let html = `
+            <div class="selected-item-content flex-column align-items-start">
+                <div class="mb-2 d-flex align-items-center gap-2">
+                    <span class="badge bg-light text-dark">JOIN</span>
+                    <select class="form-select form-select-sm" style="width: 160px;"
+                            onchange="sqlBuilder.updateJoinType(${index}, this.value)">
+                        <option value="INNER JOIN" ${item.type === 'INNER JOIN' ? 'selected' : ''}>INNER JOIN</option>
+                        <option value="LEFT JOIN" ${item.type === 'LEFT JOIN' ? 'selected' : ''}>LEFT JOIN</option>
+                        <option value="RIGHT JOIN" ${item.type === 'RIGHT JOIN' ? 'selected' : ''}>RIGHT JOIN</option>
+                    </select>
+                </div>
+        `;
+
+        // Lista de condições ON
+        item.conditions.forEach((cond, condIndex) => {
+            const left = cond.leftTable && cond.leftColumn
+                ? `${cond.leftTable}.${cond.leftColumn}`
+                : '(coluna esquerda)';
+            const right = cond.rightTable && cond.rightColumn
+                ? `${cond.rightTable}.${cond.rightColumn}`
+                : '(arraste outra coluna para completar)';
+
+            html += `
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    ${condIndex === 0 ? '<span class="text-muted">ON</span>' : '<span class="text-muted">AND</span>'}
+                    <strong>${left}</strong>
+                    <select class="form-select form-select-sm" style="width: 90px;"
+                            onchange="sqlBuilder.updateJoinConditionOperator(${index}, ${condIndex}, this.value)">
+                        <option value="=" ${cond.operator === '=' ? 'selected' : ''}>=</option>
+                        <option value="!=" ${cond.operator === '!=' ? 'selected' : ''}>!=</option>
+                        <option value=">" ${cond.operator === '>' ? 'selected' : ''}>&gt;</option>
+                        <option value="<" ${cond.operator === '<' ? 'selected' : ''}>&lt;</option>
+                    </select>
+                    <strong>${right}</strong>
+                    <button class="btn btn-sm btn-outline-danger"
+                            onclick="sqlBuilder.removeJoinCondition(${index}, ${condIndex})">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+
+        html += `
+            <div class="selected-item-actions">
+                <button class="btn btn-sm btn-outline-danger" onclick="sqlBuilder.removeJoin(${index})">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+
+        div.innerHTML = html;
+        return div;
+    }
+
+    updateJoinType(index, type) {
+        if (this.query.joins[index]) {
+            this.query.joins[index].type = type;
+            this.generateSQL();
+        }
+    }
+
+    updateJoinConditionOperator(joinIndex, condIndex, operator) {
+        const join = this.query.joins[joinIndex];
+        if (join && join.conditions[condIndex]) {
+            join.conditions[condIndex].operator = operator;
+            this.generateSQL();
+        }
+    }
+
+    removeJoinCondition(joinIndex, condIndex) {
+        const join = this.query.joins[joinIndex];
+        if (!join) return;
+        join.conditions.splice(condIndex, 1);
+        // Se não restou condição, remove o JOIN inteiro
+        if (join.conditions.length === 0) {
+            this.query.joins.splice(joinIndex, 1);
+        }
+        this.renderJoinItems();
+        this.generateSQL();
+    }
+
+    removeJoin(index) {
+        this.query.joins.splice(index, 1);
+        this.renderJoinItems();
         this.generateSQL();
     }
 
@@ -545,6 +697,32 @@ class SqlBuilder {
                 sql += ` AS ${this.query.from.alias}`;
             }
             sql += '\n';
+        }
+
+        // JOINs
+        if (this.query.from && this.query.joins && this.query.joins.length > 0) {
+            this.query.joins.forEach(join => {
+                if (!join.conditions || join.conditions.length === 0) {
+                    return;
+                }
+
+                // Assume que todas as condições do JOIN usam a mesma tabela da direita (rightTable)
+                const firstCond = join.conditions.find(c => c.rightTable && c.rightColumn);
+                if (!firstCond) {
+                    return; // sem lado direito definido, não gera SQL
+                }
+
+                const joinTable = firstCond.rightTable;
+                const conditionStrings = join.conditions
+                    .filter(c => c.leftTable && c.leftColumn && c.rightTable && c.rightColumn)
+                    .map(c => `${c.leftTable}.${c.leftColumn} ${c.operator} ${c.rightTable}.${c.rightColumn}`);
+
+                if (conditionStrings.length === 0) {
+                    return;
+                }
+
+                sql += `${join.type} ${joinTable} ON ${conditionStrings.join(' AND ')}\n`;
+            });
         }
 
         // WHERE

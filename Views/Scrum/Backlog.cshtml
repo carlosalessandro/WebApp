@@ -1,0 +1,379 @@
+@model IEnumerable<WebApp.Models.UserStory>
+@{
+    ViewData["Title"] = "Product Backlog";
+    var sprints = ViewBag.Sprints as List<WebApp.Models.Sprint> ?? new List<WebApp.Models.Sprint>();
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-list-ul me-2"></i>Product Backlog</h2>
+                <div>
+                    <a href="@Url.Action("CreateUserStory")" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Nova User Story
+                    </a>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros e Ações -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Filtrar por Prioridade</label>
+                            <select class="form-select" id="filtroPrioridade">
+                                <option value="">Todas</option>
+                                <option value="4">Crítica</option>
+                                <option value="3">Alta</option>
+                                <option value="2">Média</option>
+                                <option value="1">Baixa</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Filtrar por Epic</label>
+                            <input type="text" class="form-control" id="filtroEpic" placeholder="Nome do Epic">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="buscarStory" placeholder="Título ou descrição">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Resumo do Backlog</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="fw-bold text-primary fs-4">@Model.Count()</div>
+                            <small class="text-muted">Total Stories</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="fw-bold text-info fs-4">@Model.Sum(us => us.StoryPoints ?? 0)</div>
+                            <small class="text-muted">Story Points</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de User Stories -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-kanban"></i> User Stories</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 50px;">
+                                            <input type="checkbox" class="form-check-input" id="selectAll">
+                                        </th>
+                                        <th>Título</th>
+                                        <th style="width: 100px;">Prioridade</th>
+                                        <th style="width: 80px;">Points</th>
+                                        <th style="width: 120px;">Epic</th>
+                                        <th style="width: 120px;">Responsável</th>
+                                        <th style="width: 100px;">Status</th>
+                                        <th style="width: 150px;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="backlogTable">
+                                    @foreach (var story in Model)
+                                    {
+                                        <tr class="user-story-row" 
+                                            data-prioridade="@((int)story.Prioridade)" 
+                                            data-epic="@(story.Epic ?? "")" 
+                                            data-titulo="@story.Titulo.ToLower()" 
+                                            data-descricao="@(story.Descricao?.ToLower() ?? "")">
+                                            <td>
+                                                <input type="checkbox" class="form-check-input story-checkbox" value="@story.Id">
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <strong>@story.Titulo</strong>
+                                                    @if (!string.IsNullOrEmpty(story.Descricao))
+                                                    {
+                                                        <br>
+                                                        <small class="text-muted">@(story.Descricao.Length > 100 ? story.Descricao.Substring(0, 100) + "..." : story.Descricao)</small>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(story.Tags))
+                                                    {
+                                                        <br>
+                                                        @foreach (var tag in story.Tags.Split(',').Take(3))
+                                                        {
+                                                            <span class="badge bg-light text-dark me-1">@tag.Trim()</span>
+                                                        }
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@(story.Prioridade switch {
+                                                    WebApp.Models.PrioridadeUserStory.Critica => "danger",
+                                                    WebApp.Models.PrioridadeUserStory.Alta => "warning",
+                                                    WebApp.Models.PrioridadeUserStory.Media => "info",
+                                                    WebApp.Models.PrioridadeUserStory.Baixa => "success",
+                                                    _ => "secondary"
+                                                })">
+                                                    @story.Prioridade
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (story.StoryPoints.HasValue)
+                                                {
+                                                    <span class="badge bg-primary rounded-pill">@story.StoryPoints</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(story.Epic))
+                                                {
+                                                    <span class="badge bg-secondary">@story.Epic</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(story.Responsavel))
+                                                {
+                                                    <small><i class="bi bi-person"></i> @story.Responsavel</small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Não atribuído</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@(story.Status switch {
+                                                    WebApp.Models.StatusUserStory.Backlog => "secondary",
+                                                    WebApp.Models.StatusUserStory.SprintBacklog => "primary",
+                                                    WebApp.Models.StatusUserStory.EmDesenvolvimento => "warning",
+                                                    WebApp.Models.StatusUserStory.EmTeste => "info",
+                                                    WebApp.Models.StatusUserStory.Concluida => "success",
+                                                    _ => "secondary"
+                                                })">
+                                                    @story.Status
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button type="button" class="btn btn-outline-primary" 
+                                                            onclick="editStory(@story.Id)" title="Editar">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    @if (sprints.Any())
+                                                    {
+                                                        <div class="btn-group btn-group-sm" role="group">
+                                                            <button type="button" class="btn btn-outline-success dropdown-toggle" 
+                                                                    data-bs-toggle="dropdown" title="Mover para Sprint">
+                                                                <i class="bi bi-arrow-right"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu">
+                                                                @foreach (var sprint in sprints)
+                                                                {
+                                                                    <li>
+                                                                        <a class="dropdown-item" href="#" 
+                                                                           onclick="moveToSprint(@story.Id, @sprint.Id, '@sprint.Nome')">
+                                                                            @sprint.Nome
+                                                                        </a>
+                                                                    </li>
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-list-ul text-muted" style="font-size: 4rem;"></i>
+                            <h5 class="text-muted mt-3">Backlog vazio</h5>
+                            <p class="text-muted">Comece criando suas primeiras User Stories.</p>
+                            <a href="@Url.Action("CreateUserStory")" class="btn btn-success">
+                                <i class="bi bi-plus-circle"></i> Criar User Story
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações em Lote -->
+    @if (Model.Any() && sprints.Any())
+    {
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h6><i class="bi bi-check2-square"></i> Ações em Lote</h6>
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label">Mover selecionadas para Sprint</label>
+                                <select class="form-select" id="sprintDestino">
+                                    <option value="">Selecione um Sprint</option>
+                                    @foreach (var sprint in sprints)
+                                    {
+                                        <option value="@sprint.Id">@sprint.Nome</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-primary w-100" onclick="moveSelectedToSprint()">
+                                    <i class="bi bi-arrow-right"></i> Mover
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    // Filtros
+    document.getElementById('filtroPrioridade').addEventListener('change', aplicarFiltros);
+    document.getElementById('filtroEpic').addEventListener('input', aplicarFiltros);
+    document.getElementById('buscarStory').addEventListener('input', aplicarFiltros);
+
+    function aplicarFiltros() {
+        const prioridade = document.getElementById('filtroPrioridade').value;
+        const epic = document.getElementById('filtroEpic').value.toLowerCase();
+        const busca = document.getElementById('buscarStory').value.toLowerCase();
+
+        const rows = document.querySelectorAll('.user-story-row');
+        
+        rows.forEach(row => {
+            let mostrar = true;
+
+            if (prioridade && row.dataset.prioridade !== prioridade) {
+                mostrar = false;
+            }
+
+            if (epic && !row.dataset.epic.toLowerCase().includes(epic)) {
+                mostrar = false;
+            }
+
+            if (busca && !row.dataset.titulo.includes(busca) && !row.dataset.descricao.includes(busca)) {
+                mostrar = false;
+            }
+
+            row.style.display = mostrar ? '' : 'none';
+        });
+    }
+
+    // Seleção
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.story-checkbox');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+
+    // Mover para sprint
+    function moveToSprint(storyId, sprintId, sprintNome) {
+        if (confirm(`Mover esta User Story para o sprint "${sprintNome}"?`)) {
+            fetch('/Scrum/MoveToSprint', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `userStoryId=${storyId}&sprintId=${sprintId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao mover User Story');
+            });
+        }
+    }
+
+    // Mover selecionadas
+    function moveSelectedToSprint() {
+        const selected = Array.from(document.querySelectorAll('.story-checkbox:checked')).map(cb => cb.value);
+        const sprintId = document.getElementById('sprintDestino').value;
+
+        if (selected.length === 0) {
+            alert('Selecione pelo menos uma User Story');
+            return;
+        }
+
+        if (!sprintId) {
+            alert('Selecione um Sprint de destino');
+            return;
+        }
+
+        if (confirm(`Mover ${selected.length} User Stories para o sprint selecionado?`)) {
+            Promise.all(selected.map(storyId => 
+                fetch('/Scrum/MoveToSprint', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `userStoryId=${storyId}&sprintId=${sprintId}`
+                })
+            ))
+            .then(() => {
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao mover User Stories');
+            });
+        }
+    }
+
+    function editStory(id) {
+        // Implementar edição inline ou modal
+        alert('Funcionalidade de edição será implementada');
+    }
+</script>
+
+<style>
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .user-story-row:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+    }
+</style>

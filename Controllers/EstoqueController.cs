@@ -18,23 +18,24 @@ namespace WebApp.Controllers
         // Dashboard de Estoque
         public async Task<IActionResult> Index()
         {
+            // Carrega em memória para evitar limitações do SQLite com Sum em decimal
+            var estoques = await _context.Estoques.ToListAsync();
+
             var dashboard = new
             {
-                TotalProdutos = await _context.Estoques.CountAsync(),
-                ProdutosEstoqueBaixo = await _context.Estoques
-                    .CountAsync(e => e.QuantidadeAtual <= e.QuantidadeMinima),
-                ProdutosSemEstoque = await _context.Estoques
-                    .CountAsync(e => e.QuantidadeAtual <= 0),
-                ValorTotalEstoque = await _context.Estoques
-                    .SumAsync(e => e.QuantidadeAtual * e.CustoMedio)
+                TotalProdutos = estoques.Count,
+                ProdutosEstoqueBaixo = estoques.Count(e => e.QuantidadeAtual <= e.QuantidadeMinima),
+                ProdutosSemEstoque = estoques.Count(e => e.QuantidadeAtual <= 0),
+                ValorTotalEstoque = estoques.Sum(e => e.QuantidadeAtual * e.CustoMedio)
             };
 
-            var produtosEstoqueBaixo = await _context.Estoques
+            var produtosEstoqueBaixo = (await _context.Estoques
                 .Include(e => e.Produto)
                 .Where(e => e.QuantidadeAtual <= e.QuantidadeMinima)
+                .ToListAsync())
                 .OrderBy(e => e.QuantidadeAtual)
                 .Take(10)
-                .ToListAsync();
+                .ToList();
 
             ViewBag.Dashboard = dashboard;
             ViewBag.ProdutosEstoqueBaixo = produtosEstoqueBaixo;
@@ -51,13 +52,13 @@ namespace WebApp.Controllers
 
             if (!string.IsNullOrEmpty(filtro))
             {
-                query = query.Where(e => e.Produto!.Nome.Contains(filtro) || 
-                                        e.Produto!.Codigo.Contains(filtro));
+                query = query.Where(e => (e.Produto != null && e.Produto.Nome.Contains(filtro)) || 
+                                        (e.Produto != null && e.Produto.Codigo.Contains(filtro)));
             }
 
-            var estoques = await query
-                .OrderBy(e => e.Produto!.Nome)
-                .ToListAsync();
+            var estoques = (await query.ToListAsync())
+                .OrderBy(e => e.Produto?.Nome ?? "")
+                .ToList();
 
             ViewBag.Filtro = filtro;
             return View(estoques);
@@ -92,10 +93,11 @@ namespace WebApp.Controllers
                 .Take(100)
                 .ToListAsync();
 
-            ViewBag.Produtos = await _context.Produtos
-                .OrderBy(p => p.Nome)
+            ViewBag.Produtos = (await _context.Produtos
                 .Select(p => new { p.Id, p.Nome })
-                .ToListAsync();
+                .ToListAsync())
+                .OrderBy(p => p.Nome)
+                .ToList();
 
             ViewBag.ProdutoId = produtoId;
             ViewBag.DataInicio = dataInicio?.ToString("yyyy-MM-dd");
@@ -108,9 +110,10 @@ namespace WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Entrada()
         {
-            ViewBag.Produtos = await _context.Produtos
+            ViewBag.Produtos = (await _context.Produtos
+                .ToListAsync())
                 .OrderBy(p => p.Nome)
-                .ToListAsync();
+                .ToList();
 
             return View();
         }
@@ -182,9 +185,10 @@ namespace WebApp.Controllers
                 TempData["Error"] = "Erro ao registrar entrada de estoque.";
             }
 
-            ViewBag.Produtos = await _context.Produtos
+            ViewBag.Produtos = (await _context.Produtos
+                .ToListAsync())
                 .OrderBy(p => p.Nome)
-                .ToListAsync();
+                .ToList();
 
             return View();
         }
@@ -193,9 +197,10 @@ namespace WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Saida()
         {
-            ViewBag.Produtos = await _context.Produtos
+            ViewBag.Produtos = (await _context.Produtos
+                .ToListAsync())
                 .OrderBy(p => p.Nome)
-                .ToListAsync();
+                .ToList();
 
             return View();
         }
@@ -248,9 +253,10 @@ namespace WebApp.Controllers
                 TempData["Error"] = "Erro ao registrar saída de estoque.";
             }
 
-            ViewBag.Produtos = await _context.Produtos
+            ViewBag.Produtos = (await _context.Produtos
+                .ToListAsync())
                 .OrderBy(p => p.Nome)
-                .ToListAsync();
+                .ToList();
 
             return View();
         }
@@ -259,9 +265,10 @@ namespace WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Ajuste()
         {
-            ViewBag.Produtos = await _context.Produtos
+            ViewBag.Produtos = (await _context.Produtos
+                .ToListAsync())
                 .OrderBy(p => p.Nome)
-                .ToListAsync();
+                .ToList();
 
             return View();
         }
@@ -311,9 +318,10 @@ namespace WebApp.Controllers
                 TempData["Error"] = "Erro ao realizar ajuste de estoque.";
             }
 
-            ViewBag.Produtos = await _context.Produtos
+            ViewBag.Produtos = (await _context.Produtos
+                .ToListAsync())
                 .OrderBy(p => p.Nome)
-                .ToListAsync();
+                .ToList();
 
             return View();
         }

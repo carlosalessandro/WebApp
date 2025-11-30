@@ -1,28 +1,87 @@
 @model WebApp.Models.Venda
 
 @{
-    ViewData["Title"] = "PDV - Ponto de Venda";
+    ViewData["Title"] = "PDV Supermercado - Ponto de Venda";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid pdv-container">
+<div class="container-fluid pdv-supermercado">
+    <!-- Header do PDV -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body py-2">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <h4 class="mb-0"><i class="bi bi-shop"></i> PDV Supermercado</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <small>Caixa</small>
+                                <div class="fw-bold">001</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <small>Operador</small>
+                                <div class="fw-bold">Admin</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <small id="data-hora"></small>
+                                <div class="fw-bold" id="hora-atual"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
-        <!-- Coluna da Esquerda - Produtos -->
-        <div class="col-md-8">
+        <!-- Coluna da Esquerda - Produtos e Busca -->
+        <div class="col-lg-7">
+            <!-- Busca por Código de Barras -->
             <div class="card mb-3">
-                <div class="card-header bg-primary text-white">
+                <div class="card-body">
                     <div class="row">
+                        <div class="col-md-8">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
+                                <input type="text" id="codigo-barras" class="form-control" 
+                                       placeholder="Código de barras ou busca rápida" 
+                                       autofocus autocomplete="off">
+                                <button class="btn btn-primary" id="btn-buscar-codigo">
+                                    <i class="bi bi-search"></i> Buscar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text">Qtd</span>
+                                <input type="number" id="quantidade-rapida" class="form-control" 
+                                       value="1" min="0.001" step="0.001">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Produtos em Grade -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
                         <div class="col-md-6">
-                            <h5><i class="fas fa-shopping-cart"></i> PDV - Ponto de Venda</h5>
+                            <h6 class="mb-0"><i class="bi bi-grid"></i> Produtos</h6>
                         </div>
                         <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="text" id="busca-produto" class="form-control" placeholder="Buscar produto (nome ou código)">
-                                <div class="input-group-append">
-                                    <button class="btn btn-light" id="btn-buscar-produto">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="filtro-produtos" class="form-control" 
+                                       placeholder="Filtrar produtos...">
+                                <button class="btn btn-outline-secondary" id="btn-filtrar">
+                                    <i class="bi bi-funnel"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -45,9 +104,9 @@
                                 <div class="col-md-3 mb-3 produto-item" data-categoria="@produto.CategoriaId">
                                     <div class="card h-100 produto-card" data-id="@produto.Id" data-nome="@produto.Nome" data-preco="@produto.Preco.ToString("F2")">
                                         <div class="card-img-top text-center pt-2">
-                                            @if (produto.Imagens != null && produto.Imagens.Any())
+                                            @if (produto.Imagens != null && produto.Imagens.Count > 0)
                                             {
-                                                <img src="~/uploads/produtos/@produto.Imagens.First().NomeArquivo" alt="@produto.Nome" class="produto-img">
+                                                <img src="~/uploads/produtos/@produto.Imagens[0].NomeArquivo" alt="@produto.Nome" class="produto-img">
                                             }
                                             else
                                             {
@@ -67,342 +126,1033 @@
             </div>
         </div>
 
-        <!-- Coluna da Direita - Carrinho -->
-        <div class="col-md-4">
-            <div class="card">
+        <!-- Coluna da Direita - Cupom Fiscal -->
+        <div class="col-lg-5">
+            <div class="card h-100">
                 <div class="card-header bg-success text-white">
-                    <h5><i class="fas fa-shopping-basket"></i> Carrinho de Compras</h5>
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h6 class="mb-0"><i class="bi bi-receipt"></i> Cupom Fiscal</h6>
+                        </div>
+                        <div class="col-4 text-end">
+                            <small>Venda #@Model.Id</small>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-striped mb-0">
+                
+                <!-- Informações do Cliente -->
+                <div class="card-body p-2 border-bottom">
+                    <div class="row g-2">
+                        <div class="col-8">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" id="cliente-busca" class="form-control" 
+                                       placeholder="CPF/Nome do cliente">
+                                <button class="btn btn-outline-secondary" id="btn-buscar-cliente">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-outline-primary btn-sm w-100" id="btn-cliente-novo">
+                                <i class="bi bi-person-plus"></i> Novo
+                            </button>
+                        </div>
+                    </div>
+                    <div id="cliente-selecionado" class="mt-2" style="display: none;">
+                        <div class="alert alert-info alert-sm py-1 mb-0">
+                            <small><strong id="cliente-nome"></strong> - CPF: <span id="cliente-cpf"></span></small>
+                            <button type="button" class="btn-close btn-sm float-end" id="btn-remover-cliente"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Itens do Cupom -->
+                <div class="cupom-itens" style="height: 300px; overflow-y: auto;">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th style="width: 40%;">Item</th>
+                                <th style="width: 15%;" class="text-center">Qtd</th>
+                                <th style="width: 20%;" class="text-end">Preço</th>
+                                <th style="width: 20%;" class="text-end">Total</th>
+                                <th style="width: 5%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cupom-itens">
+                            @foreach (var item in Model.Itens)
+                            {
+                                <tr class="item-cupom" data-item-id="@item.Id">
+                                    <td>
+                                        <div class="fw-bold">@item.Produto.Nome</div>
+                                        <small class="text-muted">Cód: @item.Produto.Codigo</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="input-group input-group-sm">
+                                            <button class="btn btn-outline-secondary btn-sm diminuir-qtd" data-item="@item.Id">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <input type="text" class="form-control text-center item-qtd" 
+                                                   value="@item.Quantidade.ToString("0.000")" style="max-width: 60px;">
+                                            <button class="btn btn-outline-secondary btn-sm aumentar-qtd" data-item="@item.Id">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">@item.PrecoUnitario.ToString("C")</td>
+                                    <td class="text-end fw-bold">@item.Subtotal.ToString("C")</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger remover-item" data-item="@item.Id">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Totalizadores -->
+                <div class="card-body p-2 border-top">
+                    <div class="row g-1 mb-2">
+                        <div class="col-6">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">Desc %</span>
+                                <input type="number" id="desconto-percentual" class="form-control" 
+                                       min="0" max="100" step="0.01" placeholder="0">
+                                <button class="btn btn-outline-secondary" id="btn-aplicar-desconto-perc">
+                                    <i class="bi bi-percent"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">Desc R$</span>
+                                <input type="number" id="desconto-valor" class="form-control" 
+                                       min="0" step="0.01" placeholder="0,00">
+                                <button class="btn btn-outline-secondary" id="btn-aplicar-desconto-valor">
+                                    <i class="bi bi-currency-dollar"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumo Financeiro -->
+                    <div class="bg-light p-2 rounded">
+                        <div class="row text-sm">
+                            <div class="col-6">Qtd Itens:</div>
+                            <div class="col-6 text-end" id="total-itens">@Model.Itens.Sum(i => i.Quantidade)</div>
+                        </div>
+                        <div class="row text-sm">
+                            <div class="col-6">Subtotal:</div>
+                            <div class="col-6 text-end" id="subtotal">@Model.ValorTotal.ToString("C")</div>
+                        </div>
+                        <div class="row text-sm text-success">
+                            <div class="col-6">Desconto:</div>
+                            <div class="col-6 text-end" id="desconto-total">-@Model.Desconto.ToString("C")</div>
+                        </div>
+                        <hr class="my-1">
+                        <div class="row fw-bold fs-5 text-primary">
+                            <div class="col-6">TOTAL:</div>
+                            <div class="col-6 text-end" id="valor-total">@Model.ValorFinal.ToString("C")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="card-footer p-2">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button class="btn btn-warning w-100" id="btn-cancelar-venda" 
+                                    @(Model.Itens.Count == 0 ? "disabled" : "")>
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-success w-100" id="btn-finalizar-venda" 
+                                    @(Model.Itens.Count == 0 ? "disabled" : "")
+                                    data-bs-toggle="modal" data-bs-target="#modalPagamento">
+                                <i class="bi bi-check-circle"></i> Finalizar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Pagamento -->
+<div class="modal fade" id="modalPagamento" tabindex="-1" aria-labelledby="modalPagamentoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalPagamentoLabel">
+                    <i class="bi bi-credit-card"></i> Finalizar Pagamento
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Resumo da Venda -->
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-receipt"></i> Resumo da Venda</h6>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">Total de Itens:</div>
+                                    <div class="col-6 text-end" id="resumo-itens">@Model.Itens.Count</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">Subtotal:</div>
+                                    <div class="col-6 text-end" id="resumo-subtotal">@Model.ValorTotal.ToString("C")</div>
+                                </div>
+                                <div class="row text-success">
+                                    <div class="col-6">Desconto:</div>
+                                    <div class="col-6 text-end" id="resumo-desconto">-@Model.Desconto.ToString("C")</div>
+                                </div>
+                                <hr>
+                                <div class="row fw-bold fs-4 text-primary">
+                                    <div class="col-6">TOTAL:</div>
+                                    <div class="col-6 text-end" id="resumo-total">@Model.ValorFinal.ToString("C")</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formas de Pagamento -->
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-wallet2"></i> Forma de Pagamento</h6>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-primary w-100 forma-pagamento" data-forma="dinheiro">
+                                    <i class="bi bi-cash-stack d-block fs-2"></i>
+                                    <small>Dinheiro</small>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-primary w-100 forma-pagamento" data-forma="cartao-debito">
+                                    <i class="bi bi-credit-card d-block fs-2"></i>
+                                    <small>Cartão Débito</small>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-primary w-100 forma-pagamento" data-forma="cartao-credito">
+                                    <i class="bi bi-credit-card-2-front d-block fs-2"></i>
+                                    <small>Cartão Crédito</small>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-primary w-100 forma-pagamento" data-forma="pix">
+                                    <i class="bi bi-qr-code d-block fs-2"></i>
+                                    <small>PIX</small>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Pagamento em Dinheiro -->
+                        <div id="pagamento-dinheiro" class="mt-3" style="display: none;">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6>Pagamento em Dinheiro</h6>
+                                    <div class="mb-3">
+                                        <label class="form-label">Valor Recebido</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">R$</span>
+                                            <input type="number" class="form-control" id="valor-recebido" 
+                                                   step="0.01" min="0" placeholder="0,00">
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-info">
+                                        <div class="row">
+                                            <div class="col-6"><strong>Troco:</strong></div>
+                                            <div class="col-6 text-end"><strong id="valor-troco">R$ 0,00</strong></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pagamento com Cartão -->
+                        <div id="pagamento-cartao" class="mt-3" style="display: none;">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6>Pagamento com Cartão</h6>
+                                    <div class="mb-3">
+                                        <label class="form-label">Parcelas</label>
+                                        <select class="form-select" id="parcelas-cartao">
+                                            <option value="1">À vista</option>
+                                            <option value="2">2x sem juros</option>
+                                            <option value="3">3x sem juros</option>
+                                            <option value="4">4x sem juros</option>
+                                            <option value="5">5x sem juros</option>
+                                            <option value="6">6x sem juros</option>
+                                        </select>
+                                    </div>
+                                    <div class="alert alert-warning">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        Aguarde a confirmação da transação na máquina de cartão
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pagamento PIX -->
+                        <div id="pagamento-pix" class="mt-3" style="display: none;">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6>Pagamento via PIX</h6>
+                                    <div class="qr-code-placeholder bg-light p-4 mb-3">
+                                        <i class="bi bi-qr-code" style="font-size: 4rem;"></i>
+                                        <p class="mt-2">QR Code será gerado aqui</p>
+                                    </div>
+                                    <div class="alert alert-info">
+                                        <small>Escaneie o QR Code com o app do seu banco</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-success" id="btn-confirmar-pagamento" disabled>
+                    <i class="bi bi-check-circle"></i> Confirmar Pagamento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal do Cupom Fiscal -->
+<div class="modal fade" id="modalCupomFiscal" tabindex="-1" aria-labelledby="modalCupomFiscalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalCupomFiscalLabel">
+                    <i class="bi bi-printer"></i> Cupom Fiscal Eletrônico
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="cupom-fiscal-conteudo" class="cupom-fiscal">
+                    <!-- Cabeçalho da Empresa -->
+                    <div class="text-center mb-3">
+                        <h4 class="fw-bold">SUPERMERCADO EXEMPLO LTDA</h4>
+                        <p class="mb-1">CNPJ: 12.345.678/0001-90</p>
+                        <p class="mb-1">Rua Exemplo, 123 - Centro</p>
+                        <p class="mb-1">CEP: 12345-678 - Cidade/UF</p>
+                        <p class="mb-1">Tel: (11) 1234-5678</p>
+                        <hr>
+                        <h5>CUPOM FISCAL ELETRÔNICO - SAT</h5>
+                        <p class="mb-1">CFe nº: <span id="cupom-numero">000001</span></p>
+                        <p class="mb-1">Data: <span id="cupom-data"></span></p>
+                        <p class="mb-1">Operador: Admin - Caixa: 001</p>
+                    </div>
+
+                    <!-- Itens -->
+                    <div class="mb-3">
+                        <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>Produto</th>
-                                    <th>Qtd</th>
-                                    <th>Preço</th>
-                                    <th>Subtotal</th>
-                                    <th></th>
+                                    <th>ITEM CÓDIGO DESCRIÇÃO</th>
+                                    <th class="text-end">QTD</th>
+                                    <th class="text-end">VL UNIT</th>
+                                    <th class="text-end">VL ITEM</th>
                                 </tr>
                             </thead>
-                            <tbody id="carrinho-itens">
-                                @foreach (var item in Model.Itens)
-                                {
-                                    <tr>
-                                        <td>@item.Produto.Nome</td>
-                                        <td>
-                                            <div class="input-group input-group-sm">
-                                                <button class="btn btn-sm btn-outline-secondary diminuir-qtd" data-item="@item.Id">-</button>
-                                                <input type="text" class="form-control text-center item-qtd" value="@item.Quantidade" readonly>
-                                                <button class="btn btn-sm btn-outline-secondary aumentar-qtd" data-item="@item.Id">+</button>
-                                            </div>
-                                        </td>
-                                        <td>R$ @item.PrecoUnitario.ToString("F2")</td>
-                                        <td>R$ @item.Subtotal.ToString("F2")</td>
-                                        <td>
-                                            <form asp-action="RemoverItem" method="post">
-                                                <input type="hidden" name="itemId" value="@item.Id">
-                                                <button type="submit" class="btn btn-sm btn-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                }
+                            <tbody id="cupom-itens-lista">
+                                <!-- Itens serão inseridos aqui via JavaScript -->
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- Resumo da Compra -->
-                    <div class="p-3 bg-light">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Subtotal:</span>
-                            <span>R$ @Model.ValorTotal.ToString("F2")</span>
+                    <!-- Totais -->
+                    <div class="mb-3">
+                        <hr>
+                        <div class="row">
+                            <div class="col-6">QTD. TOTAL DE ITENS:</div>
+                            <div class="col-6 text-end" id="cupom-qtd-total"></div>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Desconto:</span>
-                            <span>R$ @Model.Desconto.ToString("F2")</span>
+                        <div class="row">
+                            <div class="col-6">SUBTOTAL:</div>
+                            <div class="col-6 text-end" id="cupom-subtotal"></div>
                         </div>
-                        <div class="d-flex justify-content-between font-weight-bold">
-                            <span>Total:</span>
-                            <span>R$ @Model.ValorFinal.ToString("F2")</span>
+                        <div class="row">
+                            <div class="col-6">DESCONTO:</div>
+                            <div class="col-6 text-end" id="cupom-desconto-valor"></div>
                         </div>
-
-                        <!-- Aplicar Desconto -->
-                        <div class="mt-3">
-                            <form asp-action="AplicarDesconto" method="post" class="form-inline">
-                                <input type="hidden" name="vendaId" value="@Model.Id">
-                                <div class="input-group mb-2 mr-sm-2">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">R$</div>
-                                    </div>
-                                    <input type="number" step="0.01" min="0" name="desconto" class="form-control" placeholder="Desconto" value="@Model.Desconto">
-                                </div>
-                                <button type="submit" class="btn btn-sm btn-info">Aplicar</button>
-                            </form>
+                        <div class="row fw-bold fs-5">
+                            <div class="col-6">VALOR A PAGAR:</div>
+                            <div class="col-6 text-end" id="cupom-total-pagar"></div>
+                        </div>
+                        <hr>
+                        <div class="row fw-bold">
+                            <div class="col-6" id="cupom-forma-pagamento">DINHEIRO:</div>
+                            <div class="col-6 text-end" id="cupom-valor-pago"></div>
+                        </div>
+                        <div class="row" id="cupom-troco-linha" style="display: none;">
+                            <div class="col-6">TROCO:</div>
+                            <div class="col-6 text-end" id="cupom-troco-valor"></div>
                         </div>
                     </div>
 
-                    <!-- Finalizar Venda -->
-                    <div class="p-3">
-                        <button type="button" class="btn btn-lg btn-success btn-block" data-toggle="modal" data-target="#finalizarVendaModal" @(Model.Itens.Count == 0 ? "disabled" : "")>
-                            <i class="fas fa-check-circle"></i> Finalizar Venda
-                        </button>
+                    <!-- Rodapé -->
+                    <div class="text-center">
+                        <hr>
+                        <p class="mb-1">OBRIGADO PELA PREFERÊNCIA!</p>
+                        <p class="mb-1">VOLTE SEMPRE!</p>
+                        <hr>
+                        <small>
+                            SAT nº: 900000001<br>
+                            Chave de Consulta: 1234 5678 9012 3456<br>
+                            Consulte pela internet<br>
+                            www.sefaz.sp.gov.br/sat
+                        </small>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para Adicionar Produto -->
-<div class="modal fade" id="adicionarProdutoModal" tabindex="-1" role="dialog" aria-labelledby="adicionarProdutoModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="adicionarProdutoModalLabel">Adicionar Produto</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Fechar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="imprimirCupom()">
+                    <i class="bi bi-printer"></i> Imprimir
+                </button>
+                <button type="button" class="btn btn-success" onclick="enviarPorEmail()">
+                    <i class="bi bi-envelope"></i> Enviar por Email
                 </button>
             </div>
-            <form asp-action="AdicionarItem" method="post">
-                <div class="modal-body">
-                    <input type="hidden" name="vendaId" value="@Model.Id">
-                    <input type="hidden" id="produtoId" name="produtoId">
-                    
-                    <div class="form-group">
-                        <label>Produto:</label>
-                        <h5 id="nomeProdutoModal"></h5>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Preço:</label>
-                        <h5 id="precoProdutoModal" class="text-success"></h5>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="quantidade">Quantidade:</label>
-                        <input type="number" class="form-control" id="quantidade" name="quantidade" value="1" min="1">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Adicionar ao Carrinho</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para Finalizar Venda -->
-<div class="modal fade" id="finalizarVendaModal" tabindex="-1" role="dialog" aria-labelledby="finalizarVendaModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="finalizarVendaModalLabel">Finalizar Venda</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form asp-action="FinalizarVenda" method="post">
-                <div class="modal-body">
-                    <input type="hidden" name="vendaId" value="@Model.Id">
-                    
-                    <div class="form-group">
-                        <label for="formaPagamento">Forma de Pagamento:</label>
-                        <select class="form-control" id="formaPagamento" name="formaPagamento" required>
-                            <option value="">Selecione...</option>
-                            <option value="Dinheiro">Dinheiro</option>
-                            <option value="Cartão de Crédito">Cartão de Crédito</option>
-                            <option value="Cartão de Débito">Cartão de Débito</option>
-                            <option value="PIX">PIX</option>
-                            <option value="Boleto">Boleto</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="clienteSearch">Cliente (opcional):</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="clienteSearch" placeholder="Buscar cliente...">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button" id="buscarClienteBtn">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div id="clientesResultado" class="mt-2"></div>
-                        <input type="hidden" id="clienteId" name="clienteId">
-                    </div>
-                    
-                    <div class="alert alert-info">
-                        <strong>Total a pagar:</strong> R$ @Model.ValorFinal.ToString("F2")
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Confirmar Pagamento</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script>
+        // Variáveis globais
+        const vendaId = @Model.Id;
+        let formaPagamentoSelecionada = '';
+        let valorTotalVenda = @Model.ValorFinal;
+        let clienteSelecionado = null;
+
         $(document).ready(function() {
-            // Variáveis globais
-            const vendaId = @Model.Id;
-            
-            // Filtrar produtos por categoria
-            $('.categoria-btn').click(function() {
-                const categoriaId = $(this).data('categoria');
-                
-                // Atualizar botão ativo
-                $('.categoria-btn').removeClass('active');
-                $(this).addClass('active');
-                
-                // Filtrar produtos
-                if (categoriaId == 0) {
-                    $('.produto-item').show();
-                } else {
-                    $('.produto-item').hide();
-                    $(`.produto-item[data-categoria="${categoriaId}"]`).show();
+            // Inicializar relógio
+            atualizarRelogio();
+            setInterval(atualizarRelogio, 1000);
+
+            // Busca por código de barras (Enter)
+            $('#codigo-barras').on('keypress', function(e) {
+                if (e.which === 13) {
+                    buscarProdutoPorCodigo();
                 }
             });
-            
-            // Buscar produtos
-            $('#btn-buscar-produto').click(function() {
-                const termo = $('#busca-produto').val();
-                const categoriaId = $('.categoria-btn.active').data('categoria');
-                
-                $.ajax({
-                    url: '@Url.Action("BuscarProdutos", "PDV")',
-                    data: { termo: termo, categoriaId: categoriaId == 0 ? null : categoriaId },
-                    success: function(result) {
-                        $('#produtos-container').html(result);
-                    }
+
+            // Busca por código de barras (botão)
+            $('#btn-buscar-codigo').click(function() {
+                buscarProdutoPorCodigo();
+            });
+
+            // Filtrar produtos
+            $('#filtro-produtos').on('input', function() {
+                const filtro = $(this).val().toLowerCase();
+                $('.produto-item').each(function() {
+                    const nome = $(this).find('.card-title').text().toLowerCase();
+                    $(this).toggle(nome.includes(filtro));
                 });
             });
-            
-            // Evento de pressionar Enter no campo de busca
-            $('#busca-produto').keypress(function(e) {
-                if (e.which == 13) {
-                    $('#btn-buscar-produto').click();
-                    return false;
-                }
-            });
-            
-            // Abrir modal ao clicar em um produto
+
+            // Clique em produto
             $(document).on('click', '.produto-card', function() {
-                const id = $(this).data('id');
-                const nome = $(this).data('nome');
-                const preco = $(this).data('preco');
-                
-                $('#produtoId').val(id);
-                $('#nomeProdutoModal').text(nome);
-                $('#precoProdutoModal').text('R$ ' + preco);
-                $('#quantidade').val(1);
-                
-                $('#adicionarProdutoModal').modal('show');
+                const produtoId = $(this).data('id');
+                const quantidade = parseFloat($('#quantidade-rapida').val()) || 1;
+                adicionarProdutoAoCarrinho(produtoId, quantidade);
             });
-            
-            // Aumentar quantidade do item
+
+            // Controles de quantidade
             $(document).on('click', '.aumentar-qtd', function() {
                 const itemId = $(this).data('item');
-                const input = $(this).prev('.item-qtd');
-                let qtd = parseInt(input.val()) + 1;
-                input.val(qtd);
-                
-                // Atualizar via AJAX (implementar depois)
+                alterarQuantidadeItem(itemId, 1);
             });
-            
-            // Diminuir quantidade do item
+
             $(document).on('click', '.diminuir-qtd', function() {
                 const itemId = $(this).data('item');
-                const input = $(this).next('.item-qtd');
-                let qtd = parseInt(input.val());
-                if (qtd > 1) {
-                    qtd -= 1;
-                    input.val(qtd);
-                    
-                    // Atualizar via AJAX (implementar depois)
+                alterarQuantidadeItem(itemId, -1);
+            });
+
+            // Remover item
+            $(document).on('click', '.remover-item', function() {
+                const itemId = $(this).data('item');
+                removerItemDoCarrinho(itemId);
+            });
+
+            // Aplicar desconto percentual
+            $('#btn-aplicar-desconto-perc').click(function() {
+                const percentual = parseFloat($('#desconto-percentual').val()) || 0;
+                if (percentual > 0 && percentual <= 100) {
+                    const valorDesconto = (valorTotalVenda * percentual) / 100;
+                    aplicarDesconto(valorDesconto);
                 }
             });
-            
-            // Buscar clientes
-            $('#buscarClienteBtn').click(function() {
-                const termo = $('#clienteSearch').val();
-                if (termo.length < 3) {
-                    alert('Digite pelo menos 3 caracteres para buscar');
-                    return;
+
+            // Aplicar desconto em valor
+            $('#btn-aplicar-desconto-valor').click(function() {
+                const valor = parseFloat($('#desconto-valor').val()) || 0;
+                if (valor > 0) {
+                    aplicarDesconto(valor);
+                }
+            });
+
+            // Formas de pagamento
+            $('.forma-pagamento').click(function() {
+                $('.forma-pagamento').removeClass('btn-primary').addClass('btn-outline-primary');
+                $(this).removeClass('btn-outline-primary').addClass('btn-primary');
+                
+                formaPagamentoSelecionada = $(this).data('forma');
+                
+                // Ocultar todas as seções de pagamento
+                $('#pagamento-dinheiro, #pagamento-cartao, #pagamento-pix').hide();
+                
+                // Mostrar seção específica
+                switch(formaPagamentoSelecionada) {
+                    case 'dinheiro':
+                        $('#pagamento-dinheiro').show();
+                        $('#valor-recebido').focus();
+                        break;
+                    case 'cartao-debito':
+                    case 'cartao-credito':
+                        $('#pagamento-cartao').show();
+                        break;
+                    case 'pix':
+                        $('#pagamento-pix').show();
+                        gerarQRCodePIX();
+                        break;
                 }
                 
-                $.ajax({
-                    url: '@Url.Action("BuscarClientes", "PDV")',
-                    data: { termo: termo },
-                    success: function(result) {
-                        let html = '<div class="list-group">';
-                        if (result.length === 0) {
-                            html += '<div class="list-group-item">Nenhum cliente encontrado</div>';
-                        } else {
-                            result.forEach(function(cliente) {
-                                html += `<a href="#" class="list-group-item list-group-item-action selecionar-cliente" data-id="${cliente.id}" data-nome="${cliente.nome}">${cliente.nome} - ${cliente.cpf}</a>`;
-                            });
-                        }
-                        html += '</div>';
-                        $('#clientesResultado').html(html);
-                    }
-                });
+                $('#btn-confirmar-pagamento').prop('disabled', false);
             });
-            
-            // Selecionar cliente
-            $(document).on('click', '.selecionar-cliente', function(e) {
-                e.preventDefault();
-                const id = $(this).data('id');
-                const nome = $(this).data('nome');
-                
-                $('#clienteId').val(id);
-                $('#clienteSearch').val(nome);
-                $('#clientesResultado').html('');
+
+            // Calcular troco
+            $('#valor-recebido').on('input', function() {
+                const valorRecebido = parseFloat($(this).val()) || 0;
+                const troco = valorRecebido - valorTotalVenda;
+                $('#valor-troco').text(troco >= 0 ? formatarMoeda(troco) : 'Valor insuficiente');
+            });
+
+            // Confirmar pagamento
+            $('#btn-confirmar-pagamento').click(function() {
+                confirmarPagamento();
+            });
+
+            // Cancelar venda
+            $('#btn-cancelar-venda').click(function() {
+                if (confirm('Tem certeza que deseja cancelar esta venda?')) {
+                    cancelarVenda();
+                }
+            });
+
+            // Buscar cliente
+            $('#btn-buscar-cliente').click(function() {
+                buscarCliente();
+            });
+
+            $('#cliente-busca').on('keypress', function(e) {
+                if (e.which === 13) {
+                    buscarCliente();
+                }
             });
         });
+
+        // Funções do PDV
+        function atualizarRelogio() {
+            const agora = new Date();
+            const data = agora.toLocaleDateString('pt-BR');
+            const hora = agora.toLocaleTimeString('pt-BR');
+            
+            $('#data-hora').text(data);
+            $('#hora-atual').text(hora);
+        }
+
+        function buscarProdutoPorCodigo() {
+            const codigo = $('#codigo-barras').val().trim();
+            if (!codigo) return;
+
+            // Simular busca por código de barras
+            $.ajax({
+                url: '@Url.Action("BuscarProdutoPorCodigo", "PDV")',
+                method: 'GET',
+                data: { codigo: codigo },
+                success: function(produto) {
+                    if (produto) {
+                        const quantidade = parseFloat($('#quantidade-rapida').val()) || 1;
+                        adicionarProdutoAoCarrinho(produto.id, quantidade);
+                        $('#codigo-barras').val('').focus();
+                    } else {
+                        alert('Produto não encontrado!');
+                        $('#codigo-barras').select();
+                    }
+                },
+                error: function() {
+                    alert('Erro ao buscar produto!');
+                }
+            });
+        }
+
+        function adicionarProdutoAoCarrinho(produtoId, quantidade) {
+            $.ajax({
+                url: '@Url.Action("AdicionarItem", "PDV")',
+                method: 'POST',
+                data: {
+                    vendaId: vendaId,
+                    produtoId: produtoId,
+                    quantidade: quantidade
+                },
+                success: function(response) {
+                    if (response.success) {
+                        location.reload(); // Recarregar para atualizar o carrinho
+                    } else {
+                        alert('Erro ao adicionar produto: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('Erro ao adicionar produto ao carrinho!');
+                }
+            });
+        }
+
+        function alterarQuantidadeItem(itemId, delta) {
+            // Implementar alteração de quantidade via AJAX
+            console.log('Alterar quantidade do item', itemId, 'em', delta);
+        }
+
+        function removerItemDoCarrinho(itemId) {
+            if (confirm('Remover este item do carrinho?')) {
+                $.ajax({
+                    url: '@Url.Action("RemoverItem", "PDV")',
+                    method: 'POST',
+                    data: { itemId: itemId },
+                    success: function() {
+                        location.reload();
+                    },
+                    error: function() {
+                        alert('Erro ao remover item!');
+                    }
+                });
+            }
+        }
+
+        function aplicarDesconto(valor) {
+            $.ajax({
+                url: '@Url.Action("AplicarDesconto", "PDV")',
+                method: 'POST',
+                data: {
+                    vendaId: vendaId,
+                    desconto: valor
+                },
+                success: function() {
+                    location.reload();
+                },
+                error: function() {
+                    alert('Erro ao aplicar desconto!');
+                }
+            });
+        }
+
+        function buscarCliente() {
+            const termo = $('#cliente-busca').val().trim();
+            if (termo.length < 3) {
+                alert('Digite pelo menos 3 caracteres');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("BuscarClientes", "PDV")',
+                method: 'GET',
+                data: { termo: termo },
+                success: function(clientes) {
+                    if (clientes.length > 0) {
+                        // Selecionar primeiro cliente encontrado
+                        clienteSelecionado = clientes[0];
+                        $('#cliente-nome').text(clienteSelecionado.nome);
+                        $('#cliente-cpf').text(clienteSelecionado.cpf);
+                        $('#cliente-selecionado').show();
+                        $('#cliente-busca').val('');
+                    } else {
+                        alert('Cliente não encontrado!');
+                    }
+                },
+                error: function() {
+                    alert('Erro ao buscar cliente!');
+                }
+            });
+        }
+
+        function gerarQRCodePIX() {
+            // Simular geração de QR Code PIX
+            $('.qr-code-placeholder').html(`
+                <div class="bg-dark text-white p-3">
+                    <i class="bi bi-qr-code" style="font-size: 6rem;"></i>
+                    <p class="mt-2">QR Code PIX</p>
+                    <small>Valor: ${formatarMoeda(valorTotalVenda)}</small>
+                </div>
+            `);
+        }
+
+        function confirmarPagamento() {
+            let dadosPagamento = {
+                vendaId: vendaId,
+                formaPagamento: formaPagamentoSelecionada,
+                clienteId: clienteSelecionado ? clienteSelecionado.id : null
+            };
+
+            if (formaPagamentoSelecionada === 'dinheiro') {
+                const valorRecebido = parseFloat($('#valor-recebido').val()) || 0;
+                if (valorRecebido < valorTotalVenda) {
+                    alert('Valor recebido é insuficiente!');
+                    return;
+                }
+                dadosPagamento.valorRecebido = valorRecebido;
+                dadosPagamento.troco = valorRecebido - valorTotalVenda;
+            }
+
+            if (formaPagamentoSelecionada.includes('cartao')) {
+                dadosPagamento.parcelas = $('#parcelas-cartao').val();
+            }
+
+            // Finalizar venda
+            $.ajax({
+                url: '@Url.Action("FinalizarVenda", "PDV")',
+                method: 'POST',
+                data: dadosPagamento,
+                success: function(response) {
+                    if (response.success) {
+                        $('#modalPagamento').modal('hide');
+                        gerarCupomFiscal(dadosPagamento);
+                    } else {
+                        alert('Erro ao finalizar venda: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('Erro ao processar pagamento!');
+                }
+            });
+        }
+
+        function gerarCupomFiscal(dadosPagamento) {
+            // Preencher dados do cupom fiscal
+            const agora = new Date();
+            $('#cupom-data').text(agora.toLocaleString('pt-BR'));
+            $('#cupom-numero').text(String(vendaId).padStart(6, '0'));
+            
+            // Preencher itens
+            let itensHtml = '';
+            @foreach (var item in Model.Itens)
+            {
+                <text>
+                itensHtml += `
+                    <tr>
+                        <td>001 @item.Produto.Codigo @item.Produto.Nome</td>
+                        <td class="text-end">@item.Quantidade.ToString("0.000")</td>
+                        <td class="text-end">@item.PrecoUnitario.ToString("C")</td>
+                        <td class="text-end">@item.Subtotal.ToString("C")</td>
+                    </tr>
+                `;
+                </text>
+            }
+            $('#cupom-itens-lista').html(itensHtml);
+            
+            // Preencher totais
+            $('#cupom-qtd-total').text('@Model.Itens.Sum(i => i.Quantidade).ToString("0.000")');
+            $('#cupom-subtotal').text('@Model.ValorTotal.ToString("C")');
+            $('#cupom-desconto-valor').text('@Model.Desconto.ToString("C")');
+            $('#cupom-total-pagar').text('@Model.ValorFinal.ToString("C")');
+            
+            // Forma de pagamento
+            const formaPagamentoTexto = {
+                'dinheiro': 'DINHEIRO',
+                'cartao-debito': 'CARTÃO DÉBITO',
+                'cartao-credito': 'CARTÃO CRÉDITO',
+                'pix': 'PIX'
+            };
+            
+            $('#cupom-forma-pagamento').text(formaPagamentoTexto[formaPagamentoSelecionada] + ':');
+            $('#cupom-valor-pago').text(formatarMoeda(dadosPagamento.valorRecebido || valorTotalVenda));
+            
+            if (dadosPagamento.troco && dadosPagamento.troco > 0) {
+                $('#cupom-troco-linha').show();
+                $('#cupom-troco-valor').text(formatarMoeda(dadosPagamento.troco));
+            }
+            
+            // Mostrar cupom fiscal
+            $('#modalCupomFiscal').modal('show');
+        }
+
+        function cancelarVenda() {
+            window.location.href = '@Url.Action("Index", "PDV")';
+        }
+
+        function imprimirCupom() {
+            const conteudo = document.getElementById('cupom-fiscal-conteudo').innerHTML;
+            const janela = window.open('', '_blank');
+            janela.document.write(`
+                <html>
+                <head>
+                    <title>Cupom Fiscal</title>
+                    <style>
+                        body { font-family: monospace; font-size: 12px; margin: 0; padding: 20px; }
+                        .cupom-fiscal { max-width: 300px; margin: 0 auto; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { padding: 2px; text-align: left; }
+                        .text-end { text-align: right; }
+                        .text-center { text-align: center; }
+                        .fw-bold { font-weight: bold; }
+                        hr { border: 1px solid #000; margin: 10px 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class="cupom-fiscal">${conteudo}</div>
+                </body>
+                </html>
+            `);
+            janela.document.close();
+            janela.print();
+        }
+
+        function enviarPorEmail() {
+            const email = prompt('Digite o email para envio do cupom:');
+            if (email) {
+                alert('Cupom fiscal enviado para: ' + email);
+                // Implementar envio por email
+            }
+        }
+
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
     </script>
 }
 
 @section Styles {
     <style>
-        .pdv-container {
-            margin-top: -15px;
+        /* Estilos específicos do PDV Supermercado */
+        .pdv-supermercado {
+            background-color: #f8f9fa;
+            min-height: 100vh;
         }
-        
+
+        /* Header do PDV */
+        .pdv-supermercado .card.bg-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Busca por código de barras */
+        #codigo-barras {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Produtos */
+        .produto-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .produto-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #007bff;
+        }
+
         .produto-img {
-            max-height: 100px;
+            max-height: 80px;
             max-width: 100%;
             object-fit: contain;
         }
-        
-        .produto-card {
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .produto-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        
+
+        /* Categorias */
         .categorias-container {
             overflow-x: auto;
             white-space: nowrap;
             padding-bottom: 10px;
         }
-        
+
         .categoria-btn {
-            margin-right: 5px;
+            margin-right: 8px;
+            border-radius: 20px;
+            font-size: 0.875rem;
         }
-        
+
+        .categoria-btn.active {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+
+        /* Cupom Fiscal */
+        .cupom-itens {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+        }
+
+        .item-cupom {
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .item-cupom:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Controles de quantidade */
         .item-qtd {
-            max-width: 40px;
+            max-width: 60px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Totalizadores */
+        .bg-light {
+            background-color: #f8f9fa !important;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        /* Modal de Pagamento */
+        .forma-pagamento {
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .forma-pagamento:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .forma-pagamento.btn-primary {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        /* QR Code PIX */
+        .qr-code-placeholder {
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+        }
+
+        /* Cupom Fiscal */
+        .cupom-fiscal {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .cupom-fiscal table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cupom-fiscal th,
+        .cupom-fiscal td {
+            padding: 2px 4px;
+            border: none;
+        }
+
+        .cupom-fiscal hr {
+            border: none;
+            border-top: 1px solid #000;
+            margin: 8px 0;
+        }
+
+        /* Responsividade */
+        media (max-width: 768px) {
+            .pdv-supermercado .col-lg-7,
+            .pdv-supermercado .col-lg-5 {
+                margin-bottom: 1rem;
+            }
+
+            .produto-card {
+                margin-bottom: 0.5rem;
+            }
+
+            .cupom-itens {
+                height: 250px !important;
+            }
+
+            .forma-pagamento {
+                height: 60px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Animações */
+        keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .btn-success:active {
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        /* Impressão */
+        media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            .cupom-fiscal,
+            .cupom-fiscal * {
+                visibility: visible;
+            }
+            
+            .cupom-fiscal {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+
+        /* Estados dos botões */
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Alertas customizados */
+        .alert-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        /* Sticky header */
+        .sticky-top {
+            position: sticky;
+            top: 0;
+            z-index: 1020;
         }
     </style>
 }

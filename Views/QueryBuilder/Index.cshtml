@@ -69,6 +69,11 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#joinTab">
+                                        <i class="bi bi-diagram-3"></i> JOIN
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link" data-bs-toggle="tab" href="#whereTab">
                                         <i class="bi bi-funnel"></i> WHERE
                                     </a>
@@ -100,6 +105,17 @@
                                         </div>
                                     </div>
                                     <div class="selected-items" id="fromItems"></div>
+                                </div>
+
+                                <div class="tab-pane fade" id="joinTab">
+                                    <div class="drop-zone" data-type="join">
+                                        <div class="drop-zone-content">
+                                            <i class="bi bi-diagram-3"></i>
+                                            <p>Arraste aqui colunas relacionadas para criar JOINs entre tabelas</p>
+                                            <small class="text-muted">Ex.: arraste uma coluna de chave estrangeira</small>
+                                        </div>
+                                    </div>
+                                    <div class="selected-items" id="joinItems"></div>
                                 </div>
 
                                 <div class="tab-pane fade" id="whereTab">
@@ -183,6 +199,7 @@
                     <ul>
                         <li><strong>SELECT:</strong> Arraste campos para selecionar quais colunas retornar</li>
                         <li><strong>FROM:</strong> Arraste uma tabela para definir a fonte principal dos dados</li>
+                        <li><strong>JOIN:</strong> Arraste colunas relacionadas para criar JOINs (INNER/LEFT/RIGHT) com múltiplas condições ON</li>
                         <li><strong>WHERE:</strong> Arraste campos para criar condições de filtro</li>
                         <li><strong>ORDER BY:</strong> Defina a ordenação dos resultados</li>
                     </ul>

@@ -1,0 +1,246 @@
+@model WebApp.Models.Sprint
+@{
+    ViewData["Title"] = "Criar Sprint";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-plus-circle me-2"></i>Criar Novo Sprint</h2>
+                <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-kanban"></i> Informações do Sprint</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateSprint" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Nome" class="form-label">Nome do Sprint *</label>
+                                    <input asp-for="Nome" class="form-control" placeholder="Ex: Sprint 1, Release 2.0" required>
+                                    <span asp-validation-for="Nome" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Status" class="form-label">Status</label>
+                                    <select asp-for="Status" class="form-select">
+                                        <option value="1">Planejamento</option>
+                                        <option value="2">Ativo</option>
+                                        <option value="3">Concluído</option>
+                                        <option value="4">Cancelado</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Descricao" class="form-label">Descrição</label>
+                            <textarea asp-for="Descricao" class="form-control" rows="3" 
+                                      placeholder="Descreva o objetivo e escopo deste sprint"></textarea>
+                            <span asp-validation-for="Descricao" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="DataInicio" class="form-label">Data de Início *</label>
+                                    <input asp-for="DataInicio" type="date" class="form-control" required>
+                                    <span asp-validation-for="DataInicio" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="DataFim" class="form-label">Data de Fim *</label>
+                                    <input asp-for="DataFim" type="date" class="form-control" required>
+                                    <span asp-validation-for="DataFim" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Objetivo" class="form-label">Objetivo do Sprint</label>
+                            <textarea asp-for="Objetivo" class="form-control" rows="3" 
+                                      placeholder="Qual é o objetivo principal que este sprint deve alcançar?"></textarea>
+                            <span asp-validation-for="Objetivo" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="VelocidadeAlvo" class="form-label">Velocidade Alvo (Story Points)</label>
+                                    <input asp-for="VelocidadeAlvo" type="number" class="form-control" min="0" 
+                                           placeholder="Ex: 50">
+                                    <div class="form-text">Quantos story points a equipe pretende completar</div>
+                                    <span asp-validation-for="VelocidadeAlvo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Duração Calculada</label>
+                                    <input type="text" class="form-control" id="duracaoCalculada" readonly 
+                                           placeholder="Selecione as datas">
+                                    <div class="form-text">Duração em dias úteis do sprint</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Templates de Sprint -->
+                        <div class="mb-4">
+                            <h6><i class="bi bi-lightning"></i> Templates Rápidos</h6>
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-primary w-100" onclick="aplicarTemplate(1)">
+                                        <i class="bi bi-calendar-week"></i><br>
+                                        Sprint 1 Semana
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-primary w-100" onclick="aplicarTemplate(2)">
+                                        <i class="bi bi-calendar2-week"></i><br>
+                                        Sprint 2 Semanas
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-primary w-100" onclick="aplicarTemplate(3)">
+                                        <i class="bi bi-calendar-month"></i><br>
+                                        Sprint 3 Semanas
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary me-md-2">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Criar Sprint
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Calcular duração quando as datas mudarem
+    document.getElementById('DataInicio').addEventListener('change', calcularDuracao);
+    document.getElementById('DataFim').addEventListener('change', calcularDuracao);
+
+    function calcularDuracao() {
+        const dataInicio = document.getElementById('DataInicio').value;
+        const dataFim = document.getElementById('DataFim').value;
+        
+        if (dataInicio && dataFim) {
+            const inicio = new Date(dataInicio);
+            const fim = new Date(dataFim);
+            
+            if (fim >= inicio) {
+                const diffTime = Math.abs(fim - inicio);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                
+                // Calcular dias úteis (aproximado - exclui fins de semana)
+                let diasUteis = 0;
+                let currentDate = new Date(inicio);
+                
+                while (currentDate <= fim) {
+                    const dayOfWeek = currentDate.getDay();
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Não é domingo (0) nem sábado (6)
+                        diasUteis++;
+                    }
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+                
+                document.getElementById('duracaoCalculada').value = `${diffDays} dias (${diasUteis} dias úteis)`;
+            } else {
+                document.getElementById('duracaoCalculada').value = 'Data fim deve ser posterior à data início';
+            }
+        }
+    }
+
+    function aplicarTemplate(semanas) {
+        const hoje = new Date();
+        const proximaSegunda = new Date(hoje);
+        
+        // Encontrar próxima segunda-feira
+        const diasParaSegunda = (1 + 7 - hoje.getDay()) % 7;
+        proximaSegunda.setDate(hoje.getDate() + (diasParaSegunda === 0 ? 7 : diasParaSegunda));
+        
+        // Calcular data fim
+        const dataFim = new Date(proximaSegunda);
+        dataFim.setDate(proximaSegunda.getDate() + (semanas * 7) - 1);
+        
+        // Ajustar para sexta-feira
+        if (dataFim.getDay() === 6) { // Sábado
+            dataFim.setDate(dataFim.getDate() - 1);
+        } else if (dataFim.getDay() === 0) { // Domingo
+            dataFim.setDate(dataFim.getDate() - 2);
+        }
+        
+        // Definir valores
+        document.getElementById('DataInicio').value = proximaSegunda.toISOString().split('T')[0];
+        document.getElementById('DataFim').value = dataFim.toISOString().split('T')[0];
+        
+        // Definir nome sugerido
+        const sprintNumber = Math.floor(Math.random() * 100) + 1;
+        document.getElementById('Nome').value = `Sprint ${sprintNumber}`;
+        
+        // Definir velocidade sugerida baseada na duração
+        const velocidadeSugerida = semanas * 25; // 25 pontos por semana
+        document.getElementById('VelocidadeAlvo').value = velocidadeSugerida;
+        
+        // Calcular duração
+        calcularDuracao();
+    }
+
+    // Validação de datas
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const dataInicio = new Date(document.getElementById('DataInicio').value);
+        const dataFim = new Date(document.getElementById('DataFim').value);
+        
+        if (dataFim <= dataInicio) {
+            e.preventDefault();
+            alert('A data de fim deve ser posterior à data de início.');
+            return false;
+        }
+        
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        
+        if (dataInicio < hoje) {
+            const confirmar = confirm('A data de início é anterior a hoje. Deseja continuar?');
+            if (!confirmar) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+    // Calcular duração inicial se as datas já estiverem preenchidas
+    document.addEventListener('DOMContentLoaded', function() {
+        calcularDuracao();
+    });
+</script>
+
+<style>
+    .btn-outline-primary:hover {
+        transform: translateY(-1px);
+    }
+    
+    .form-text {
+        font-size: 0.875rem;
+    }
+</style>

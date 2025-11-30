@@ -1,0 +1,215 @@
+@model IEnumerable<WebApp.Models.Sprint>
+@{
+    ViewData["Title"] = "Scrum Dashboard";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-kanban me-2"></i>Scrum Dashboard</h2>
+                <div>
+                    <a href="@Url.Action("CreateSprint")" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Novo Sprint
+                    </a>
+                    <a href="@Url.Action("Backlog")" class="btn btn-outline-primary">
+                        <i class="bi bi-list-ul"></i> Product Backlog
+                    </a>
+                    <a href="@Url.Action("Planning")" class="btn btn-outline-success">
+                        <i class="bi bi-calendar-event"></i> Sprint Planning
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards de Resumo -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <i class="bi bi-play-circle text-primary fs-1"></i>
+                    <h4 class="card-title text-primary">@Model.Count(s => s.Status == WebApp.Models.StatusSprint.Ativo)</h4>
+                    <p class="card-text">Sprints Ativos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <i class="bi bi-clock text-warning fs-1"></i>
+                    <h4 class="card-title text-warning">@Model.Count(s => s.Status == WebApp.Models.StatusSprint.Planejamento)</h4>
+                    <p class="card-text">Em Planejamento</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <i class="bi bi-check-circle text-success fs-1"></i>
+                    <h4 class="card-title text-success">@Model.Count(s => s.Status == WebApp.Models.StatusSprint.Concluido)</h4>
+                    <p class="card-text">Concluídos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <i class="bi bi-graph-up text-info fs-1"></i>
+                    <h4 class="card-title text-info">@(Model.Any() ? Model.Where(s => s.UserStories.Any()).Average(s => s.ProgressoPercentual).ToString("F1") : "0")%</h4>
+                    <p class="card-text">Progresso Médio</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Sprints -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-list"></i> Sprints</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="row">
+                            @foreach (var sprint in Model)
+                            {
+                                <div class="col-lg-6 col-xl-4 mb-4">
+                                    <div class="card h-100 border-@(sprint.Status switch {
+                                        WebApp.Models.StatusSprint.Ativo => "primary",
+                                        WebApp.Models.StatusSprint.Planejamento => "warning",
+                                        WebApp.Models.StatusSprint.Concluido => "success",
+                                        WebApp.Models.StatusSprint.Cancelado => "danger",
+                                        _ => "secondary"
+                                    })">
+                                        <div class="card-header bg-@(sprint.Status switch {
+                                            WebApp.Models.StatusSprint.Ativo => "primary",
+                                            WebApp.Models.StatusSprint.Planejamento => "warning",
+                                            WebApp.Models.StatusSprint.Concluido => "success",
+                                            WebApp.Models.StatusSprint.Cancelado => "danger",
+                                            _ => "secondary"
+                                        }) text-white">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0">@sprint.Nome</h6>
+                                                <span class="badge bg-light text-dark">@sprint.Status</span>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            @if (!string.IsNullOrEmpty(sprint.Descricao))
+                                            {
+                                                <p class="card-text small">@sprint.Descricao</p>
+                                            }
+                                            
+                                            <div class="mb-3">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-calendar"></i> 
+                                                    @sprint.DataInicio.ToString("dd/MM/yyyy") - @sprint.DataFim.ToString("dd/MM/yyyy")
+                                                </small>
+                                                <br>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-clock"></i> 
+                                                    @sprint.DuracaoEmDias dias
+                                                    @if (sprint.Status == WebApp.Models.StatusSprint.Ativo)
+                                                    {
+                                                        <span class="text-primary">(@sprint.DiasRestantes dias restantes)</span>
+                                                    }
+                                                </small>
+                                            </div>
+
+                                            <!-- Progresso -->
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <small class="text-muted">Progresso</small>
+                                                    <small class="text-muted">@sprint.ProgressoPercentual%</small>
+                                                </div>
+                                                <div class="progress" style="height: 8px;">
+                                                    <div class="progress-bar bg-@(sprint.Status switch {
+                                                        WebApp.Models.StatusSprint.Ativo => "primary",
+                                                        WebApp.Models.StatusSprint.Concluido => "success",
+                                                        _ => "secondary"
+                                                    })" 
+                                                         role="progressbar" 
+                                                         style="width: @sprint.ProgressoPercentual%">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Métricas -->
+                                            <div class="row text-center mb-3">
+                                                <div class="col-4">
+                                                    <div class="border-end">
+                                                        <div class="fw-bold text-primary">@sprint.UserStories.Count</div>
+                                                        <small class="text-muted">Stories</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="border-end">
+                                                        <div class="fw-bold text-info">@sprint.StoryPointsTotal</div>
+                                                        <small class="text-muted">Points</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="fw-bold text-success">@sprint.StoryPointsConcluidos</div>
+                                                    <small class="text-muted">Done</small>
+                                                </div>
+                                            </div>
+
+                                            <!-- Ações -->
+                                            <div class="d-grid gap-2">
+                                                <a href="@Url.Action("SprintBoard", new { id = sprint.Id })" 
+                                                   class="btn btn-outline-primary btn-sm">
+                                                    <i class="bi bi-kanban"></i> Sprint Board
+                                                </a>
+                                                
+                                                @if (sprint.Status == WebApp.Models.StatusSprint.Ativo || sprint.Status == WebApp.Models.StatusSprint.Concluido)
+                                                {
+                                                    <div class="btn-group" role="group">
+                                                        <a href="@Url.Action("BurndownChart", new { id = sprint.Id })" 
+                                                           class="btn btn-outline-info btn-sm">
+                                                            <i class="bi bi-graph-down"></i> Burndown
+                                                        </a>
+                                                        <a href="@Url.Action("SprintReview", new { id = sprint.Id })" 
+                                                           class="btn btn-outline-success btn-sm">
+                                                            <i class="bi bi-chat-square-text"></i> Review
+                                                        </a>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-kanban text-muted" style="font-size: 4rem;"></i>
+                            <h5 class="text-muted mt-3">Nenhum sprint encontrado</h5>
+                            <p class="text-muted">Comece criando seu primeiro sprint para organizar o trabalho da equipe.</p>
+                            <a href="@Url.Action("CreateSprint")" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Criar Primeiro Sprint
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-end {
+        border-right: 1px solid #dee2e6 !important;
+    }
+    
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+</style>

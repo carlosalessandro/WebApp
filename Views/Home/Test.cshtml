@@ -1,0 +1,56 @@
+@{
+    ViewData["Title"] = "Teste de View";
+}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h3>✅ Teste de View - Funcionando!</h3>
+        </div>
+        <div class="card-body">
+            <h4>Informações do Usuário:</h4>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <strong>Autenticado:</strong> @(User.Identity?.IsAuthenticated == true ? "Sim" : "Não")
+                </li>
+                <li class="list-group-item">
+                    <strong>Nome:</strong> @(User.Identity?.Name ?? "N/A")
+                </li>
+                <li class="list-group-item">
+                    <strong>Email:</strong> @(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "N/A")
+                </li>
+            </ul>
+
+            <hr />
+
+            <h4 class="mt-4">Teste de Navegação:</h4>
+            <div class="row mt-3">
+                <div class="col-md-4 mb-3">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary w-100">
+                        <i class="bi bi-house"></i> Home
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a asp-controller="Cliente" asp-action="Index" class="btn btn-info w-100">
+                        <i class="bi bi-people"></i> Clientes
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a asp-controller="Produto" asp-action="Index" class="btn btn-warning w-100">
+                        <i class="bi bi-box"></i> Produtos
+                    </a>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-4">
+                <strong>Diagnóstico:</strong> Se você está vendo esta página, significa que:
+                <ul class="mb-0 mt-2">
+                    <li>✅ O sistema de autenticação está funcionando</li>
+                    <li>✅ As views estão sendo renderizadas corretamente</li>
+                    <li>✅ O layout está sendo aplicado</li>
+                    <li>✅ O menu lateral deve estar visível</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

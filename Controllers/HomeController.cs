@@ -6,6 +6,7 @@ using WebApp.Models;
 
 namespace WebApp.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -15,13 +16,17 @@ namespace WebApp.Controllers
             _logger = logger;
         }
 
-        [Authorize]
         public IActionResult Index()
         {
             // Passa informações do usuário para a view
             ViewBag.IsAuthenticated = User.Identity?.IsAuthenticated ?? false;
             ViewBag.UserName = User.Identity?.Name;
             ViewBag.UserEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            return View();
+        }
+
+        public IActionResult Test()
+        {
             return View();
         }
 

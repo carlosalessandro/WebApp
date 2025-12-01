@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using WebApp.Models;
 
 namespace WebApp.Controllers
 {
+    [Authorize]
     public class RelatorioPCPController : Controller
     {
         private readonly ApplicationDbContext _context;

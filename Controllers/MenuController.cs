@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Models;
 using WebApp.Services;
 
 namespace WebApp.Controllers
 {
+    [Authorize]
     public class MenuController : Controller
     {
         private readonly IMenuService _menuService;

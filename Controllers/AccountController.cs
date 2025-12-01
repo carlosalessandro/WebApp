@@ -156,5 +156,12 @@ namespace WebApp.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Test()
+        {
+            return Content("Sistema funcionando! Teste de rota básica OK.");
+        }
     }
 }

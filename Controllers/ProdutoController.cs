@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Models;
 using System.IO;
 
 namespace WebApp.Controllers
 {
+    [Authorize]
     public class ProdutoController : Controller
     {
         private readonly ApplicationDbContext _context;

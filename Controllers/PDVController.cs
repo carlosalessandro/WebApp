@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using WebApp.Services;
 
 namespace WebApp.Controllers
 {
+    [Authorize]
     public class PDVController : Controller
     {
         // Método para garantir que o item de menu NFC-e exista

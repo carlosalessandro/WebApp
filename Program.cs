@@ -19,10 +19,7 @@ var allowedOrigins = builder.Configuration
     .ToArray() ?? Array.Empty<string>();
 
 // Add services to the container.
-builder.Services.AddControllersWithViews(options =>
-    {
-        options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-    })
+builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
@@ -73,8 +70,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Cookie.Name = "WebApp.Auth";
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        options.Cookie.SameSite = SameSiteMode.Lax;
         options.LoginPath = "/Account/Login";
         options.LogoutPath = "/Account/Logout";
         options.AccessDeniedPath = "/Account/AccessDenied";
@@ -85,8 +82,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 // Configure cookie policy
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
-    options.Secure = CookieSecurePolicy.Always;
-    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.Secure = CookieSecurePolicy.SameAsRequest;
+    options.MinimumSameSitePolicy = SameSiteMode.Lax;
     options.HttpOnly = HttpOnlyPolicy.Always;
 });
 
@@ -97,8 +94,8 @@ builder.Services.AddAntiforgery(options =>
 {
     options.Cookie.Name = "XSRF-TOKEN";
     options.Cookie.HttpOnly = false;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SameSite = SameSiteMode.Lax;
     options.HeaderName = "X-XSRF-TOKEN";
 });
 
@@ -109,8 +106,6 @@ builder.Services.AddScoped<IWhatsAppService, WhatsAppService>();
 builder.Services.AddScoped<INFCeService, NFCeService>();
 
 var app = builder.Build();
-
-var antiforgery = app.Services.GetRequiredService<IAntiforgery>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -123,26 +118,6 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCookiePolicy();
-
-app.Use(async (context, next) =>
-{
-    if (HttpMethods.IsGet(context.Request.Method))
-    {
-        var tokens = antiforgery.GetAndStoreTokens(context);
-        if (!string.IsNullOrEmpty(tokens.RequestToken))
-        {
-            context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!, new CookieOptions
-            {
-                HttpOnly = false,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Path = "/"
-            });
-        }
-    }
-
-    await next();
-});
 
 // Enable CORS
 app.UseCors(CorsPolicyName);

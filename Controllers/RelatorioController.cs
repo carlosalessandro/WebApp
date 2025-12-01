@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Models;
 using OfficeOpenXml;
@@ -13,6 +14,7 @@ using System.Text;
 
 namespace WebApp.Controllers
 {
+    [Authorize]
     public class RelatorioController : Controller
     {
         private readonly ApplicationDbContext _context;

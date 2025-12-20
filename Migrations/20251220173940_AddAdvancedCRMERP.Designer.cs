@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApp.Models;
 
@@ -10,9 +11,11 @@ using WebApp.Models;
 namespace WebApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251220173940_AddAdvancedCRMERP")]
+    partial class AddAdvancedCRMERP
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -569,7 +572,7 @@ namespace WebApp.Migrations
                         {
                             Id = 1,
                             Ativa = true,
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1038),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1544),
                             Descricao = "Permissões relacionadas à administração do sistema",
                             Nome = "Administração",
                             Ordem = 1
@@ -578,7 +581,7 @@ namespace WebApp.Migrations
                         {
                             Id = 2,
                             Ativa = true,
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1049),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1546),
                             Descricao = "Permissões relacionadas ao gerenciamento de usuários",
                             Nome = "Usuários",
                             Ordem = 2
@@ -587,7 +590,7 @@ namespace WebApp.Migrations
                         {
                             Id = 3,
                             Ativa = true,
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1051),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1551),
                             Descricao = "Permissões relacionadas ao gerenciamento de clientes",
                             Nome = "Clientes",
                             Ordem = 3
@@ -596,7 +599,7 @@ namespace WebApp.Migrations
                         {
                             Id = 4,
                             Ativa = true,
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1053),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1568),
                             Descricao = "Permissões relacionadas à visualização de relatórios",
                             Nome = "Relatórios",
                             Ordem = 4
@@ -1505,171 +1508,6 @@ namespace WebApp.Migrations
                     b.ToTable("Estoques");
                 });
 
-            modelBuilder.Entity("WebApp.Models.ExcelChatbotMessage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Metadata")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("SessionId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SessionId");
-
-                    b.ToTable("ExcelChatbotMessages");
-                });
-
-            modelBuilder.Entity("WebApp.Models.ExcelChatbotOperation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("ExecutedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("OperationType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Parameters")
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Result")
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("SessionId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("Success")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SessionId");
-
-                    b.ToTable("ExcelChatbotOperations");
-                });
-
-            modelBuilder.Entity("WebApp.Models.ExcelChatbotSession", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FileName")
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FilePath")
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("LastActivity")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SessionId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ExcelChatbotSessions");
-                });
-
-            modelBuilder.Entity("WebApp.Models.ExcelFileData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ColumnCount")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ColumnHeaders")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FileExtension")
-                        .HasMaxLength(10)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FilePath")
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("FileSize")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsProcessed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ProcessingError")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("RowCount")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("SampleData")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SheetNames")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ExcelFileDatas");
-                });
-
             modelBuilder.Entity("WebApp.Models.Fornecedor", b =>
                 {
                     b.Property<int>("Id")
@@ -1908,7 +1746,7 @@ namespace WebApp.Migrations
                             Action = "Index",
                             Ativo = true,
                             Controller = "Home",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(913),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1063),
                             EMenuPai = false,
                             Icone = "bi-house",
                             Ordem = 1,
@@ -1919,7 +1757,7 @@ namespace WebApp.Migrations
                             Id = 2,
                             AbrirNovaAba = false,
                             Ativo = true,
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(924),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1079),
                             EMenuPai = true,
                             Icone = "bi-folder",
                             Ordem = 2,
@@ -1932,7 +1770,7 @@ namespace WebApp.Migrations
                             Action = "Index",
                             Ativo = true,
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(928),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1082),
                             EMenuPai = false,
                             Icone = "bi-people",
                             MenuPaiId = 2,
@@ -1946,64 +1784,11 @@ namespace WebApp.Migrations
                             Action = "Privacy",
                             Ativo = true,
                             Controller = "Home",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(930),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1088),
                             EMenuPai = false,
                             Icone = "bi-shield",
                             Ordem = 3,
                             Titulo = "Privacidade"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            AbrirNovaAba = false,
-                            Ativo = true,
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(939),
-                            EMenuPai = true,
-                            Icone = "bi-gear",
-                            Ordem = 4,
-                            Titulo = "Sistema"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            AbrirNovaAba = false,
-                            Action = "Index",
-                            Ativo = true,
-                            Controller = "CRM",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(941),
-                            EMenuPai = false,
-                            Icone = "bi-people-fill",
-                            MenuPaiId = 10,
-                            Ordem = 1,
-                            Titulo = "CRM"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            AbrirNovaAba = false,
-                            Action = "Index",
-                            Ativo = true,
-                            Controller = "ERP",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(943),
-                            EMenuPai = false,
-                            Icone = "bi-building",
-                            MenuPaiId = 10,
-                            Ordem = 2,
-                            Titulo = "ERP"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            AbrirNovaAba = false,
-                            Action = "Index",
-                            Ativo = true,
-                            Controller = "ExcelChatbot",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(946),
-                            EMenuPai = false,
-                            Icone = "bi-robot",
-                            MenuPaiId = 10,
-                            Ordem = 3,
-                            Titulo = "Chatbot Excel"
                         });
                 });
 
@@ -2358,7 +2143,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 1,
                             Codigo = "SISTEMA_GERENCIAR",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1137),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1753),
                             Descricao = "Permissão para gerenciar configurações do sistema",
                             Nome = "Gerenciar Sistema",
                             Ordem = 1
@@ -2371,7 +2156,7 @@ namespace WebApp.Migrations
                             CategoriaId = 1,
                             Codigo = "MENU_GERENCIAR",
                             Controller = "Menu",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1140),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1769),
                             Descricao = "Permissão para gerenciar itens do menu",
                             Nome = "Gerenciar Menu",
                             Ordem = 2
@@ -2382,7 +2167,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 2,
                             Codigo = "USUARIO_VISUALIZAR",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1147),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1771),
                             Descricao = "Permissão para visualizar lista de usuários",
                             Nome = "Visualizar Usuários",
                             Ordem = 1
@@ -2393,7 +2178,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 2,
                             Codigo = "USUARIO_CRIAR",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1158),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1781),
                             Descricao = "Permissão para criar novos usuários",
                             Nome = "Criar Usuários",
                             Ordem = 2
@@ -2404,7 +2189,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 2,
                             Codigo = "USUARIO_EDITAR",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1160),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1783),
                             Descricao = "Permissão para editar usuários existentes",
                             Nome = "Editar Usuários",
                             Ordem = 3
@@ -2415,7 +2200,7 @@ namespace WebApp.Migrations
                             Ativa = true,
                             CategoriaId = 2,
                             Codigo = "USUARIO_EXCLUIR",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1166),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1787),
                             Descricao = "Permissão para excluir usuários",
                             Nome = "Excluir Usuários",
                             Ordem = 4
@@ -2428,7 +2213,7 @@ namespace WebApp.Migrations
                             CategoriaId = 3,
                             Codigo = "CLIENTE_VISUALIZAR",
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1178),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1801),
                             Descricao = "Permissão para visualizar lista de clientes",
                             Nome = "Visualizar Clientes",
                             Ordem = 1
@@ -2441,7 +2226,7 @@ namespace WebApp.Migrations
                             CategoriaId = 3,
                             Codigo = "CLIENTE_CRIAR",
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1181),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1822),
                             Descricao = "Permissão para criar novos clientes",
                             Nome = "Criar Clientes",
                             Ordem = 2
@@ -2454,7 +2239,7 @@ namespace WebApp.Migrations
                             CategoriaId = 3,
                             Codigo = "CLIENTE_EDITAR",
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1183),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1827),
                             Descricao = "Permissão para editar clientes existentes",
                             Nome = "Editar Clientes",
                             Ordem = 3
@@ -2467,7 +2252,7 @@ namespace WebApp.Migrations
                             CategoriaId = 3,
                             Codigo = "CLIENTE_EXCLUIR",
                             Controller = "Cliente",
-                            DataCriacao = new DateTime(2025, 12, 20, 15, 20, 47, 519, DateTimeKind.Local).AddTicks(1192),
+                            DataCriacao = new DateTime(2025, 12, 20, 14, 39, 39, 987, DateTimeKind.Local).AddTicks(1840),
                             Descricao = "Permissão para excluir clientes",
                             Nome = "Excluir Clientes",
                             Ordem = 4
@@ -3143,7 +2928,7 @@ namespace WebApp.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 12, 20, 15, 20, 47, 518, DateTimeKind.Local).AddTicks(9940),
+                            CreatedAt = new DateTime(2025, 12, 20, 14, 39, 39, 986, DateTimeKind.Local).AddTicks(9352),
                             Email = "admin@teste.com",
                             Name = "Administrador",
                             Password = "admin123"
@@ -3151,7 +2936,7 @@ namespace WebApp.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 12, 20, 15, 20, 47, 518, DateTimeKind.Local).AddTicks(9942),
+                            CreatedAt = new DateTime(2025, 12, 20, 14, 39, 39, 986, DateTimeKind.Local).AddTicks(9355),
                             Email = "usuario@teste.com",
                             Name = "Usuário Teste",
                             Password = "123456"
@@ -3792,50 +3577,6 @@ namespace WebApp.Migrations
                     b.Navigation("Produto");
                 });
 
-            modelBuilder.Entity("WebApp.Models.ExcelChatbotMessage", b =>
-                {
-                    b.HasOne("WebApp.Models.ExcelChatbotSession", "Session")
-                        .WithMany("Messages")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Session");
-                });
-
-            modelBuilder.Entity("WebApp.Models.ExcelChatbotOperation", b =>
-                {
-                    b.HasOne("WebApp.Models.ExcelChatbotSession", "Session")
-                        .WithMany("Operations")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Session");
-                });
-
-            modelBuilder.Entity("WebApp.Models.ExcelChatbotSession", b =>
-                {
-                    b.HasOne("WebApp.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WebApp.Models.ExcelFileData", b =>
-                {
-                    b.HasOne("WebApp.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("WebApp.Models.ItemPedidoCompra", b =>
                 {
                     b.HasOne("WebApp.Models.PedidoCompra", "PedidoCompra")
@@ -4260,13 +4001,6 @@ namespace WebApp.Migrations
             modelBuilder.Entity("WebApp.Models.Estoque", b =>
                 {
                     b.Navigation("Movimentacoes");
-                });
-
-            modelBuilder.Entity("WebApp.Models.ExcelChatbotSession", b =>
-                {
-                    b.Navigation("Messages");
-
-                    b.Navigation("Operations");
                 });
 
             modelBuilder.Entity("WebApp.Models.Fornecedor", b =>

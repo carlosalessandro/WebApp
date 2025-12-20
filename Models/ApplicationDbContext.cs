@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using WebApp.Models.CRM;
+using WebApp.Models.ERP;
 
 namespace WebApp.Models
 {
@@ -56,8 +58,196 @@ namespace WebApp.Models
         public DbSet<TaskUserStory> TaskUserStories { get; set; } = null!;
         public DbSet<SprintReview> SprintReviews { get; set; } = null!;
 
+        // Módulo CRM Avançado
+        public DbSet<Models.CRM.CampanhaMarketing> CampanhasMarketing { get; set; } = null!;
+        public DbSet<Models.CRM.Lead> Leads { get; set; } = null!;
+        public DbSet<Models.CRM.OrigemLead> OrigensLeads { get; set; } = null!;
+        public DbSet<Models.CRM.Oportunidade> Oportunidades { get; set; } = null!;
+        public DbSet<Models.CRM.PropostaComercial> PropostasComerciais { get; set; } = null!;
+        public DbSet<Models.CRM.ItemProposta> ItensProposta { get; set; } = null!;
+        public DbSet<Models.CRM.AtividadeCRM> AtividadesCRM { get; set; } = null!;
+        public DbSet<Models.CRM.AtividadeLead> AtividadesLead { get; set; } = null!;
+        public DbSet<Models.CRM.AtividadeOportunidade> AtividadesOportunidade { get; set; } = null!;
+        public DbSet<Models.CRM.AtividadeCampanha> AtividadesCampanha { get; set; } = null!;
+        public DbSet<Models.CRM.LeadCampanha> LeadsCampanha { get; set; } = null!;
+
+        // Módulo ERP Avançado
+        public DbSet<Models.ERP.PlanoContas> PlanoContas { get; set; } = null!;
+        public DbSet<Models.ERP.LancamentoContabil> LancamentosContabeis { get; set; } = null!;
+        public DbSet<Models.ERP.CentroCusto> CentrosCusto { get; set; } = null!;
+        public DbSet<Models.ERP.Departamento> Departamentos { get; set; } = null!;
+        public DbSet<Models.ERP.OrdemProducaoCompleta> OrdensProducaoCompletas { get; set; } = null!;
+        public DbSet<Models.ERP.ApontamentoProducaoCompleto> ApontamentosProducaoCompletos { get; set; } = null!;
+        public DbSet<Models.ERP.RecursoProducao> RecursosProducao { get; set; } = null!;
+        public DbSet<Models.ERP.RecursoAlocadoOP> RecursosAlocadosOP { get; set; } = null!;
+        public DbSet<Models.ERP.InspecaoQualidade> InspecoesQualidade { get; set; } = null!;
+
+        // Projeto
+        public DbSet<Projeto> Projetos { get; set; } = null!;
+
+        // Excel Chatbot
+        public DbSet<ExcelChatbotSession> ExcelChatbotSessions { get; set; } = null!;
+        public DbSet<ExcelChatbotMessage> ExcelChatbotMessages { get; set; } = null!;
+        public DbSet<ExcelChatbotOperation> ExcelChatbotOperations { get; set; } = null!;
+        public DbSet<ExcelFileData> ExcelFileDatas { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Configurações do modelo LancamentoContabil
+            modelBuilder.Entity<LancamentoContabil>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.NumeroDocumento).IsRequired().HasMaxLength(20);
+                entity.Property(e => e.Historico).IsRequired().HasMaxLength(500);
+                entity.Property(e => e.Valor).IsRequired();
+                entity.Property(e => e.DataLancamento).IsRequired();
+                entity.Property(e => e.DataCriacao).IsRequired();
+
+                // Relacionamentos
+                entity.HasOne(e => e.ContaDebito)
+                      .WithMany(e => e.LancamentosDebito)
+                      .HasForeignKey(e => e.ContaDebitoId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ContaCredito)
+                      .WithMany(e => e.LancamentosCredito)
+                      .HasForeignKey(e => e.ContaCreditoId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configurações do modelo PlanoContas
+            modelBuilder.Entity<PlanoContas>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Codigo).IsRequired().HasMaxLength(20);
+                entity.Property(e => e.Nome).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.DataCriacao).IsRequired();
+
+                // Relacionamento hierárquico
+                entity.HasOne(e => e.Pai)
+                      .WithMany(e => e.Filhos)
+                      .HasForeignKey(e => e.PaiId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configurações do modelo CRM
+            modelBuilder.Entity<Models.CRM.Lead>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Nome).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
+                entity.Property(e => e.DataCriacao).IsRequired();
+
+                // Relacionamentos
+                entity.HasOne(e => e.Origem)
+                      .WithMany(e => e.Leads)
+                      .HasForeignKey(e => e.OrigemId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Models.CRM.OrigemLead>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Nome).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Ativo).IsRequired();
+            });
+
+            modelBuilder.Entity<Models.CRM.CampanhaMarketing>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Nome).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.DataCriacao).IsRequired();
+            });
+
+            modelBuilder.Entity<Models.CRM.Oportunidade>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Nome).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.DataCriacao).IsRequired();
+
+                // Relacionamentos
+                entity.HasOne(e => e.Lead)
+                      .WithMany(e => e.Oportunidades)
+                      .HasForeignKey(e => e.LeadId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configurações do modelo ERP
+            modelBuilder.Entity<Models.ERP.OrdemProducaoCompleta>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.NumeroOP).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.DataEmissao).IsRequired();
+            });
+
+            modelBuilder.Entity<Models.ERP.RecursoProducao>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Nome).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Codigo).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.DataCriacao).IsRequired();
+            });
+
+            modelBuilder.Entity<Models.ERP.InspecaoQualidade>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.DataInspecao).IsRequired();
+
+                // Relacionamentos
+                entity.HasOne(e => e.OrdemProducao)
+                      .WithMany(e => e.Inspecoes)
+                      .HasForeignKey(e => e.OrdemProducaoId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configurações do modelo Projeto
+            modelBuilder.Entity<Projeto>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Nome).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.DataCriacao).IsRequired();
+            });
+
+            // Configurações do modelo ExcelChatbotSession
+            modelBuilder.Entity<ExcelChatbotSession>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.SessionId).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.FileName).HasMaxLength(500);
+                entity.Property(e => e.FilePath).HasMaxLength(1000);
+                entity.Property(e => e.CreatedAt).IsRequired();
+                entity.Property(e => e.LastActivity).IsRequired();
+            });
+
+            // Configurações do modelo ExcelChatbotMessage
+            modelBuilder.Entity<ExcelChatbotMessage>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Content).IsRequired();
+                entity.Property(e => e.Timestamp).IsRequired();
+            });
+
+            // Configurações do modelo ExcelChatbotOperation
+            modelBuilder.Entity<ExcelChatbotOperation>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.OperationType).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Description).IsRequired();
+                entity.Property(e => e.Parameters).HasMaxLength(1000);
+                entity.Property(e => e.Result).HasMaxLength(1000);
+                entity.Property(e => e.ExecutedAt).IsRequired();
+            });
+
+            // Configurações do modelo ExcelFileData
+            modelBuilder.Entity<ExcelFileData>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.FileName).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.FilePath).HasMaxLength(500);
+                entity.Property(e => e.UploadedAt).IsRequired();
+                entity.Property(e => e.FileExtension).HasMaxLength(10);
+            });
+
             base.OnModelCreating(modelBuilder);
 
             // Configurações do modelo User
@@ -309,6 +499,52 @@ namespace WebApp.Models
                     Icone = "bi-shield",
                     Ordem = 3,
                     Ativo = true,
+                    DataCriacao = DateTime.Now
+                },
+                new MenuItem
+                {
+                    Id = 10,
+                    Titulo = "Sistema",
+                    Icone = "bi-gear",
+                    Ordem = 4,
+                    Ativo = true,
+                    EMenuPai = true,
+                    DataCriacao = DateTime.Now
+                },
+                new MenuItem
+                {
+                    Id = 11,
+                    Titulo = "CRM",
+                    Controller = "CRM",
+                    Action = "Index",
+                    Icone = "bi-people-fill",
+                    Ordem = 1,
+                    Ativo = true,
+                    MenuPaiId = 10,
+                    DataCriacao = DateTime.Now
+                },
+                new MenuItem
+                {
+                    Id = 12,
+                    Titulo = "ERP",
+                    Controller = "ERP",
+                    Action = "Index",
+                    Icone = "bi-building",
+                    Ordem = 2,
+                    Ativo = true,
+                    MenuPaiId = 10,
+                    DataCriacao = DateTime.Now
+                },
+                new MenuItem
+                {
+                    Id = 13,
+                    Titulo = "Chatbot Excel",
+                    Controller = "ExcelChatbot",
+                    Action = "Index",
+                    Icone = "bi-robot",
+                    Ordem = 3,
+                    Ativo = true,
+                    MenuPaiId = 10,
                     DataCriacao = DateTime.Now
                 }
             );

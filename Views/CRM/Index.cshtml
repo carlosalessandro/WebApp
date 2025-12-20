@@ -1,0 +1,239 @@
+@{
+    ViewData["Title"] = "Dashboard CRM";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-success">Dashboard CRM</h2>
+            <p class="text-muted">Visão geral do gerenciamento de relacionamento com clientes</p>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@ViewBag.TotalLeads</h4>
+                            <p class="card-text">Total de Leads</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@ViewBag.TotalOportunidades</h4>
+                            <p class="card-text">Oportunidades</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-handshake fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@ViewBag.TaxaConversão.ToString("F1")%</h4>
+                            <p class="card-text">Taxa de Conversão</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-line fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">R$ @ViewBag.ValorPipeline.ToString("N2")</h4>
+                            <p class="card-text">Valor do Pipeline</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Leads por Origem</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="leadsOrigemChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Oportunidades por Status</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="oportunidadesStatusChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tendências -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Leads dos Últimos 30 Dias</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="leadsTendenciaChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Ações Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="@Url.Action("LeadCreate", "CRM")" class="btn btn-success btn-block">
+                                <i class="fas fa-plus"></i> Novo Lead
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="@Url.Action("Leads", "CRM")" class="btn btn-primary btn-block">
+                                <i class="fas fa-users"></i> Gerenciar Leads
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="@Url.Action("Oportunidades", "CRM")" class="btn btn-info btn-block">
+                                <i class="fas fa-handshake"></i> Oportunidades
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="@Url.Action("Campanhas", "CRM")" class="btn btn-warning btn-block">
+                                <i class="fas fa-bullhorn"></i> Campanhas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Gráfico de Leads por Origem
+        fetch('/CRM/GetLeadsPorOrigem')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('leadsOrigemChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.map(d => d.origem),
+                        datasets: [{
+                            data: data.map(d => d.quantidade),
+                            backgroundColor: [
+                                '#28a745',
+                                '#17a2b8',
+                                '#ffc107',
+                                '#dc3545',
+                                '#6f42c1',
+                                '#fd7e14'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            });
+
+        // Gráfico de Oportunidades por Status
+        fetch('/CRM/GetOportunidadesPorStatus')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('oportunidadesStatusChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(d => d.status),
+                        datasets: [{
+                            label: 'Quantidade',
+                            data: data.map(d => d.quantidade),
+                            backgroundColor: '#28a745'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+
+        // Gráfico de Tendência de Leads
+        fetch('/CRM/GetLeadsUltimos30Dias')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('leadsTendenciaChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => d.data),
+                        datasets: [{
+                            label: 'Leads',
+                            data: data.map(d => d.quantidade),
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+    </script>
+}

@@ -1,0 +1,211 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2><i class="bi bi-building me-2"></i>Dashboard ERP</h2>
+      <p class="text-muted">Sistema Integrado de Gestão Empresarial</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div *ngIf="!loading">
+    <!-- Financeiro -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h4 class="mb-3"><i class="bi bi-currency-dollar me-2"></i>Financeiro</h4>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card stat-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="text-muted mb-2">Contas a Pagar</h6>
+                <h3 class="mb-0 text-danger">{{ formatCurrency(stats.totalContasPagar) }}</h3>
+              </div>
+              <div class="stat-icon bg-danger">
+                <i class="bi bi-arrow-down-circle"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card stat-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="text-muted mb-2">Contas a Receber</h6>
+                <h3 class="mb-0 text-success">{{ formatCurrency(stats.totalContasReceber) }}</h3>
+              </div>
+              <div class="stat-icon bg-success">
+                <i class="bi bi-arrow-up-circle"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card stat-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="text-muted mb-2">Fluxo de Caixa (Mês)</h6>
+                <h3 class="mb-0" [class.text-success]="stats.fluxoCaixaMes > 0" [class.text-danger]="stats.fluxoCaixaMes < 0">
+                  {{ formatCurrency(stats.fluxoCaixaMes) }}
+                </h3>
+              </div>
+              <div class="stat-icon bg-primary">
+                <i class="bi bi-cash-stack"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Produção -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h4 class="mb-3"><i class="bi bi-gear me-2"></i>Produção (PCP)</h4>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card stat-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="text-muted mb-2">OPs em Andamento</h6>
+                <h2 class="mb-0">{{ stats.opsEmAndamento }}</h2>
+              </div>
+              <div class="stat-icon bg-info">
+                <i class="bi bi-clipboard-data"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card stat-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="text-muted mb-2">OPs Atrasadas</h6>
+                <h2 class="mb-0 text-danger">{{ stats.opsAtrasadas }}</h2>
+              </div>
+              <div class="stat-icon bg-danger">
+                <i class="bi bi-exclamation-triangle"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card stat-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="text-muted mb-2">Produtividade Média</h6>
+                <h2 class="mb-0">{{ stats.produtividadeMedia }}%</h2>
+              </div>
+              <div class="stat-icon bg-success">
+                <i class="bi bi-speedometer2"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card stat-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="text-muted mb-2">Taxa Aprovação</h6>
+                <h2 class="mb-0">{{ stats.taxaAprovacaoQualidade }}%</h2>
+              </div>
+              <div class="stat-icon bg-primary">
+                <i class="bi bi-check-circle"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recursos -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h4 class="mb-3"><i class="bi bi-tools me-2"></i>Recursos</h4>
+      </div>
+      <div class="col-md-6 mb-3">
+        <div class="card stat-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="text-muted mb-2">Recursos Disponíveis</h6>
+                <h2 class="mb-0">{{ stats.recursosDisponiveis }}</h2>
+              </div>
+              <div class="stat-icon bg-success">
+                <i class="bi bi-check-circle-fill"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <div class="card stat-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="text-muted mb-2">Em Manutenção</h6>
+                <h2 class="mb-0">{{ stats.recursosManutencao }}</h2>
+              </div>
+              <div class="stat-icon bg-warning">
+                <i class="bi bi-wrench"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Ações Rápidas</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3 mb-2">
+                <button class="btn btn-outline-primary w-100">
+                  <i class="bi bi-clipboard-plus me-2"></i>Nova OP
+                </button>
+              </div>
+              <div class="col-md-3 mb-2">
+                <button class="btn btn-outline-success w-100">
+                  <i class="bi bi-file-earmark-text me-2"></i>Lançamento Contábil
+                </button>
+              </div>
+              <div class="col-md-3 mb-2">
+                <button class="btn btn-outline-info w-100">
+                  <i class="bi bi-tools me-2"></i>Novo Recurso
+                </button>
+              </div>
+              <div class="col-md-3 mb-2">
+                <button class="btn btn-outline-warning w-100">
+                  <i class="bi bi-clipboard-check me-2"></i>Inspeção Qualidade
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

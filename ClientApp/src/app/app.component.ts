@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -24,6 +25,13 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
     }
   `]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Sistema Kanban';
+
+  constructor(private themeService: ThemeService) {}
+
+  ngOnInit(): void {
+    // Carrega o tema ativo ao iniciar a aplicação
+    this.themeService.loadActiveTheme();
+  }
 }

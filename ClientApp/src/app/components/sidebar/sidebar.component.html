@@ -1,0 +1,85 @@
+<nav class="sidebar d-flex flex-column">
+  <!-- Header -->
+  <div class="sidebar-header">
+    <div class="navbar-brand text-center">
+      <i class="bi bi-grid-3x3-gap-fill"></i>
+      <span class="brand-text">ERP System</span>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="sidebar-search px-3 py-2">
+    <div class="input-group input-group-sm">
+      <span class="input-group-text bg-transparent border-end-0">
+        <i class="bi bi-search"></i>
+      </span>
+      <input
+        type="text"
+        class="form-control border-start-0"
+        placeholder="Buscar menu..."
+        [(ngModel)]="searchTerm"
+        (input)="filterMenu()"
+      />
+      <button
+        *ngIf="searchTerm"
+        class="btn btn-sm btn-outline-secondary"
+        type="button"
+        (click)="clearSearch()"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Menu Categories -->
+  <div class="sidebar-menu flex-grow-1">
+    <div *ngFor="let category of filteredCategories" class="menu-category">
+      <!-- Category Header -->
+      <div
+        class="category-header"
+        (click)="toggleCategory(category)"
+        [class.expanded]="category.expanded"
+      >
+        <i [class]="'bi ' + category.icon"></i>
+        <span class="category-label">{{ category.label }}</span>
+        <i class="bi bi-chevron-down toggle-icon ms-auto"></i>
+      </div>
+
+      <!-- Category Items -->
+      <ul class="category-items" *ngIf="category.expanded">
+        <li *ngFor="let item of category.items" class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: false }"
+          >
+            <i [class]="'bi ' + item.icon"></i>
+            <span>{{ item.label }}</span>
+            <span *ngIf="item.badge" [class]="'badge ms-auto ' + (item.badgeClass || 'bg-primary')">
+              {{ item.badge }}
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="sidebar-footer p-3">
+    <div class="user-info mb-2">
+      <div class="d-flex align-items-center">
+        <div class="user-avatar">
+          <i class="bi bi-person-circle"></i>
+        </div>
+        <div class="user-details ms-2">
+          <div class="user-name">Usuário</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-outline-danger btn-sm w-100">
+      <i class="bi bi-box-arrow-right"></i> Sair
+    </button>
+  </div>
+</nav>

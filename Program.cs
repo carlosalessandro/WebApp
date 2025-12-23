@@ -107,6 +107,22 @@ builder.Services.AddScoped<INFCeService, NFCeService>();
 
 var app = builder.Build();
 
+// Seed default themes
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        await WebApp.Scripts.SeedDefaultThemes.SeedThemes(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Erro ao inserir temas padrão.");
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

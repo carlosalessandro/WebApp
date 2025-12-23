@@ -1,0 +1,228 @@
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-palette-fill me-2"></i>Configuração de Temas</h2>
+        <button class="btn btn-primary" (click)="startCreate()" *ngIf="!isCreating">
+          <i class="bi bi-plus-circle me-2"></i>Novo Tema
+        </button>
+      </div>
+
+      <!-- Lista de Temas -->
+      <div class="row mb-4" *ngIf="!isCreating">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Temas Salvos</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>Cor Principal</th>
+                      <th>Status</th>
+                      <th>Data Criação</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let theme of themes">
+                      <td>{{ theme.name }}</td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="color-preview me-2" [style.background-color]="theme.primaryColor"></div>
+                          {{ theme.primaryColor }}
+                        </div>
+                      </td>
+                      <td>
+                        <span class="badge" [class.bg-success]="theme.isActive" [class.bg-secondary]="!theme.isActive">
+                          {{ theme.isActive ? 'Ativo' : 'Inativo' }}
+                        </span>
+                      </td>
+                      <td>{{ theme.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                      <td>
+                        <button class="btn btn-sm btn-success me-2" (click)="activateTheme(theme)" 
+                                *ngIf="!theme.isActive" title="Ativar tema">
+                          <i class="bi bi-check-circle"></i>
+                        </button>
+                        <button class="btn btn-sm btn-primary me-2" (click)="editTheme(theme)" title="Editar">
+                          <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" (click)="deleteTheme(theme)" 
+                                *ngIf="!theme.isActive" title="Excluir">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div *ngIf="themes.length === 0" class="text-center text-muted py-4">
+                  Nenhum tema cadastrado. Crie seu primeiro tema personalizado!
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulário de Criação/Edição -->
+      <div class="row" *ngIf="isCreating">
+        <div class="col-lg-8">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">{{ isEditing ? 'Editar Tema' : 'Criar Novo Tema' }}</h5>
+            </div>
+            <div class="card-body">
+              <!-- Temas Predefinidos -->
+              <div class="mb-4">
+                <label class="form-label fw-bold">Temas Predefinidos</label>
+                <div class="row g-2">
+                  <div class="col-md-3" *ngFor="let preset of presetThemes">
+                    <button class="btn btn-outline-secondary w-100" (click)="applyPreset(preset)">
+                      <div class="color-preview-large mb-2" [style.background-color]="preset.primaryColor"></div>
+                      {{ preset.name }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <hr>
+
+              <!-- Nome do Tema -->
+              <div class="mb-3">
+                <label for="themeName" class="form-label">Nome do Tema</label>
+                <input type="text" class="form-control" id="themeName" 
+                       [(ngModel)]="newTheme.name" placeholder="Ex: Meu Tema Personalizado">
+              </div>
+
+              <!-- Cores Principais -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="primaryColor" class="form-label">Cor Principal</label>
+                  <div class="input-group">
+                    <input type="color" class="form-control form-control-color" 
+                           id="primaryColor" [(ngModel)]="newTheme.primaryColor">
+                    <input type="text" class="form-control" [(ngModel)]="newTheme.primaryColor">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="secondaryColor" class="form-label">Cor Secundária</label>
+                  <div class="input-group">
+                    <input type="color" class="form-control form-control-color" 
+                           id="secondaryColor" [(ngModel)]="newTheme.secondaryColor">
+                    <input type="text" class="form-control" [(ngModel)]="newTheme.secondaryColor">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cores de Variação -->
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <label for="darkColor" class="form-label">Cor Escura</label>
+                  <div class="input-group">
+                    <input type="color" class="form-control form-control-color" 
+                           id="darkColor" [(ngModel)]="newTheme.darkColor">
+                    <input type="text" class="form-control" [(ngModel)]="newTheme.darkColor">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="lightColor" class="form-label">Cor Clara</label>
+                  <div class="input-group">
+                    <input type="color" class="form-control form-control-color" 
+                           id="lightColor" [(ngModel)]="newTheme.lightColor">
+                    <input type="text" class="form-control" [(ngModel)]="newTheme.lightColor">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="hoverColor" class="form-label">Cor Hover</label>
+                  <div class="input-group">
+                    <input type="color" class="form-control form-control-color" 
+                           id="hoverColor" [(ngModel)]="newTheme.hoverColor">
+                    <input type="text" class="form-control" [(ngModel)]="newTheme.hoverColor">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cores de Texto -->
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <label for="textDark" class="form-label">Texto Escuro</label>
+                  <div class="input-group">
+                    <input type="color" class="form-control form-control-color" 
+                           id="textDark" [(ngModel)]="newTheme.textDark">
+                    <input type="text" class="form-control" [(ngModel)]="newTheme.textDark">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="textMedium" class="form-label">Texto Médio</label>
+                  <div class="input-group">
+                    <input type="color" class="form-control form-control-color" 
+                           id="textMedium" [(ngModel)]="newTheme.textMedium">
+                    <input type="text" class="form-control" [(ngModel)]="newTheme.textMedium">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="backgroundColor" class="form-label">Cor de Fundo</label>
+                  <div class="input-group">
+                    <input type="color" class="form-control form-control-color" 
+                           id="backgroundColor" [(ngModel)]="newTheme.backgroundColor">
+                    <input type="text" class="form-control" [(ngModel)]="newTheme.backgroundColor">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botões de Ação -->
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary" (click)="saveTheme()">
+                  <i class="bi bi-save me-2"></i>{{ isEditing ? 'Atualizar' : 'Salvar' }}
+                </button>
+                <button class="btn btn-secondary" (click)="previewTheme()">
+                  <i class="bi bi-eye me-2"></i>Visualizar
+                </button>
+                <button class="btn btn-outline-secondary" (click)="cancelEdit()">
+                  <i class="bi bi-x-circle me-2"></i>Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="col-lg-4">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Preview</h5>
+            </div>
+            <div class="card-body">
+              <div class="theme-preview p-3 rounded" 
+                   [style.background]="'linear-gradient(135deg, ' + newTheme.secondaryColor + ' 0%, ' + newTheme.primaryColor + ' 100%)'">
+                <div class="preview-card bg-white p-3 rounded shadow-sm mb-3">
+                  <h6 [style.color]="newTheme.textDark">Título do Card</h6>
+                  <p [style.color]="newTheme.textMedium" class="mb-2">Texto de exemplo</p>
+                  <button class="btn btn-sm" 
+                          [style.background-color]="newTheme.primaryColor"
+                          [style.border-color]="newTheme.darkColor"
+                          [style.color]="'white'">
+                    Botão
+                  </button>
+                </div>
+                <div class="preview-sidebar p-3 rounded" 
+                     [style.background-color]="newTheme.lightColor">
+                  <div class="nav-item p-2 rounded mb-2" 
+                       [style.background-color]="newTheme.hoverColor">
+                    <span [style.color]="newTheme.textDark">Menu Item</span>
+                  </div>
+                  <div class="nav-item p-2">
+                    <span [style.color]="newTheme.textMedium">Menu Item</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

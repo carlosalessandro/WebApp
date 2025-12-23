@@ -91,6 +91,9 @@ namespace WebApp.Models
         public DbSet<ExcelChatbotOperation> ExcelChatbotOperations { get; set; } = null!;
         public DbSet<ExcelFileData> ExcelFileDatas { get; set; } = null!;
 
+        // Theme Configuration
+        public DbSet<ThemeConfig> ThemeConfigs { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configurações do modelo LancamentoContabil
